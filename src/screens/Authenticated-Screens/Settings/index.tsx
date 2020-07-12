@@ -35,7 +35,7 @@ import {
   RemoveMedia,
 } from './styles';
 
-const Register: React.FC = ({ navigation }) => {
+const Settings: React.FC = ({ navigation }) => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   // const [pictures, setPictures] = useState([5]);
@@ -201,7 +201,7 @@ const Register: React.FC = ({ navigation }) => {
           <BackButtonWrapper onPress={() => navigation.goBack()}>
             <Icon color="#84378F" size={28} name="chevron-left" />
           </BackButtonWrapper>
-          <Title>Crie sua conta</Title>
+          <Title>Editar conta</Title>
         </Header>
         <Form>
           <Input placeholder="Seu nome" />
@@ -295,4 +295,4 @@ const Register: React.FC = ({ navigation }) => {
   );
 };
 
-export default Register;
+export default Settings;

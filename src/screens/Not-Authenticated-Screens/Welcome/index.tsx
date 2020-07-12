@@ -15,21 +15,23 @@ import {
   TextBetweenButtons,
 } from './styles';
 
-const Welcome: React.FC = () => {
+const Welcome: React.FC = ({ navigation }) => {
   return (
     <Container>
       <IconSpace />
       <Span>
         <Title>Quero Açaí </Title>
         <P>
-          Descubra batedeiras de açaí próximo à você e faça sua reserva direto
-          com o vendedor.
+          Descubra uma nova forma de conectar-se com seus clientes e embarque no
+          digital.
         </P>
         <LoginButton>
-          <LoginButtonText>Faça Login</LoginButtonText>
+          <LoginButtonText onPress={() => navigation.navigate('Login')}>
+            Faça Login
+          </LoginButtonText>
         </LoginButton>
         <TextBetweenButtons>ou</TextBetweenButtons>
-        <RegisterButton>
+        <RegisterButton onPress={() => navigation.navigate('Register')}>
           <RegisterButtonText>Registre-se</RegisterButtonText>
         </RegisterButton>
       </Span>

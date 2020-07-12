@@ -19,7 +19,7 @@ import {
   RegisterButtonText,
 } from './styles';
 
-const Login: React.FC = () => {
+const Login: React.FC = ({ navigation }) => {
   return (
     <Container>
       <KeyboardAwareScrollView>
@@ -35,13 +35,15 @@ conta`}
           <LoginButton>
             <LoginButtonText>Entrar</LoginButtonText>
           </LoginButton>
-          <RetrievePasswordButton>
+          <RetrievePasswordButton
+            onPress={() => navigation.navigate('RecoveryPassword')}
+          >
             <RetrievePasswordText>Esqueceu a senha?</RetrievePasswordText>
           </RetrievePasswordButton>
         </Form>
         <Footer>
           <RegularText>Não tem uma conta?</RegularText>
-          <RegisterButton>
+          <RegisterButton onPress={() => navigation.navigate('Register')}>
             <RegisterButtonText>Registre-se aqui</RegisterButtonText>
           </RegisterButton>
         </Footer>

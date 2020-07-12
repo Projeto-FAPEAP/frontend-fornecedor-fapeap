@@ -114,3 +114,7 @@ export const RegisterButtonText = styled.Text`
 
   color: ${(props) => props.theme.colors.primary};
 `;
+
+export const BackButtonWrapper = styled.TouchableOpacity`
+  padding-left: ${hp('2.5%')}px;
+`;

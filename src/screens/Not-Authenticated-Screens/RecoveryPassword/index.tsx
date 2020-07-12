@@ -17,17 +17,17 @@ import {
   RegularText,
   RegisterButtonText,
   P,
-  I,
+  BackButtonWrapper,
 } from './styles';
 
-const RecoveryPassword: React.FC = () => {
+const RecoveryPassword: React.FC = ({ navigation }) => {
   return (
     <Container>
       <KeyboardAwareScrollView>
         <Header>
-          <I>
+          <BackButtonWrapper onPress={() => navigation.goBack()}>
             <Icon color="#84378F" size={28} name="chevron-left" />
-          </I>
+          </BackButtonWrapper>
           <Title>
             {`Recupere sua
 conta`}

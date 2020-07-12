@@ -14,7 +14,7 @@ export const Container = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: ${hp('4.4%')};
+  font-size: ${hp('4.4%')}px;
   color: #fff;
 
   padding: 25px;
@@ -23,16 +23,16 @@ export const Title = styled.Text`
 export const Span = styled.View`
   background: ${(props) => props.theme.colors.primary};
 
-  height: ${hp('50%')};
+  height: ${hp('50%')}px;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
 `;
 
 export const IconSpace = styled.View`
-  height: ${hp('50%')};
+  height: ${hp('50%')}px;
 `;
 export const P = styled.Text`
-  font-size: ${hp('2.4%')};
+  font-size: ${hp('2.4%')}px;
   color: #fff;
   padding-left: 25px;
   padding-right: 25px;
@@ -40,7 +40,7 @@ export const P = styled.Text`
 
 export const LoginButton = styled.TouchableOpacity`
   border-radius: 22px;
-  height: ${hp('5%')};
+  height: ${hp('5%')}px;
   margin-top: 25px;
   margin-right: 25px;
   margin-left: 25px;
@@ -70,7 +70,7 @@ export const RegisterButton = styled.TouchableOpacity`
 export const RegisterButtonText = styled.Text`
   text-align: center;
   align-content: center;
-  font-size: ${hp('2.4%')};
+  font-size: ${hp('2.4%')}px;
   color: ${(props) => props.theme.colors.secundary};
 `;
 export const TextBetweenButtons = styled.Text`

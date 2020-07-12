@@ -6,9 +6,10 @@ import ImagePicker, {
   ImagePickerOptions,
 } from 'react-native-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import MediaMeta from 'react-native-media-meta';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
+
+import MediaMeta from 'src/screens/Authenticated-Screens/Settings/node_modules/react-native-media-meta';
 
 import {
   Container,
@@ -24,18 +25,17 @@ import {
   P,
   BackButtonWrapper,
   Footer,
-  Dropdown,
-  DropdownWrappeer,
   MediaSpot,
   MediaSpotButton,
   WrapperList,
   AddMediaButtonWrapper,
   RemoveMediaButtonWrapper,
+  LearningSlide,
   MediaWrapper,
   RemoveMedia,
 } from './styles';
 
-const Register: React.FC = ({ navigation }) => {
+const AlmostThere: React.FC = () => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   // const [pictures, setPictures] = useState([5]);
@@ -88,13 +88,11 @@ const Register: React.FC = ({ navigation }) => {
       { cancelable: false },
     );
   }
-
   function learn(): void {
     setTimeout(function () {
       setLearning(false);
     }, 5000);
   }
-
   function handleChoosePhoto(): void {
     // Alert.alert('Jonathan');
     if (photoList.length < 5) {
@@ -104,17 +102,21 @@ const Register: React.FC = ({ navigation }) => {
       ImagePicker.launchImageLibrary(options, (Response) => {
         if (Response.uri) {
           for (let i = 0; i < photoList.length; i += 1) {
+            console.log(photos[i].uri, 'jonathn', Response.uri, 'jogo', i);
             if (String(photos[i].uri) === Response.uri) {
+              console.log(photos[i], Response.uri);
               Repeat = true;
             }
           }
 
           if (Repeat) {
+            console.log('éfalse');
             Alert.alert(
               'Aviso',
               'Você já adicionou essa imagem, evite adicionar imagens repetidas!',
             );
           } else {
+            console.log('é verdar');
             photos.push(Object(Response));
 
             setPhotoList(photos);
@@ -163,6 +165,7 @@ const Register: React.FC = ({ navigation }) => {
       },
     );
   }
+
   function removeVideo(): void {
     // Alert.alert('Jonathan');
     Alert.alert(
@@ -187,41 +190,22 @@ const Register: React.FC = ({ navigation }) => {
     );
   }
 
-  function isEmpty(obj: object): boolean {
+  function isEmpty(obj): boolean {
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) return false;
     }
     return true;
   }
-
   return (
     <Container>
       <KeyboardAwareScrollView>
         <Header>
-          <BackButtonWrapper onPress={() => navigation.goBack()}>
+          <BackButtonWrapper>
             <Icon color="#84378F" size={28} name="chevron-left" />
           </BackButtonWrapper>
-          <Title>Crie sua conta</Title>
+          <Title>Quase lá</Title>
         </Header>
         <Form>
-          <Input placeholder="Seu nome" />
-          <Input placeholder="Nome do estabelecimento" />
-          <Input placeholder="CPF/CNPJ" />
-          <Input placeholder="Endereço" />
-          <DropdownWrappeer>
-            <Dropdown
-              selectedValue={showExtraInput}
-              onValueChange={(itemValue, itemIndex) =>
-                setShowExtraInput(itemValue)
-              }
-            >
-              <Dropdown.Item label="Faz delivery?" value={0} />
-              <Dropdown.Item label="Sim, faço delivery" value={1} />
-              <Dropdown.Item label="Não" value={2} />
-            </Dropdown>
-          </DropdownWrappeer>
-          {delivery ? <Input placeholder="Qual a taxa de entrega?" /> : null}
-          <Input placeholder="Contato whatsapp" />
           <P>Fotos do Estabelecimento(até 4 fotos)</P>
 
           <WrapperList>
@@ -273,7 +257,9 @@ const Register: React.FC = ({ navigation }) => {
                   resizeMode="contain"
                   controls
                 />
-              ) : null}
+              ) : (
+                console.log(video)
+              )}
               <RemoveMedia onPress={() => removeVideo()}>
                 <Icon color="#EA3232" size={35} name="trash-o" />
               </RemoveMedia>
@@ -294,5 +280,4 @@ const Register: React.FC = ({ navigation }) => {
     </Container>
   );
 };
-
-export default Register;
+export default AlmostThere;
