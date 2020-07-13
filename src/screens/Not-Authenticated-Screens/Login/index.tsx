@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import { Text, SafeAreaView, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/Feather';
 
+import AuthContext from '../../../contexts/auth';
 import {
   Container,
   Title,
@@ -20,6 +21,17 @@ import {
 } from './styles';
 
 const Login: React.FC = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { logIn } = useContext(AuthContext);
+
+  function logInLocal(): void {
+    if (email && password) {
+      logIn(email, password);
+    } else {
+      Alert.alert('Aviso', 'Preencha todos os campos!');
+    }
+  }
   return (
     <Container>
       <KeyboardAwareScrollView>
@@ -30,9 +42,16 @@ conta`}
           </Title>
         </Header>
         <Form>
-          <Input placeholder="Seu email" />
-          <Input placeholder="Sua senha" />
-          <LoginButton>
+          <Input
+            placeholder="Seu email"
+            onChangeText={(text) => setEmail(text)}
+          />
+          <Input
+            placeholder="Sua senha"
+            secureTextEntry
+            onChangeText={(text) => setPassword(text)}
+          />
+          <LoginButton onPress={() => logInLocal()}>
             <LoginButtonText>Entrar</LoginButtonText>
           </LoginButton>
           <RetrievePasswordButton

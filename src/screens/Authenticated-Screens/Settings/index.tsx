@@ -1,6 +1,13 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useContext,
+} from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import ImagePicker, {
   ImagePickerResponse,
   ImagePickerOptions,
@@ -10,6 +17,7 @@ import MediaMeta from 'react-native-media-meta';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
 
+import AuthContext from '../../../contexts/auth';
 import {
   Container,
   Title,
@@ -44,6 +52,7 @@ const Settings: React.FC = ({ navigation }) => {
   const [video, setVideo] = useState({});
   const [videoSelected, setVideoSelected] = useState(false);
   const [learning, setLearning] = useState(false);
+  const { logOut } = useContext(AuthContext);
   useEffect(() => {
     if (showExtraInput === 1) {
       setDelivery(true);
@@ -55,7 +64,9 @@ const Settings: React.FC = ({ navigation }) => {
   /*  useLayoutEffect(() => {
     Alert.alert('item adicionado');
   }, [photoList]); */
-
+  function logOutt(): void {
+    logOut();
+  }
   function removePhoto(index: number): void {
     // Alert.alert('Jonathan');
     Alert.alert(
@@ -204,6 +215,12 @@ const Settings: React.FC = ({ navigation }) => {
           <Title>Editar conta</Title>
         </Header>
         <Form>
+          <TouchableOpacity
+            onPress={() => logOutt()}
+            style={{ borderWidth: 1 }}
+          >
+            <Text>Sair</Text>
+          </TouchableOpacity>
           <Input placeholder="Seu nome" />
           <Input placeholder="Nome do estabelecimento" />
           <Input placeholder="CPF/CNPJ" />

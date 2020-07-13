@@ -168,6 +168,7 @@ export const MediaWrapper = styled.View`
   width: ${wp('85%')}px;
   border-color: #b8b6b6;
   align-items: flex-end;
+  background: #000;
 `;
 
 export const RemoveMedia = styled.TouchableOpacity`

@@ -1,12 +1,13 @@
 import React, { useState, createContext, useEffect } from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
 
 interface AuthContextData {
   signed: boolean;
   user: object | null;
   loading: boolean;
-  logIn(): Promise<void>;
+  logIn(email: string, password: string): Promise<void>;
   logOut(): void;
 }
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -30,17 +31,30 @@ export const AuthProvider: React.FC = ({ children }) => {
     loadData();
   }, []);
 
-  async function logIn(): Promise<void> {
-    const response = await axios.get();
-    setUser(response.data.fornecedor);
-    await AsyncStorage.setItem(
-      '@QueroAçaí-Fornecedor:user',
-      JSON.stringify(response.data.fornecedor),
-    );
-    await AsyncStorage.setItem(
-      '@QueroAçaí-Fornecedor:user',
-      response.tokenFornecedor,
-    );
+  async function logIn(email: string, password: string): Promise<void> {
+    console.log(email, password, 'teste');
+    try {
+      const response = await axios.post(
+        'http://fapeap-app.herokuapp.com/sessao/fornecedor',
+
+        {
+          cpf_cnpj: email,
+          senha: password,
+        },
+      );
+      console.log(response.data);
+      setUser(response.data.fornecedor);
+      await AsyncStorage.setItem(
+        '@QueroAçaí-Fornecedor:user',
+        JSON.stringify(response.data.fornecedor),
+      );
+      await AsyncStorage.setItem(
+        '@QueroAçaí-Fornecedor:user',
+        response.data.tokenFornecedor,
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
   function logOut(): void {
     AsyncStorage.clear().then(() => {
