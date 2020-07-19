@@ -65,6 +65,7 @@ const Settings: React.FC = ({ navigation }) => {
     Alert.alert('item adicionado');
   }, [photoList]); */
   function logOutt(): void {
+    console.log('oiiiiiii');
     logOut();
   }
   function removePhoto(index: number): void {
@@ -209,18 +210,13 @@ const Settings: React.FC = ({ navigation }) => {
     <Container>
       <KeyboardAwareScrollView>
         <Header>
-          <BackButtonWrapper onPress={() => navigation.goBack()}>
-            <Icon color="#84378F" size={28} name="chevron-left" />
+          <BackButtonWrapper onPress={() => logOutt()}>
+            <Text>Sair</Text>
           </BackButtonWrapper>
           <Title>Editar conta</Title>
         </Header>
+
         <Form>
-          <TouchableOpacity
-            onPress={() => logOutt()}
-            style={{ borderWidth: 1 }}
-          >
-            <Text>Sair</Text>
-          </TouchableOpacity>
           <Input placeholder="Seu nome" />
           <Input placeholder="Nome do estabelecimento" />
           <Input placeholder="CPF/CNPJ" />

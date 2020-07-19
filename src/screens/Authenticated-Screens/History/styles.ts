@@ -32,8 +32,8 @@ export const TopTabMenu = styled.View`
 `;
 
 export const Header = styled.View`
-  justify-content: space-around;
-
+  justify-content: center;
+align-items:center
   height: ${hp('7.5%')}px;
   background: ${(props) => props.theme.colors.primary};
 `;
@@ -87,11 +87,11 @@ export const AddMediaButtonWrapper = styled.View`
 `;
 
 export const RemoveMediaButtonWrapper = styled.ImageBackground`
-    justify-content: center;
-    align-items: center;
-  background-color:#0E1717
-    height: 100%;
-  `;
+      justify-content: center;
+      align-items: center;
+    background-color:#0E1717
+      height: 100%;
+    `;
 
 export const MediaSpotButton = styled.TouchableOpacity`
   height: ${hp('30%')}px;
@@ -217,6 +217,7 @@ export const TopTabMenuInWrapper = styled.View`
 `;
 
 export const ListWrapper = styled.View`
+  padding: ${hp('2%')}px;
   align-items: center;
   background: #f2f1f7;
 `;
@@ -251,13 +252,13 @@ export const SearchWrapper = styled.View`
   align-items: center;
 `;
 export const SearchInput = styled.TextInput`
-  width: ${wp('65%')}px;
+  width: ${wp('95%')}px;
   background: #fff;
   border-radius: 22px;
   border-width: 1px;
   border-color: #e4e4e6;
   padding: ${hp('1.5%')}px;
-  height: ${hp('7%')}px;
+  height: ${hp('6%')}px;
 `;
 export const AddButton = styled.TouchableOpacity`
   justify-content: center;
@@ -269,22 +270,22 @@ export const AddButton = styled.TouchableOpacity`
 `;
 
 export const AddButtonText = styled.Text`
-text-align:center
-  width: ${wp('25%')}px;
-  color: #fff;
-`;
+  text-align:center
+    width: ${wp('25%')}px;
+    color: #fff;
+  `;
 
 export const ListProducts = styled.View`
-justify-content:space-around
-  align-items: center;
-  flex-direction: row;
-  background: #fff;
-  height: ${hp('17%')}px;
-  width: ${wp('95%')}px;
-  margin-bottom: ${hp('1%')}px;
-  border-width: 1px;
-  border-color: #e4e4e6;
-`;
+  justify-content:space-around
+    align-items: center;
+    flex-direction: row;
+    background: #fff;
+    height: ${hp('17%')}px;
+    width: ${wp('95%')}px;
+    margin-bottom: ${hp('1%')}px;
+    border-width: 1px;
+    border-color: #e4e4e6;
+  `;
 
 export const ListProductsImageWrapper = styled.Image`
   height: ${hp('23%')}px;
@@ -294,99 +295,3 @@ export const ListProductsImageWrapper = styled.Image`
 export const ListProductsTextWrapper = styled.View`
   width: ${wp('65%')}px;
 `;
-
-// adicionar Produtos tela
-
-export const ModalBackground = styled.View`
-  flex: 1;
-  align-items: center;
-  flex-direction: column;
-  background-color: #00000040;
-  justify-content: center;
-`;
-
-export const FormAddProduct = styled.View`
-  align-items: center;
-  flex-direction: column;
-  background-color: #ffffff;
-  height: ${hp('95%')}px;
-  width: ${wp('90%')}px;
-  border-radius: 10px;
-
-  align-items: center;
-  justify-content: space-around;
-`;
-
-export const HeaderAddProduct = styled.View`
-  align-items: center;
-  flex-direction: row;
-  background-color: #ffffff;
-  height: ${hp('15%')}px;
-  width: ${wp('90%')}px;
-`;
-
-export const HeaderAddProductInnerTitle = styled.View`
-  align-items: center;
-
-  width: ${wp('75%')}px;
-`;
-export const HeaderAddProductInnerIcon = styled.View`
-  align-items: center;
-justify-content:center
-  width: ${wp('15%')}px;
-`;
-
-export const AddProductButton = styled.TouchableOpacity`
-  width: ${wp('70%')}px;
-  border-radius: 22px;
-  height: ${hp('6%')}px;
-  margin-top: 25px;
-  margin-right: 25px;
-  margin-left: 25px;
-  justify-content: center;
-  background: ${(props) => props.theme.colors.primary};
-  margin-bottom: ${hp('1.8%')}px;
-`;
-
-export const AddProductButtonText = styled.Text`
-  text-align: center;
-  align-content: center;
-  font-size: ${hp('2.4%')}px;
-  color: ${(props) => props.theme.colors.secundary};
-`;
-
-export const WrapperListAddProduct = styled.View`
-  height: ${hp('25%')}px;
-justify-content:center
-align-items:center
-  width: ${wp('75%')}px;
-
-`;
-
-export const MediaSpotButtonAddProduct = styled.TouchableOpacity`
-  height: ${hp('25%')}px;
-  align-self: center;
-  width: ${wp('75%')}px;
-  border-width: 1px;
-  border-color: #b8b6b6;
-`;
-
-export const AddMediaButtonWrapperAddProduct = styled.View`
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
-
-export const RemoveMediaButtonWrapperAddProduct = styled.ImageBackground`
-    justify-content: center;
-    align-items: center;
-  background-color:#0E1717
-    height: 100%;
-  `;
-
-export const CloseButtonAddProduct = styled.TouchableOpacity`
-align-items: center;
-justify-content:center
-  width: ${wp('15%')}px;
-  `;

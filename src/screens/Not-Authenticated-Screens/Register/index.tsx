@@ -38,6 +38,11 @@ import {
   RemoveMedia,
 } from './styles';
 
+declare let Blob: {
+  readonly size: number;
+  readonly type: string;
+  slice(start?: number, end?: number, contentType?: string): Blob;
+};
 const Register: React.FC = ({ navigation }) => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
@@ -160,6 +165,7 @@ const Register: React.FC = ({ navigation }) => {
       options as ImagePickerOptions,
       (response) => {
         if (response.uri) {
+          console.log(response, 'aqui');
           MediaMeta.get(response.path)
             .then((metadata) => {
               if (metadata.duration <= 60000) {
@@ -212,6 +218,7 @@ const Register: React.FC = ({ navigation }) => {
   }
 
   async function register(): Promise<void> {
+    console.log('yy');
     if (
       (name ||
         storeName ||
@@ -233,31 +240,71 @@ const Register: React.FC = ({ navigation }) => {
       Alert.alert('Aviso', 'Preencha todos os campos');
     } else {
       const formData = new FormData();
+
       const photoListArray = photoList;
       const videoAux = video;
+      const arquivo = {
+        uri: photoListArray[0].uri,
+        type: photoListArray[0].type,
+        name: photoListArray[0].fileName,
+      };
+
       let splitedArray = [];
-      formData.append('nome_fornecedor', name);
+      formData.append('nome', name);
       formData.append('nome_fantasia', storeName);
-      formData.append('cpf_cnpj', cpfCnpj);
-      formData.append('email', email);
+      formData.append('cpf_cnpj', '41');
+      formData.append('email', '41');
       formData.append('senha', password);
       formData.append('telefone', phone);
       formData.append('telefone_whatsapp', phoneWhatsapp);
       formData.append('taxa_delivery', deliveryTax);
       formData.append('logradouro', address);
-      formData.append('numero_fornecedor', number);
+      formData.append('numero_local', 'gf');
       formData.append('bairro', neighborhood);
       formData.append('cep', cep);
+      // formData.append('imagens', 'jofo');
+      formData.append('arquivo', JSON.stringify(arquivo));
+      console.log(arquivo);
       for (let i = 0; i < photoList.length; i += 1) {
-        /* splitedArray = String(photoListArray[i].uri).split('/');
-        console.log(splitedArray[splitedArray.length - 1]); */
-
-        formData.append('imagens', photoListArray[i].fileName);
+        splitedArray = String(photoListArray[i].uri).split('/');
+        // console.log(splitedArray[splitedArray.length - 1]);
+        // formData.append('video', photoListArray[i].path);
+        // formData.append('imagens', photoList);
+        /* formData.append(
+          'imagens',
+          JSON.stringify({
+            filename: photoListArray[i].fileName,
+            originalname: photoListArray[i].fileName,
+            size: photoListArray[i].fileSize,
+          }),
+        ); */
       }
+      /* console.log(videoAux[0]); */
       splitedArray = String(videoAux[0].path).split('/');
+      // console.log(videoAux[0]);
+      // formData.append('video', videoAux[0].path);
+      /* console.log(
+        videoAux[0].path,
+        'patha ',
+        'typeeeee',
+        videoAux[0].type,
+        'filenameeeeee',
+        videoAux[0].fileName,
+      ); */
+      /* formData.append('video', photo); */
+      /* console.log(formData); */
+      /// formData.append('video', JSON.stringify(photoListArray[0]));
 
-      formData.append('video', splitedArray[splitedArray.length - 1]);
-
+      // formData.append('video', photoList);
+      /* formData.append(
+        'video',
+        JSON.stringify({
+          filename: photoListArray[0].fileName,
+          originalname: photoListArray[0].fileName,
+          size: photoListArray[0].fileSize,
+        }),
+      ); */
+      // console.log(formData);
       /* axios
         .post('https://fapeap-app.herokuapp.com/fornecedor', formData, {
           headers: {
@@ -268,19 +315,57 @@ const Register: React.FC = ({ navigation }) => {
           console.log(response);
         })
         .catch((error) => console.log(error)); */
-      try {
-        const response = await axios.post(
-          'http://fapeap-app.herokuapp.com/fornecedor',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+
+      /* try {
+        fetch('http://192.168.1.100:3333/fornecedor', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Accept: 'application/json, text/plain, ',
+            'content-type': 'multipart/form-data;',
           },
-        );
-        console.log(response.data);
+        })
+          .then(
+            (response) => response.json(), // if the response is a JSON object
+          )
+          .then(
+            (success) => console.log(success), // Handle the success response object
+          )
+          .catch(
+            (error) => console.log(error), // Handle the error response object
+          );
       } catch (error) {
         console.log(error);
+      }
+    } */
+
+      try {
+        const response = await axios.post(
+          'http://192.168.1.100:3333/fornecedor',
+          formData,
+        );
+
+        console.log(response, 'jonat');
+      } catch (error) {
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
       }
     }
   }
@@ -301,10 +386,14 @@ const Register: React.FC = ({ navigation }) => {
           />
           <Input
             placeholder="Nome do estabelecimento"
-            onChangeText={(text) => setName(text)}
+            onChangeText={(text) => setStoreName(text)}
           />
 
           <Input placeholder="Email" onChangeText={(text) => setEmail(text)} />
+          <Input
+            placeholder="Senha"
+            onChangeText={(text) => setPassword(text)}
+          />
           <Input
             placeholder="Telefone"
             onChangeText={(text) => setPhone(text)}

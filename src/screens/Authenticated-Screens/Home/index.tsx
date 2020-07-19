@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  FlatList,
+  Alert,
+  Image,
+  Modal,
+} from 'react-native';
 import ImagePicker, {
   ImagePickerResponse,
   ImagePickerOptions,
@@ -48,6 +56,18 @@ import {
   ListProducts,
   ListProductsImageWrapper,
   ListProductsTextWrapper,
+  ModalBackground,
+  FormAddProduct,
+  HeaderAddProduct,
+  HeaderAddProductInnerTitle,
+  HeaderAddProductInnerIcon,
+  AddProductButton,
+  AddProductButtonText,
+  WrapperListAddProduct,
+  MediaSpotButtonAddProduct,
+  AddMediaButtonWrapperAddProduct,
+  RemoveMediaButtonWrapperAddProduct,
+  CloseButtonAddProduct,
 } from './styles';
 
 const Home: React.FC = () => {
@@ -60,6 +80,7 @@ const Home: React.FC = () => {
   const [videoSelected, setVideoSelected] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
   const [showOrders, setShowOrders] = useState(true);
+  const [modalVisibilty, setModalVisibility] = useState(false);
   function changeToOrders(): void {
     setShowOrders(true);
     setShowProducts(false);
@@ -215,9 +236,102 @@ const Home: React.FC = () => {
         </TopTabMenu>
         {showProducts ? (
           <View>
+            <Modal
+              transparent
+              animationType="none"
+              visible={modalVisibilty}
+              onRequestClose={() => {
+                setModalVisibility(false);
+              }}
+            >
+              <ModalBackground>
+                <FormAddProduct>
+                  <HeaderAddProduct>
+                    <HeaderAddProductInnerTitle>
+                      <Title>Cadastro de Produtos</Title>
+                    </HeaderAddProductInnerTitle>
+                    <HeaderAddProductInnerIcon>
+                      <CloseButtonAddProduct
+                        onPress={() => {
+                          setModalVisibility(false);
+                        }}
+                      >
+                        <Icon name="close" size={35} color="red" />
+                      </CloseButtonAddProduct>
+                    </HeaderAddProductInnerIcon>
+                  </HeaderAddProduct>
+                  <Input placeholder="Nome do Produto" />
+                  <Input placeholder="Preço do Produto" />
+                  <DropdownWrappeer>
+                    <Dropdown
+                      selectedValue={showExtraInput}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setShowExtraInput(itemValue)
+                      }
+                    >
+                      <Dropdown.Item label="Disponibilidade?" value={0} />
+                      <Dropdown.Item label="Disponível" value={1} />
+                      <Dropdown.Item label="Indisponível" value={2} />
+                    </Dropdown>
+                  </DropdownWrappeer>
+                  <DropdownWrappeer>
+                    <Dropdown
+                      selectedValue={showExtraInput}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setShowExtraInput(itemValue)
+                      }
+                    >
+                      <Dropdown.Item label="Unidade de Medida?" value={0} />
+                      <Dropdown.Item label="Kilograma" value={1} />
+                      <Dropdown.Item label="Litro" value={2} />
+                    </Dropdown>
+                  </DropdownWrappeer>
+                  <P>Fotos do Produto(até 4 fotos)</P>
+
+                  <WrapperListAddProduct>
+                    <FlatList
+                      horizontal
+                      data={photoList}
+                      extraData={extraPhoto}
+                      ListFooterComponent={() => (
+                        <MediaSpotButtonAddProduct
+                          onPress={() => handleChoosePhoto()}
+                        >
+                          <AddMediaButtonWrapperAddProduct>
+                            <Icon color="#84378F" size={35} name="plus" />
+                          </AddMediaButtonWrapperAddProduct>
+                        </MediaSpotButtonAddProduct>
+                      )}
+                      renderItem={({ item, index }) => (
+                        <MediaSpotButtonAddProduct
+                          onPress={() => removePhoto(index)}
+                        >
+                          <RemoveMediaButtonWrapperAddProduct
+                            source={item}
+                            resizeMode="contain"
+                          >
+                            <Icon color="#EA3232" size={35} name="trash-o" />
+                          </RemoveMediaButtonWrapperAddProduct>
+                        </MediaSpotButtonAddProduct>
+                      )}
+                      keyExtractor={(index) => String(index.uri)}
+                    />
+                  </WrapperListAddProduct>
+                  <AddProductButton>
+                    <AddProductButtonText>
+                      Adicionar Produto
+                    </AddProductButtonText>
+                  </AddProductButton>
+                </FormAddProduct>
+              </ModalBackground>
+            </Modal>
             <SearchWrapper>
               <SearchInput placeholder="Buscar Produto" />
-              <AddButton>
+              <AddButton
+                onPress={() => {
+                  setModalVisibility(true);
+                }}
+              >
                 <AddButtonText>Adicionar</AddButtonText>
               </AddButton>
             </SearchWrapper>
