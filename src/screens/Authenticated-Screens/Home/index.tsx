@@ -7,7 +7,9 @@ import {
   Alert,
   Image,
   Modal,
+  ScrollView,
 } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import ImagePicker, {
   ImagePickerResponse,
   ImagePickerOptions,
@@ -15,6 +17,10 @@ import ImagePicker, {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
+
+import api from '../../../services/api';
 import {
   Container,
   Title,
@@ -35,7 +41,6 @@ import {
   MediaSpotButton,
   WrapperList,
   AddMediaButtonWrapper,
-  RemoveMediaButtonWrapper,
   WelcomeText,
   TopTabMenu,
   OrderButton,
@@ -68,6 +73,10 @@ import {
   AddMediaButtonWrapperAddProduct,
   RemoveMediaButtonWrapperAddProduct,
   CloseButtonAddProduct,
+  MediaWrapper,
+  RemoveMedia,
+  RemoveMediaButtonWrapper,
+  FormScroll,
 } from './styles';
 
 const Home: React.FC = () => {
@@ -81,6 +90,17 @@ const Home: React.FC = () => {
   const [showProducts, setShowProducts] = useState(false);
   const [showOrders, setShowOrders] = useState(true);
   const [modalVisibilty, setModalVisibility] = useState(false);
+
+  // Variaveis referentes ao cadastro do Produto
+  const [productName, setProductName] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [itemsNumber, setItemsNumber] = useState('');
+  const [availability, setAvailability] = useState(0);
+  const [measurement, setMeasurement] = useState(0);
+  const [productphotoList, setProductphotoList] = useState<
+    ImagePickerResponse[]
+  >([]);
+  const [learning, setLearning] = useState(false);
   function changeToOrders(): void {
     setShowOrders(true);
     setShowProducts(false);
@@ -115,17 +135,17 @@ const Home: React.FC = () => {
         {
           text: 'Sim',
           onPress: () => {
-            const oldPhotosList = photoList;
+            const oldPhotosList = productphotoList;
             const newPhotoList = [];
             let j = 0;
-            for (let i = 0; i < photoList.length; i += 1) {
+            for (let i = 0; i < productphotoList.length; i += 1) {
               if (i !== index) {
                 newPhotoList[j] = oldPhotosList[i];
                 j += 1;
               }
             }
 
-            setPhotoList(newPhotoList);
+            setProductphotoList(newPhotoList);
             Alert.alert('Removido com Sucesso!');
           },
         },
@@ -133,21 +153,42 @@ const Home: React.FC = () => {
       { cancelable: false },
     );
   }
+
+  function learn(): void {
+    setTimeout(function () {
+      setLearning(false);
+    }, 5000);
+  }
   function handleChoosePhoto(): void {
     // Alert.alert('Jonathan');
-    if (photoList.length < 5) {
-      const photos = photoList;
-
+    if (productphotoList.length < 2) {
+      const photos = productphotoList;
+      let Repeat = false;
       const options = {};
       ImagePicker.launchImageLibrary(options, (Response) => {
         if (Response.uri) {
-          photos.push(Object(Response));
+          for (let i = 0; i < productphotoList.length; i += 1) {
+            if (String(photos[i].uri) === Response.uri) {
+              Repeat = true;
+            }
+          }
 
-          setPhotoList(photos);
-          setExtraPhoto(true);
-          Alert.alert('Adicionado com Sucesso!');
+          if (Repeat) {
+            Alert.alert(
+              'Aviso',
+              'Você já adicionou essa imagem, evite adicionar imagens repetidas!',
+            );
+          } else {
+            photos.push(Object(Response));
+
+            setProductphotoList(photos);
+            setExtraPhoto(true);
+            setLearning(true);
+            learn();
+            Alert.alert('Adicionado com Sucesso!');
+            setExtraPhoto(false);
+          }
         }
-        setExtraPhoto(false);
       });
     } else {
       Alert.alert(
@@ -157,45 +198,64 @@ const Home: React.FC = () => {
     }
   }
 
-  function handleChooseVideo(): void {
-    const options = {
-      mediaType: 'video',
-    };
+  async function addProduct(): Promise<void> {
+    if (
+      (productName || productPrice || itemsNumber) === '' ||
+      (availability || measurement) === 0 ||
+      productphotoList.length === 0
+    ) {
+      Alert.alert('Aviso', 'Preencha todos os campos!!');
+    } else {
+      const formData = new FormData();
 
-    ImagePicker.launchImageLibrary(
-      options as ImagePickerOptions,
-      (response) => {
-        if (response.uri) {
-          setVideo(response);
-          console.log(response.fileSize, 'jonatha');
-          setVideoSelected(true);
-          Alert.alert('Adicionado com Sucesso!');
+      const photoListArray = productphotoList;
+      const token = await AsyncStorage.getItem('@QueroAçaí-Fornecedor:token');
+      console.log(token, 'Jonathan');
+      const image = {};
+      formData.append('nome', productName);
+      formData.append('preco', productPrice);
+      formData.append('estoque_produto', itemsNumber);
+      formData.append('status_produto', availability);
+
+      formData.append('unidade_medida', measurement);
+      /*  for (let i = 0; i < productphotoList.length; i += 1) {
+        image = {
+          uri: photoListArray[i].uri,
+          type: photoListArray[i].type,
+          name: photoListArray[i].fileName,
+        };
+        formData.append('imagem', image);
+      } */
+      console.log(formData);
+      try {
+        const response = await axios.post(
+          `${api.defaults.baseURL}/produto`,
+          formData,
+        );
+        console.log(response.data);
+        Alert.alert('Adicionado com Sucesso!!');
+      } catch (error) {
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
         }
-      },
-    );
-  }
-  function removeVideo(): void {
-    // Alert.alert('Jonathan');
-    Alert.alert(
-      'Remover Video',
-      'Quer mesmo remover?',
-      [
-        {
-          text: 'Não',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'Sim',
-          onPress: () => {
-            setVideo({});
-            setVideoSelected(false);
-            Alert.alert('Removido com Sucesso!');
-          },
-        },
-      ],
-      { cancelable: false },
-    );
+        console.log(error.config);
+      }
+    }
   }
 
   return (
@@ -260,64 +320,94 @@ const Home: React.FC = () => {
                       </CloseButtonAddProduct>
                     </HeaderAddProductInnerIcon>
                   </HeaderAddProduct>
-                  <Input placeholder="Nome do Produto" />
-                  <Input placeholder="Preço do Produto" />
-                  <DropdownWrappeer>
-                    <Dropdown
-                      selectedValue={showExtraInput}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setShowExtraInput(itemValue)
-                      }
-                    >
-                      <Dropdown.Item label="Disponibilidade?" value={0} />
-                      <Dropdown.Item label="Disponível" value={1} />
-                      <Dropdown.Item label="Indisponível" value={2} />
-                    </Dropdown>
-                  </DropdownWrappeer>
-                  <DropdownWrappeer>
-                    <Dropdown
-                      selectedValue={showExtraInput}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setShowExtraInput(itemValue)
-                      }
-                    >
-                      <Dropdown.Item label="Unidade de Medida?" value={0} />
-                      <Dropdown.Item label="Kilograma" value={1} />
-                      <Dropdown.Item label="Litro" value={2} />
-                    </Dropdown>
-                  </DropdownWrappeer>
-                  <P>Fotos do Produto(até 4 fotos)</P>
-
-                  <WrapperListAddProduct>
-                    <FlatList
-                      horizontal
-                      data={photoList}
-                      extraData={extraPhoto}
-                      ListFooterComponent={() => (
-                        <MediaSpotButtonAddProduct
-                          onPress={() => handleChoosePhoto()}
-                        >
-                          <AddMediaButtonWrapperAddProduct>
-                            <Icon color="#84378F" size={35} name="plus" />
-                          </AddMediaButtonWrapperAddProduct>
-                        </MediaSpotButtonAddProduct>
-                      )}
-                      renderItem={({ item, index }) => (
-                        <MediaSpotButtonAddProduct
-                          onPress={() => removePhoto(index)}
-                        >
-                          <RemoveMediaButtonWrapperAddProduct
-                            source={item}
-                            resizeMode="contain"
-                          >
-                            <Icon color="#EA3232" size={35} name="trash-o" />
-                          </RemoveMediaButtonWrapperAddProduct>
-                        </MediaSpotButtonAddProduct>
-                      )}
-                      keyExtractor={(index) => String(index.uri)}
+                  <FormScroll>
+                    <Input
+                      placeholder="Nome do Produto"
+                      onChangeText={(text) => setProductName(text)}
                     />
-                  </WrapperListAddProduct>
-                  <AddProductButton>
+                    <Input
+                      placeholder="Preço do Produto"
+                      onChangeText={(text) => setProductPrice(text)}
+                    />
+                    <Input
+                      placeholder="Número de items do produto"
+                      onChangeText={(text) => setItemsNumber(text)}
+                    />
+                    <DropdownWrappeer>
+                      <Dropdown
+                        selectedValue={availability}
+                        onValueChange={(itemValue, itemIndex) =>
+                          setAvailability(itemValue)
+                        }
+                      >
+                        <Dropdown.Item label="Disponibilidade?" value={0} />
+                        <Dropdown.Item label="Disponível" value={1} />
+                        <Dropdown.Item label="Indisponível" value={2} />
+                      </Dropdown>
+                    </DropdownWrappeer>
+                    <DropdownWrappeer>
+                      <Dropdown
+                        selectedValue={measurement}
+                        onValueChange={(itemValue, itemIndex) =>
+                          setMeasurement(itemValue)
+                        }
+                      >
+                        <Dropdown.Item label="Unidade de Medida?" value={0} />
+                        <Dropdown.Item label="Quilograma (kg)" value={1} />
+                        <Dropdown.Item label="Litro (l)" value={2} />
+                        <Dropdown.Item label="Grama (g)" value={3} />
+                        <Dropdown.Item label="Mililitro (ml)" value={4} />
+                      </Dropdown>
+                    </DropdownWrappeer>
+                    <P>Fotos do Produto (até 2 fotos)</P>
+
+                    <WrapperListAddProduct>
+                      <FlatList
+                        horizontal
+                        data={productphotoList}
+                        extraData={extraPhoto}
+                        ListFooterComponent={() => (
+                          <MediaSpotButtonAddProduct
+                            onPress={() => handleChoosePhoto()}
+                          >
+                            <AddMediaButtonWrapperAddProduct>
+                              <Icon color="#84378F" size={35} name="plus" />
+                            </AddMediaButtonWrapperAddProduct>
+                          </MediaSpotButtonAddProduct>
+                        )}
+                        /* ListEmptyComponent={() => <View />} */
+                        renderItem={({ item, index }) => (
+                          <MediaWrapper>
+                            <RemoveMediaButtonWrapper
+                              source={item}
+                              resizeMode="contain"
+                            >
+                              {learning ? (
+                                <Animatable.View
+                                  animation="slideInRight"
+                                  iterationCount={5}
+                                >
+                                  <Image
+                                    source={require('../../../assets/learn.png')}
+                                  />
+                                </Animatable.View>
+                              ) : null}
+                              <RemoveMedia onPress={() => removePhoto(index)}>
+                                <Icon
+                                  color="#EA3232"
+                                  size={35}
+                                  name="trash-o"
+                                />
+                              </RemoveMedia>
+                            </RemoveMediaButtonWrapper>
+                          </MediaWrapper>
+                        )}
+                        keyExtractor={(index) => String(index.uri)}
+                      />
+                    </WrapperListAddProduct>
+                  </FormScroll>
+
+                  <AddProductButton onPress={() => addProduct()}>
                     <AddProductButtonText>
                       Adicionar Produto
                     </AddProductButtonText>

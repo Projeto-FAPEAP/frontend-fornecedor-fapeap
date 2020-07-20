@@ -4,13 +4,13 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import History from '../../screens/Authenticated-Screens/History';
-import Home from '../../screens/Authenticated-Screens/Home';
-import Settings from '../../screens/Authenticated-Screens/Settings';
+import History from '../../../screens/Authenticated-Screens/History';
+import Home from '../../../screens/Authenticated-Screens/Home';
+import Settings from '../../../screens/Authenticated-Screens/Settings';
 
 const Tab = createBottomTabNavigator();
 
-const Authenticated: React.FC = () => {
+const BottomTabRoutes: React.FC = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -71,4 +71,4 @@ const Authenticated: React.FC = () => {
   );
 };
 
-export default Authenticated;
+export default BottomTabRoutes;

@@ -4,6 +4,8 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import axios from 'axios';
 
+import api from '../services/api';
+
 interface Response {
   responseState: boolean;
   responseStatus: string;
@@ -43,7 +45,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
     try {
       const response = await axios.post(
-        'http://192.168.1.100:3333/sessao/fornecedor',
+        `${api.defaults.baseURL}/sessao/fornecedor`,
 
         {
           cpf_cnpj: email,
@@ -52,6 +54,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       );
       console.log(response.data);
       setUser(response.data.fornecedor);
+      api.defaults.headers.Authorization = `Bearer ${response.data.tokenFornecedor}`;
       await AsyncStorage.setItem(
         '@QueroAçaí-Fornecedor:user',
         JSON.stringify(response.data.fornecedor),

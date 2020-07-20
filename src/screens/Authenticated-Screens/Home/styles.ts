@@ -86,12 +86,12 @@ export const AddMediaButtonWrapper = styled.View`
   height: 100%;
 `;
 
-export const RemoveMediaButtonWrapper = styled.ImageBackground`
+/* export const RemoveMediaButtonWrapper = styled.ImageBackground`
     justify-content: center;
     align-items: center;
   background-color:#0E1717
     height: 100%;
-  `;
+  `; */
 
 export const MediaSpotButton = styled.TouchableOpacity`
   height: ${hp('30%')}px;
@@ -128,6 +128,7 @@ export const DropdownWrappeer = styled.View`
   margin-top: 26px;
   padding-horizontal: ${hp('1.8%')}px;
   overflow: hidden;
+  align-self: center;
 `;
 
 export const Dropdown = styled.Picker`
@@ -141,6 +142,7 @@ export const P = styled.Text`
   font-size: ${hp('2.4%')}px;
   color: #000000;
   padding-vertical: ${hp('1.8%')}px;
+  text-align: center;
 `;
 
 export const RegisterButton = styled.TouchableOpacity`
@@ -360,7 +362,7 @@ export const WrapperListAddProduct = styled.View`
 justify-content:center
 align-items:center
   width: ${wp('75%')}px;
-
+align-self:center
 `;
 
 export const MediaSpotButtonAddProduct = styled.TouchableOpacity`
@@ -390,3 +392,34 @@ align-items: center;
 justify-content:center
   width: ${wp('15%')}px;
   `;
+
+export const RemoveMediaButtonWrapper = styled.ImageBackground`
+    justify-content: flex-start;
+    align-items: flex-end;
+  background-color:#0E1717
+  height: 100%;
+  width: ${wp('75%')}px;
+  `;
+
+export const MediaWrapper = styled.View`
+  flex-direction: column;
+  justify-content: flex-start;
+  height: ${hp('25%')}px;
+  border-width: 1px;
+  width: ${wp('75%')}px;
+  border-color: #b8b6b6;
+  align-items: flex-end;
+  background: #000;
+`;
+
+export const RemoveMedia = styled.TouchableOpacity`
+  height: ${hp('8%')}px;
+  width: ${wp('10%')}px;
+  justify-content: center;
+
+  align-items: center;
+`;
+
+export const FormScroll = styled.ScrollView`
+  width: 100%;
+`;

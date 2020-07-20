@@ -13,6 +13,7 @@ import Video from 'react-native-video';
 
 import axios from 'axios';
 
+import api from '../../../services/api';
 import {
   Container,
   Title,
@@ -243,11 +244,11 @@ const Register: React.FC = ({ navigation }) => {
 
       const photoListArray = photoList;
       const videoAux = video;
-      const arquivo = {
+      /* const arquivo = {
         uri: photoListArray[0].uri,
         type: photoListArray[0].type,
         name: photoListArray[0].fileName,
-      };
+      }; */
 
       let splitedArray = [];
       formData.append('nome', name);
@@ -263,21 +264,20 @@ const Register: React.FC = ({ navigation }) => {
       formData.append('bairro', neighborhood);
       formData.append('cep', cep);
       // formData.append('imagens', 'jofo');
-      formData.append('arquivo', JSON.stringify(arquivo));
+
       console.log(arquivo);
       for (let i = 0; i < photoList.length; i += 1) {
         splitedArray = String(photoListArray[i].uri).split('/');
-        // console.log(splitedArray[splitedArray.length - 1]);
-        // formData.append('video', photoListArray[i].path);
-        // formData.append('imagens', photoList);
-        /* formData.append(
+        console.log(splitedArray[splitedArray.length - 1]);
+
+        formData.append(
           'imagens',
           JSON.stringify({
             filename: photoListArray[i].fileName,
             originalname: photoListArray[i].fileName,
             size: photoListArray[i].fileSize,
           }),
-        ); */
+        );
       }
       /* console.log(videoAux[0]); */
       splitedArray = String(videoAux[0].path).split('/');
@@ -291,7 +291,7 @@ const Register: React.FC = ({ navigation }) => {
         'filenameeeeee',
         videoAux[0].fileName,
       ); */
-      /* formData.append('video', photo); */
+      formData.append('video', photo);
       /* console.log(formData); */
       /// formData.append('video', JSON.stringify(photoListArray[0]));
 
@@ -341,7 +341,7 @@ const Register: React.FC = ({ navigation }) => {
 
       try {
         const response = await axios.post(
-          'http://192.168.1.100:3333/fornecedor',
+          `${api.defaults.baseURL}/fornecedor`,
           formData,
         );
 

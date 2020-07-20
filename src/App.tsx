@@ -16,9 +16,13 @@ import themeLigth from './styles/themes/light';
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider theme={themeLigth}>
-      <OrderDetails />
-    </ThemeProvider>
+    <NavigationContainer>
+      <AuthProvider>
+        <ThemeProvider theme={themeLigth}>
+          <Routes />
+        </ThemeProvider>
+      </AuthProvider>
+    </NavigationContainer>
   );
 };
 /*  
