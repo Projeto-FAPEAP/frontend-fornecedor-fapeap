@@ -33,6 +33,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       );
       console.log(userLoaded, tokenLoaded);
       if (userLoaded && tokenLoaded) {
+      
         setUser(JSON.parse(userLoaded));
         console.log(JSON.parse(userLoaded), 'joantahn');
       }
@@ -44,7 +45,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     console.log(email, password, 'teste');
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${api.defaults.baseURL}/sessao/fornecedor`,
 
         {
@@ -52,9 +53,10 @@ export const AuthProvider: React.FC = ({ children }) => {
           senha: password,
         },
       );
-      console.log(response.data);
+      console.log(response,'shhhhhhhhhhhhh');
+      
       setUser(response.data.fornecedor);
-      api.defaults.headers.Authorization = `Bearer ${response.data.tokenFornecedor}`;
+    
       await AsyncStorage.setItem(
         '@QueroAçaí-Fornecedor:user',
         JSON.stringify(response.data.fornecedor),
@@ -70,14 +72,25 @@ export const AuthProvider: React.FC = ({ children }) => {
         });
       });
     } catch (error) {
-      console.log(error.response.data);
-      return new Promise((resolve) => {
-        resolve({
-          responseState: false,
-          responseStatus: error.response.data.error,
-        });
-      });
-    }
+if(error.message === 'Network Error'){
+  console.log('auiiiiiiii')
+  return new Promise((resolve) => {
+    resolve({
+      responseState: false,
+      responseStatus: 'Verifique sua conexão de internet e tente novamente!!',
+    });
+  });
+}else{
+  console.log(error);
+  return new Promise((resolve) => {
+    resolve({
+      responseState: false,
+      responseStatus: error.response.data.error,
+    });
+  });
+}
+}
+      
   }
   function logOut(): void {
     AsyncStorage.clear().then(() => {

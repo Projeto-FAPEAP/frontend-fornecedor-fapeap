@@ -221,6 +221,8 @@ export const TopTabMenuInWrapper = styled.View`
 export const ListWrapper = styled.View`
   align-items: center;
   background: #f2f1f7;
+  height:${hp('65%')}px;
+ 
 `;
 
 export const ListRow = styled.View`
@@ -276,7 +278,7 @@ text-align:center
   color: #fff;
 `;
 
-export const ListProducts = styled.View`
+export const ListProducts = styled.TouchableOpacity`
 justify-content:space-around
   align-items: center;
   flex-direction: row;
@@ -339,15 +341,22 @@ justify-content:center
 `;
 
 export const AddProductButton = styled.TouchableOpacity`
-  width: ${wp('70%')}px;
+  width: ${wp('40%')}px;
   border-radius: 22px;
   height: ${hp('6%')}px;
-  margin-top: 25px;
-  margin-right: 25px;
-  margin-left: 25px;
+  
   justify-content: center;
   background: ${(props) => props.theme.colors.primary};
   margin-bottom: ${hp('1.8%')}px;
+`;
+
+export const WrapperButtons = styled.View`
+ flex-direction:row;
+width:100%
+
+align-items:center;
+justify-content:space-around
+height:${hp('12%')}px;
 `;
 
 export const AddProductButtonText = styled.Text`
@@ -355,6 +364,16 @@ export const AddProductButtonText = styled.Text`
   align-content: center;
   font-size: ${hp('2.4%')}px;
   color: ${(props) => props.theme.colors.secundary};
+`;
+
+export const RemoveProductButton = styled.TouchableOpacity`
+  width: ${wp('40%')}px;
+  border-radius: 22px;
+  height: ${hp('6%')}px;
+ 
+  justify-content: center;
+  background: #EB5757;
+  margin-bottom: ${hp('1.8%')}px;
 `;
 
 export const WrapperListAddProduct = styled.View`

@@ -19,7 +19,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import axios from 'axios';
-
+import Loader from '../../utils/index'
 import api from '../../../services/api';
 import {
   Container,
@@ -76,21 +76,33 @@ import {
   MediaWrapper,
   RemoveMedia,
   RemoveMediaButtonWrapper,
-  FormScroll,
+  FormScroll,RemoveProductButton,WrapperButtons
 } from './styles';
+
+interface Products{
+  id:string
+  nome:string;
+  preco:string;
+  status_produto:number;
+estoque_produto:number;
+unidade_medida:string|number;
+}
+
+
 
 const Home: React.FC = () => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   // const [pictures, setPictures] = useState([5]);
   const [showExtraInput, setShowExtraInput] = useState(0);
+  const [loading,setLoading] = useState(false);
   const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
   const [video, setVideo] = useState({});
   const [videoSelected, setVideoSelected] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
   const [showOrders, setShowOrders] = useState(true);
-  const [modalVisibilty, setModalVisibility] = useState(false);
-
+  const [addProductModal, setAddProductModal] = useState(false);
+  const [editProductModal, setEditProductModal] = useState(false);
   // Variaveis referentes ao cadastro do Produto
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
@@ -100,6 +112,14 @@ const Home: React.FC = () => {
   const [productphotoList, setProductphotoList] = useState<
     ImagePickerResponse[]
   >([]);
+  ///////////////////////////////////////////////
+  //variáveis referentes a listagem de produtos
+ const[productsList,setProductsList] = useState<Products[]>([])
+  ////////////////////////////////////////////////
+
+  //Variaveis referentes ao delete de produtos
+  const[selectedProduct,setSelectedProduct] = useState('') 
+  ////////////////////////////////////////////
   const [learning, setLearning] = useState(false);
   function changeToOrders(): void {
     setShowOrders(true);
@@ -109,6 +129,11 @@ const Home: React.FC = () => {
     setShowProducts(true);
     setShowOrders(false);
   }
+
+useEffect(()=>{
+  getAllProducts()
+},[])
+
   useEffect(() => {
     if (showExtraInput === 1) {
       setDelivery(true);
@@ -199,6 +224,7 @@ const Home: React.FC = () => {
   }
 
   async function addProduct(): Promise<void> {
+
     if (
       (productName || productPrice || itemsNumber) === '' ||
       (availability || measurement) === 0 ||
@@ -206,6 +232,135 @@ const Home: React.FC = () => {
     ) {
       Alert.alert('Aviso', 'Preencha todos os campos!!');
     } else {
+      setLoading(true)
+      const formData = new FormData();
+
+      const photoListArray = productphotoList;
+      const token = await AsyncStorage.getItem('@QueroAçaí-Fornecedor:token');
+      console.log(token, 'Jonathan');
+      const image = {};
+
+
+      /* formData.append('nome', productName);
+      formData.append('preco', productPrice);
+      formData.append('estoque_produto', itemsNumber);
+      formData.append('status_produto', availability);
+
+      formData.append('unidade_medida', measurement); */
+
+
+      /*  for (let i = 0; i < productphotoList.length; i += 1) {
+        image = {
+          uri: photoListArray[i].uri,
+          type: photoListArray[i].type,
+          name: photoListArray[i].fileName,
+        };
+        formData.append('imagem', image);
+      } */
+      console.log(productPrice);
+      try {
+        const response = await api.post(
+          `${api.defaults.baseURL}/produto`,
+          {nome: productName,
+          preco: parseFloat(productPrice),
+        status_produto:availability === 1?true:false,
+      estoque_produto:itemsNumber,
+    unidade_medida:measurement,
+  },
+        );
+        console.log(response.data);
+        setProductName('')
+    setItemsNumber('')
+    setAvailability(0)
+    setMeasurement(0)
+    setProductPrice('')
+    setProductphotoList([])
+    setAddProductModal(false)
+        getAllProducts()
+        setLoading(false)
+        Alert.alert('Adicionado com Sucesso!!');
+      } catch (error) {
+        setLoading(false)
+        console.log(JSON.stringify(error,null,2))
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+       
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+      }
+    }
+  }
+
+
+
+
+  async function getProduct(idProduct:string): Promise<void> {
+    setLoading(true)
+    console.log(idProduct,'getr')
+      try {
+        const response = await api.get(
+          `${api.defaults.baseURL}/produto/${idProduct}`,
+        );
+        const available = response.data[0].status_produto?1:2;
+        setProductName(response.data[0].nome)
+        setProductPrice(response.data[0].preco)
+        setAvailability(available)
+        setMeasurement(parseInt(response.data[0].unidade_medida))
+        setItemsNumber(response.data[0].estoque_produto.toString())
+        setSelectedProduct(response.data[0].id)
+        setLoading(false)
+        setEditProductModal(true)
+        //setProductphotoList(response[0].data.imagens)
+      } catch (error) {
+        setLoading(false)
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+      }
+    
+  }
+
+  async function editProduct(): Promise<void> {
+    
+    if (
+      (productName || productPrice || itemsNumber) === '' ||
+      (availability || measurement) === 0 ||
+      productphotoList.length === 0
+    ) {
+      Alert.alert('Aviso', 'Preencha todos os campos!!');
+    } else {
+      setLoading(true)
       const formData = new FormData();
 
       const photoListArray = productphotoList;
@@ -228,13 +383,24 @@ const Home: React.FC = () => {
       } */
       console.log(formData);
       try {
-        const response = await axios.post(
-          `${api.defaults.baseURL}/produto`,
-          formData,
+        const response = await api.put(
+          `${api.defaults.baseURL}/produto/${selectedProduct}`,
+          {nome: productName,
+          preco: parseFloat(productPrice),
+        status_produto:availability === 1?true:false,
+      estoque_produto:itemsNumber,
+    unidade_medida:measurement,
+  },
         );
-        console.log(response.data);
-        Alert.alert('Adicionado com Sucesso!!');
+        console.log(JSON.stringify(response.data,null,2))
+
+        getAllProducts()
+        setLoading(false)
+        setEditProductModal(false)
+        Alert.alert('Atualizado com Sucesso!!');
       } catch (error) {
+        setLoading(false)
+        console.log(JSON.stringify(error,null,2))
         console.log(error, 'jonathan');
         console.log(Object(error.response), 'salve');
         Alert.alert(error.response.data.error);
@@ -258,9 +424,149 @@ const Home: React.FC = () => {
     }
   }
 
+
+  
+
+  async function getAllProducts(): Promise<void> {
+    const tokenLoaded = await AsyncStorage.getItem(
+      '@QueroAçaí-Fornecedor:token',
+    );
+    console.log("jonf")
+    setLoading(true)
+      try {
+        const response = await api.get(
+          `${api.defaults.baseURL}/produto`,
+        
+        
+        );
+        console.log(JSON.stringify(response.data,null,2));
+        handleMeasurement(response.data)
+        console.log('jjjjjjjjjjjjjjjj')
+        setLoading(false)
+        console.log(loading)
+      } catch (error) {
+        setLoading(false)
+        if(error.message === 'Network Error'){
+Alert.alert("Verifique sua conexão de internet e tente novamente!!")
+        }else{
+          console.log(JSON.stringify(error,null,2))
+          console.log(error, 'jonathan');
+          console.log(Object(error.response), 'salve');
+          Alert.alert(error.response.data.error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        }
+        
+      }
+    
+  }
+
+  function handleMeasurement(data:Array<Products>):void{
+    
+    for(let i = 0; i< data.length;i+=1){
+      if(data[i].unidade_medida === '1'){
+        data[i].unidade_medida = '1 kg'
+      }else if(data[i].unidade_medida ==='2'){
+        data[i].unidade_medida = '1 Litro'
+      }else if(data[i].unidade_medida ==='3'){
+        data[i].unidade_medida = '500 gramas'
+
+      }else if(data[i].unidade_medida ==='4'){
+        data[i].unidade_medida = '500 ml'
+      }
+    }
+    setProductsList(data)
+  }
+
+  async function deleteProduct(): Promise<void> {
+    Alert.alert(
+      'Remover Video',
+      'Quer mesmo remover?',
+      [
+        {
+          text: 'Não',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: async() => {
+            setLoading(true)
+            console.log(selectedProduct,'getr')
+            try {
+              const response = await api.delete(
+                `${api.defaults.baseURL}/produto/${selectedProduct}`,
+                
+               
+                
+              );
+              getAllProducts()
+              setEditProductModal(false)
+              setLoading(false);
+              Alert.alert('Removido com sucesso!!')
+              //setProductphotoList(response[0].data.imagens)
+            } catch (error) {
+              setLoading(false)
+              console.log(JSON.stringify(error,null,2))
+              console.log(error, 'jonathan');
+              console.log(Object(error.response), 'salve');
+              Alert.alert(error.response.data.error);
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            }
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+    
+    
+  }
+
+  function openAddProductModal():void{
+    
+    setProductName('')
+    setItemsNumber('')
+    setAvailability(0)
+    setMeasurement(0)
+    setProductPrice('')
+    setProductphotoList([])
+setAddProductModal(true)
+  }
+
+
   return (
     <Container>
-      <KeyboardAwareScrollView>
+      {/* <KeyboardAwareScrollView> */}
+        <Loader loading={loading}/>
         <Header>
           <WelcomeText>Olá, Usuário</WelcomeText>
         </Header>
@@ -299,9 +605,9 @@ const Home: React.FC = () => {
             <Modal
               transparent
               animationType="none"
-              visible={modalVisibilty}
+              visible={addProductModal}
               onRequestClose={() => {
-                setModalVisibility(false);
+                setAddProductModal(false);
               }}
             >
               <ModalBackground>
@@ -313,7 +619,7 @@ const Home: React.FC = () => {
                     <HeaderAddProductInnerIcon>
                       <CloseButtonAddProduct
                         onPress={() => {
-                          setModalVisibility(false);
+                          setAddProductModal(false);
                         }}
                       >
                         <Icon name="close" size={35} color="red" />
@@ -353,10 +659,10 @@ const Home: React.FC = () => {
                         }
                       >
                         <Dropdown.Item label="Unidade de Medida?" value={0} />
-                        <Dropdown.Item label="Quilograma (kg)" value={1} />
-                        <Dropdown.Item label="Litro (l)" value={2} />
-                        <Dropdown.Item label="Grama (g)" value={3} />
-                        <Dropdown.Item label="Mililitro (ml)" value={4} />
+                        <Dropdown.Item label="1 Quilograma (kg)" value={1} />
+                        <Dropdown.Item label="1 Litro (l)" value={2} />
+                        <Dropdown.Item label="500 Gramas (g)" value={3} />
+                        <Dropdown.Item label="500 Mililitros (ml)" value={4} />
                       </Dropdown>
                     </DropdownWrappeer>
                     <P>Fotos do Produto (até 2 fotos)</P>
@@ -406,20 +712,157 @@ const Home: React.FC = () => {
                       />
                     </WrapperListAddProduct>
                   </FormScroll>
-
+                  <WrapperButtons>
                   <AddProductButton onPress={() => addProduct()}>
                     <AddProductButtonText>
                       Adicionar Produto
                     </AddProductButtonText>
                   </AddProductButton>
+                  </WrapperButtons>
                 </FormAddProduct>
+              </ModalBackground>
+            </Modal>
+            <Modal
+              transparent
+              animationType="none"
+              visible={editProductModal}
+              onRequestClose={() => {
+                setEditProductModal(false);
+              }}
+            >
+              <ModalBackground>
+                
+                <FormAddProduct>
+                  <HeaderAddProduct>
+                    <HeaderAddProductInnerTitle>
+                      <Title>Edição de Produtos</Title>
+                    </HeaderAddProductInnerTitle>
+                    <HeaderAddProductInnerIcon>
+                      <CloseButtonAddProduct
+                        onPress={() => {
+                          setEditProductModal(false);
+                        }}
+                      >
+                        <Icon name="close" size={35} color="red" />
+                      </CloseButtonAddProduct>
+                    </HeaderAddProductInnerIcon>
+                  </HeaderAddProduct>
+              
+                  <FormScroll>
+                    <Input
+                      placeholder="Nome do Produto"
+                      value={productName}
+                      onChangeText={(text) => setProductName(text)}
+                    />
+                    <Input
+                      placeholder="Preço do Produto"
+                      value={productPrice}
+                      onChangeText={(text) => setProductPrice(text)}
+                    />
+                    <Input
+                      placeholder="Número de items do produto"
+                      value={itemsNumber}
+                      onChangeText={(text) => setItemsNumber(text)}
+                    />
+                    <DropdownWrappeer>
+                      <Dropdown
+                        selectedValue={availability}
+                        onValueChange={(itemValue, itemIndex) =>
+                          setAvailability(itemValue)
+                        }
+                      >
+                        <Dropdown.Item label="Disponibilidade?" value={0} />
+                        <Dropdown.Item label="Disponível" value={1} />
+                        <Dropdown.Item label="Indisponível" value={2} />
+                      </Dropdown>
+                    </DropdownWrappeer>
+                    <DropdownWrappeer>
+                      <Dropdown
+                        selectedValue={measurement}
+                        onValueChange={(itemValue, itemIndex) =>
+                          setMeasurement(itemValue)
+                        }
+                      >
+                        <Dropdown.Item label="Unidade de Medida?" value={0} />
+                        <Dropdown.Item label="1 Quilograma (kg)" value={1} />
+                        <Dropdown.Item label="1 Litro (l)" value={2} />
+                        <Dropdown.Item label="500 Gramas (g)" value={3} />
+                        <Dropdown.Item label="500 Mililitros (ml)" value={4} />
+                      </Dropdown>
+                    </DropdownWrappeer>
+                    <P>Fotos do Produto (até 2 fotos)</P>
+
+                    <WrapperListAddProduct>
+                      <FlatList
+                        horizontal
+                        data={productphotoList}
+                        extraData={extraPhoto}
+                        ListFooterComponent={() => (
+                          <MediaSpotButtonAddProduct
+                            onPress={() => handleChoosePhoto()}
+                          >
+                            <AddMediaButtonWrapperAddProduct>
+                              <Icon color="#84378F" size={35} name="plus" />
+                            </AddMediaButtonWrapperAddProduct>
+                          </MediaSpotButtonAddProduct>
+                        )}
+                        /* ListEmptyComponent={() => <View />} */
+                        renderItem={({ item, index }) => (
+                          <MediaWrapper>
+                            <RemoveMediaButtonWrapper
+                              source={item}
+                              resizeMode="contain"
+                            >
+                              {learning ? (
+                                <Animatable.View
+                                  animation="slideInRight"
+                                  iterationCount={5}
+                                >
+                                  <Image
+                                    source={require('../../../assets/learn.png')}
+                                  />
+                                </Animatable.View>
+                              ) : null}
+                              <RemoveMedia onPress={() => removePhoto(index)}>
+                                <Icon
+                                  color="#EA3232"
+                                  size={35}
+                                  name="trash-o"
+                                />
+                              </RemoveMedia>
+                            </RemoveMediaButtonWrapper>
+                          </MediaWrapper>
+                        )}
+                        keyExtractor={(index) => String(index.uri)}
+                      />
+                    </WrapperListAddProduct>
+                  </FormScroll>
+            
+<WrapperButtons>
+
+
+                  <AddProductButton onPress={() => editProduct()}>
+                    <AddProductButtonText>
+                      Atualizar
+                    </AddProductButtonText>
+                  </AddProductButton>
+                  <RemoveProductButton>
+                  <AddProductButtonText onPress={()=>{
+                    deleteProduct()
+                  }}>
+                      Excluir
+                    </AddProductButtonText>
+                  </RemoveProductButton>
+                  </WrapperButtons>
+                </FormAddProduct>
+                
               </ModalBackground>
             </Modal>
             <SearchWrapper>
               <SearchInput placeholder="Buscar Produto" />
               <AddButton
                 onPress={() => {
-                  setModalVisibility(true);
+                  openAddProductModal();
                 }}
               >
                 <AddButtonText>Adicionar</AddButtonText>
@@ -427,11 +870,11 @@ const Home: React.FC = () => {
             </SearchWrapper>
             <ListWrapper>
               <FlatList
-                scrollEnabled={false}
-                horizontal
-                data={photoList}
-                extraData={extraPhoto}
-                ListFooterComponent={() => (
+            scrollEnabled
+                
+                data={productsList}
+                
+                /* ListFooterComponent={() => (
                   <View style={{ backgroundColor: '#F2F1F7' }}>
                     <ListProducts>
                       <ListProductsImageWrapper
@@ -490,18 +933,34 @@ const Home: React.FC = () => {
                       </ListProductsTextWrapper>
                     </ListProducts>
                   </View>
-                )}
+                )} */
                 renderItem={({ item, index }) => (
-                  <MediaSpotButton onPress={() => removePhoto(index)}>
-                    <RemoveMediaButtonWrapper
-                      source={item}
-                      resizeMode="contain"
-                    >
-                      <Icon color="#EA3232" size={35} name="trash-o" />
-                    </RemoveMediaButtonWrapper>
-                  </MediaSpotButton>
+                  <ListProducts onPress={()=>getProduct(item.id)}>
+                      <ListProductsImageWrapper
+                        source={require('../../../assets/acai_1.jpg')}
+                        resizeMode="contain"
+                      />
+                      <ListProductsTextWrapper>
+                <ListRowTitle>{item.nome}</ListRowTitle>
+                <ListRowSubTitle>{item.unidade_medida+" R$ "+item.preco}</ListRowSubTitle>
+                {item.status_produto?(
+                   <ListRowSubTitle>
+                   <Icon name="check-circle" color="green" size={20} />
+                   {' ' + 'Disponivel'}
+                 </ListRowSubTitle>
+                  
+
+                ):(
+                  <ListRowSubTitle>
+                  <Icon name="ban" color="red" size={20} />
+                  {' ' + 'Indisponivel'}
+                </ListRowSubTitle>
                 )}
-                keyExtractor={(index) => String(index.uri)}
+                        
+                      </ListProductsTextWrapper>
+                    </ListProducts>
+                )}
+                keyExtractor={(item,index) => String(index)}
               />
             </ListWrapper>
           </View>
@@ -726,7 +1185,7 @@ const Home: React.FC = () => {
             <RegisterButtonText>Registre-me</RegisterButtonText>
           </RegisterButton>
         </Form> */}
-      </KeyboardAwareScrollView>
+      {/* </KeyboardAwareScrollView> */}
     </Container>
   );
 };
