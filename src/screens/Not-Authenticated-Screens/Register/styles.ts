@@ -92,6 +92,9 @@ export const DropdownWrappeer = styled.View`
   margin-top: 26px;
   padding-horizontal: ${hp('1.8%')}px;
   overflow: hidden;
+  padding-vertical: ${hp('-2%')}px;
+
+  justify-content: center;
 `;
 
 export const Dropdown = styled.Picker`

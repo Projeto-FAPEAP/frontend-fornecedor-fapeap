@@ -16,7 +16,6 @@ export const Container = styled.View`
 export const Title = styled.Text`
   font-size: ${hp('4.4%')}px;
   color: #fff;
-
   padding: 25px;
 `;
 
@@ -24,6 +23,7 @@ export const Span = styled.View`
   background: ${(props) => props.theme.colors.primary};
 
   height: ${hp('50%')}px;
+  width: ${wp('100%')}px;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
 `;

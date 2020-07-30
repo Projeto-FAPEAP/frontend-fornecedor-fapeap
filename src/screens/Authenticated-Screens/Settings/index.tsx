@@ -230,76 +230,7 @@ const Settings: React.FC = ({ navigation }) => {
           <Title>Editar sua conta</Title>
         </Header>
         <Form>
-          <Input
-            placeholder="Seu nome"
-            onChangeText={(text) => setName(text)}
-          />
-          <Input
-            placeholder="Nome do estabelecimento"
-            onChangeText={(text) => setStoreName(text)}
-          />
-
-          <Input placeholder="Email" onChangeText={(text) => setEmail(text)} />
-          <Input
-            placeholder="Senha"
-            keyboardType="email-address"
-            onChangeText={(text) => setPassword(text)}
-          />
-          <Input
-            placeholder="CPF/CNPJ"
-            keyboardType="number-pad"
-            onChangeText={(text) => setCpfCnpj(text)}
-          />
-          <Input
-            placeholder="Telefone"
-            keyboardType="number-pad"
-            onChangeText={(text) => setPhone(text)}
-          />
-          <Input
-            placeholder="Contato whatsapp"
-            keyboardType="number-pad"
-            onChangeText={(text) => setPhoneWhatsapp(text)}
-          />
-
-          <Input
-            placeholder="Endereço"
-            onChangeText={(text) => setAddress(text)}
-          />
-          <Input
-            placeholder="Número"
-            keyboardType="number-pad"
-            onChangeText={(text) => setNumber(text)}
-          />
-          <Input
-            placeholder="Bairro"
-            onChangeText={(text) => setNeighborhood(text)}
-          />
-          <Input
-            placeholder="CEP"
-            onChangeText={(text) => setCep(text)}
-            keyboardType="number-pad"
-          />
-          <DropdownWrappeer>
-            <Dropdown
-              selectedValue={showExtraInput}
-              onValueChange={(itemValue, itemIndex) =>
-                setShowExtraInput(itemValue)
-              }
-            >
-              <Dropdown.Item label="Faz delivery?" value={0} />
-              <Dropdown.Item label="Sim, faço delivery" value={1} />
-              <Dropdown.Item label="Não" value={2} />
-            </Dropdown>
-          </DropdownWrappeer>
-          {delivery ? (
-            <Input
-              placeholder="Qual a taxa de entrega?"
-              keyboardType="number-pad"
-              onChangeText={(text) => setDeliveryTax(text)}
-            />
-          ) : null}
-
-          <P>Fotos do Estabelecimento(até 4 fotos)</P>
+          <P>Fotos (até 4 fotos)</P>
 
           <WrapperList>
             <FlatList

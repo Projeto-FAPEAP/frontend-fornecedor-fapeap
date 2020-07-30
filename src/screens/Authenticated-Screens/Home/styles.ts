@@ -129,6 +129,7 @@ export const DropdownWrappeer = styled.View`
   padding-horizontal: ${hp('1.8%')}px;
   overflow: hidden;
   align-self: center;
+  justify-content: center;
 `;
 
 export const Dropdown = styled.Picker`
@@ -336,8 +337,7 @@ export const FormAddProduct = styled.View`
   flex-direction: column;
   background-color: #ffffff;
   min-height: ${hp('95%')}px;
-  width: ${wp('90%')}px;
-  border-radius: 10px;
+  width: ${wp('100%')}px;
 
   align-items: center;
   justify-content: space-around;

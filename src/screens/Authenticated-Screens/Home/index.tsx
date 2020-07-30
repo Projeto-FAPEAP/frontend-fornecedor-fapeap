@@ -16,11 +16,13 @@ import {
   ScrollView,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { createNativeWrapper } from 'react-native-gesture-handler';
 import ImagePicker, {
   ImagePickerResponse,
   ImagePickerOptions,
 } from 'react-native-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import RNPickerSelect from 'react-native-picker-select';
 import GestureRecognizer, {
   swipeDirections,
 } from 'react-native-swipe-gestures';
@@ -268,12 +270,16 @@ const Home: React.FC = ({ navigation }) => {
 
   async function addProduct(): Promise<void> {
     if (
-      (productName || productPrice || itemsNumber) === '' ||
-      (availability || measurement) === 0 ||
+      productName === '' ||
+      productPrice === '' ||
+      itemsNumber === '' ||
+      availability === 1 ||
+      measurement === 1 ||
       productphotoList.length === 0
     ) {
       Alert.alert('Aviso', 'Preencha todos os campos!!');
     } else {
+      console.log(measurement);
       setLoading(true);
       const formData = new FormData();
 
@@ -285,7 +291,7 @@ const Home: React.FC = ({ navigation }) => {
       formData.append('nome', productName);
       formData.append('preco', parseFloat(productPrice));
       formData.append('estoque_produto', itemsNumber);
-      formData.append('status_produto', availability);
+      formData.append('status_produto', availability === 2);
 
       formData.append('unidade_medida', measurement);
 
@@ -367,11 +373,13 @@ const Home: React.FC = ({ navigation }) => {
       const response = await api.get(
         `${api.defaults.baseURL}/produto/${idProduct}`,
       );
-      const available = response.data[0].status_produto ? 1 : 2;
+      const available = response.data[0].status_produto ? 2 : 3;
+      const Measurement = parseInt(response.data[0].unidade_medida) + 1;
+      console.log(Measurement, 'hhhhhhhhhhhhhhhh');
       setProductName(response.data[0].nome);
       setProductPrice(response.data[0].preco);
       setAvailability(available);
-      setMeasurement(parseInt(response.data[0].unidade_medida));
+      setMeasurement(parseInt(Measurement));
       setItemsNumber(response.data[0].estoque_produto.toString());
       setSelectedProduct(response.data[0].id);
       setLoading(false);
@@ -403,14 +411,19 @@ const Home: React.FC = ({ navigation }) => {
   }
 
   async function editProduct(): Promise<void> {
+    console.log(measurement, availability, 'coemço');
     if (
-      (productName || productPrice || itemsNumber) === '' ||
-      (availability || measurement) === 0 ||
+      productName === '' ||
+      productPrice === '' ||
+      itemsNumber === '' ||
+      availability === 1 ||
+      measurement === 1 ||
       productphotoList.length === 0
     ) {
       Alert.alert('Aviso', 'Preencha todos os campos!!');
     } else {
       setLoading(true);
+      console.log(measurement, availability);
       const formData = new FormData();
 
       const photoListArray = productphotoList;
@@ -438,9 +451,9 @@ const Home: React.FC = ({ navigation }) => {
           {
             nome: productName,
             preco: parseFloat(productPrice),
-            status_produto: availability === 1,
+            status_produto: availability === 2,
             estoque_produto: itemsNumber,
-            unidade_medida: measurement,
+            unidade_medida: measurement - 1,
           },
         );
         console.log(JSON.stringify(response.data, null, 2));
@@ -866,7 +879,27 @@ const Home: React.FC = ({ navigation }) => {
                     onChangeText={(text) => setItemsNumber(text)}
                   />
                   <DropdownWrappeer>
-                    <Dropdown
+                    <RNPickerSelect
+                      value={availability}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setAvailability(itemValue)
+                      }
+                      style={{
+                        placeholder: {
+                          color: '#2e2e2e',
+                        },
+                      }}
+                      placeholder={{
+                        label: 'Selecione a disponibilidade',
+                        value: 1,
+                        color: '#9EA0A4',
+                      }}
+                      items={[
+                        { label: 'Disponível', value: 2 },
+                        { label: 'Indisponível', value: 3 },
+                      ]}
+                    />
+                    {/* <Dropdown
                       selectedValue={availability}
                       onValueChange={(itemValue, itemIndex) =>
                         setAvailability(itemValue)
@@ -875,10 +908,35 @@ const Home: React.FC = ({ navigation }) => {
                       <Dropdown.Item label="Disponibilidade?" value={0} />
                       <Dropdown.Item label="Disponível" value={1} />
                       <Dropdown.Item label="Indisponível" value={2} />
-                    </Dropdown>
+                    </Dropdown> */}
                   </DropdownWrappeer>
                   <DropdownWrappeer>
-                    <Dropdown
+                    <RNPickerSelect
+                      value={measurement}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setMeasurement(itemValue)
+                      }
+                      style={{
+                        placeholder: {
+                          color: '#2e2e2e',
+                        },
+                      }}
+                      placeholder={{
+                        label: 'Selecione a unidade de medida',
+                        value: 1,
+                        color: '#999999',
+                      }}
+                      items={[
+                        {
+                          label: '1 Quilograma (kg)',
+                          value: 2,
+                        },
+                        { label: '1 Litro (l)', value: 3 },
+                        { label: '500 Gramas (g)', value: 4 },
+                        { label: '500 Mililitros (ml)', value: 5 },
+                      ]}
+                    />
+                    {/* <Dropdown
                       selectedValue={measurement}
                       onValueChange={(itemValue, itemIndex) =>
                         setMeasurement(itemValue)
@@ -889,7 +947,7 @@ const Home: React.FC = ({ navigation }) => {
                       <Dropdown.Item label="1 Litro (l)" value={2} />
                       <Dropdown.Item label="500 Gramas (g)" value={3} />
                       <Dropdown.Item label="500 Mililitros (ml)" value={4} />
-                    </Dropdown>
+                    </Dropdown> */}
                   </DropdownWrappeer>
                   <P>Fotos do Produto (até 2 fotos)</P>
 
@@ -989,30 +1047,62 @@ const Home: React.FC = ({ navigation }) => {
                     onChangeText={(text) => setItemsNumber(text)}
                   />
                   <DropdownWrappeer>
-                    <Dropdown
-                      selectedValue={availability}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setAvailability(itemValue)
+                    <RNPickerSelect
+                      value={availability}
+                      onValueChange={(value, itemIndex) =>
+                        setAvailability(value)
                       }
-                    >
-                      <Dropdown.Item label="Disponibilidade?" value={0} />
-                      <Dropdown.Item label="Disponível" value={1} />
-                      <Dropdown.Item label="Indisponível" value={2} />
-                    </Dropdown>
+                      style={{
+                        placeholder: {
+                          color: '#2e2e2e',
+                        },
+                      }}
+                      placeholder={
+                        {
+                          /*   label: 'Selecione a disponibilidade',
+                        value: 0,
+                        color: '#9EA0A4', */
+                        }
+                      }
+                      items={[
+                        { label: 'Selecione a disponibilidade', value: 1 },
+                        { label: 'Disponível', value: 2 },
+                        { label: 'Indisponível', value: 3 },
+                      ]}
+                    />
                   </DropdownWrappeer>
                   <DropdownWrappeer>
-                    <Dropdown
-                      selectedValue={measurement}
+                    <RNPickerSelect
+                      value={measurement}
                       onValueChange={(itemValue, itemIndex) =>
                         setMeasurement(itemValue)
                       }
-                    >
-                      <Dropdown.Item label="Unidade de Medida?" value={0} />
-                      <Dropdown.Item label="1 Quilograma (kg)" value={1} />
-                      <Dropdown.Item label="1 Litro (l)" value={2} />
-                      <Dropdown.Item label="500 Gramas (g)" value={3} />
-                      <Dropdown.Item label="500 Mililitros (ml)" value={4} />
-                    </Dropdown>
+                      style={{
+                        placeholder: {
+                          color: '#2e2e2e',
+                        },
+                      }}
+                      placeholder={
+                        {
+                          /*  label: 'Selecione a unidade de medida',
+                        value: 1,
+                        color: '#999999', */
+                        }
+                      }
+                      items={[
+                        {
+                          label: 'Selecione a unidade de medida',
+                          value: 1,
+                        },
+                        {
+                          label: '1 Quilograma (kg)',
+                          value: 2,
+                        },
+                        { label: '1 Litro (l)', value: 3 },
+                        { label: '500 Gramas (g)', value: 4 },
+                        { label: '500 Mililitros (ml)', value: 5 },
+                      ]}
+                    />
                   </DropdownWrappeer>
                   <P>Fotos do Produto (até 2 fotos)</P>
 

@@ -14,6 +14,7 @@ import ImagePicker, {
 } from 'react-native-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MediaMeta from 'react-native-media-meta';
+import RNPickerSelect from 'react-native-picker-select';
 import { useSafeArea } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
@@ -426,7 +427,27 @@ const Register: React.FC = ({ navigation }) => {
             keyboardType="number-pad"
           />
           <DropdownWrappeer>
-            <Dropdown
+            <RNPickerSelect
+              value={showExtraInput}
+              onValueChange={(itemValue, itemIndex) =>
+                setShowExtraInput(itemValue)
+              }
+              style={{
+                placeholder: {
+                  color: '#2e2e2e',
+                },
+              }}
+              placeholder={{
+                label: 'Faz delivery?',
+                value: 0,
+                color: '#9EA0A4',
+              }}
+              items={[
+                { label: 'Sim, faço delivery', value: 1 },
+                { label: 'Não', value: 2 },
+              ]}
+            />
+            {/* <Dropdown
               selectedValue={showExtraInput}
               onValueChange={(itemValue, itemIndex) =>
                 setShowExtraInput(itemValue)
@@ -435,7 +456,7 @@ const Register: React.FC = ({ navigation }) => {
               <Dropdown.Item label="Faz delivery?" value={0} />
               <Dropdown.Item label="Sim, faço delivery" value={1} />
               <Dropdown.Item label="Não" value={2} />
-            </Dropdown>
+            </Dropdown> */}
           </DropdownWrappeer>
           {delivery ? (
             <Input
@@ -445,7 +466,7 @@ const Register: React.FC = ({ navigation }) => {
             />
           ) : null}
 
-          <P>Fotos do Estabelecimento(até 4 fotos)</P>
+          <P>Fotos (até 4 fotos)</P>
 
           <WrapperList>
             <FlatList
