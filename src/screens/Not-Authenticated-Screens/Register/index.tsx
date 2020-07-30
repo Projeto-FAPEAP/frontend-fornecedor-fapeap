@@ -1,6 +1,13 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useContext,
+} from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import DocumentPicker from 'react-native-document-picker';
 import ImagePicker, {
   ImagePickerResponse,
   ImagePickerOptions,
@@ -10,10 +17,12 @@ import MediaMeta from 'react-native-media-meta';
 import { useSafeArea } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
-import DocumentPicker from 'react-native-document-picker';
+
 import axios from 'axios';
 
+import AuthContext from '../../../contexts/auth';
 import api from '../../../services/api';
+import Loader from '../../utils/index.js';
 import {
   Container,
   Title,
@@ -39,13 +48,6 @@ import {
   RemoveMedia,
 } from './styles';
 
-
-
-declare let Blob: {
-  readonly size: number;
-  readonly type: string;
-  slice(start?: number, end?: number, contentType?: string): Blob;
-};
 const Register: React.FC = ({ navigation }) => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
@@ -66,6 +68,8 @@ const Register: React.FC = ({ navigation }) => {
   const [number, setNumber] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [cep, setCep] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { logIn } = useContext(AuthContext);
   useEffect(() => {
     if (showExtraInput === 1) {
       setDelivery(true);
@@ -74,10 +78,7 @@ const Register: React.FC = ({ navigation }) => {
     }
   }, [showExtraInput]);
 
- 
-
   function removePhoto(index: number): void {
-   
     Alert.alert(
       'Remover foto',
       'Quer mesmo remover?',
@@ -116,7 +117,6 @@ const Register: React.FC = ({ navigation }) => {
   }
 
   function handleChoosePhoto(): void {
-
     if (photoList.length < 5) {
       const photos = photoList;
       let Repeat = false;
@@ -160,18 +160,18 @@ const Register: React.FC = ({ navigation }) => {
         type: [DocumentPicker.types.video],
       });
       const videoAux = videoState;
-      let teste = { a :res.uri,
-        b :res.type, // mime type
-        c : res.name,
-        d:res.size}
-      console.log(JSON.stringify( teste,null,2))
+      const teste = {
+        a: res.uri,
+        b: res.type, // mime type
+        c: res.name,
+        d: res.size,
+      };
+      console.log(JSON.stringify(teste, null, 2));
       videoAux[0] = Object(res);
       setVideoState(videoAux);
       console.log(videoState);
       setVideoSelected(true);
       Alert.alert('Adicionado com Sucesso!');
-    
-      
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker, exit any dialogs or menus and move on
@@ -179,10 +179,8 @@ const Register: React.FC = ({ navigation }) => {
         throw err;
       }
     }
-   
   }
   function removeVideo(): void {
-    
     Alert.alert(
       'Remover Video',
       'Quer mesmo remover?',
@@ -233,55 +231,144 @@ const Register: React.FC = ({ navigation }) => {
     } else if (showExtraInput === 1 && deliveryTax === '') {
       Alert.alert('Aviso', 'Preencha todos os campos');
     } else {
+      setLoading(true);
       const formData = new FormData();
       const photoListArray = photoList;
       const videoAux = videoState;
       formData.append('nome', name);
       formData.append('nome_fantasia', storeName);
-      formData.append('cpf_cnpj', cpfCnpj);
+      formData.append('cpf_cnpj', parseInt(cpfCnpj));
       formData.append('email', email);
       formData.append('senha', password);
-      formData.append('telefone', phone);
-      formData.append('telefone_whatsapp', phoneWhatsapp);
-      formData.append('taxa_delivery', deliveryTax);
+      formData.append('telefone', parseInt(phone));
+      formData.append('telefone_whatsapp', parseInt(phoneWhatsapp));
+      deliveryTax !== ''
+        ? formData.append('taxa_delivery', parseFloat(deliveryTax))
+        : null;
       formData.append('logradouro', address);
-      formData.append('numero_local', number);
+      formData.append('numero_local', parseInt(number));
       formData.append('bairro', neighborhood);
-      formData.append('cep', cep);
+      formData.append('cep', parseInt(cep));
       for (let i = 0; i < photoList.length; i += 1) {
-        formData.append(
-          'files',
-          photoListArray[i]
-        );
+        formData.append('files', photoListArray[i]);
       }
-      formData.append(
-        'file',
-        videoAux[0]
-      );
-      console.log(JSON.stringify(formData,null,2))
-        fetch('https://fapeap.colares.net.br/fornecedor', {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data' ,
+      formData.append('file', videoAux[0]);
+      console.log(JSON.stringify(formData, null, 2));
+      try {
+        const response = await axios.post(
+          'https://fapeap.colares.net.br/fornecedor',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        })
-          .then(
-            (response) => response.json(), // if the response is a JSON object
-          )
-          .then(
-            (success) => console.log(success), // Handle the success response object
-          )
-          .catch(
-      
-            (error) => console.log(JSON.stringify(error,null,2)), // Handle the error response object
+        );
+        /* const response = await fetch(
+          'https://fapeap.colares.net.br/fornecedor',
+          {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        ); */
+        setLoading(false);
+        console.log(JSON.stringify(response, null, 2));
+        if (response.data.verificado) {
+          console.log(response.data.cpf_cnpj, 'hhhhhhhhhhhhh');
+          Alert.alert(
+            'Aviso',
+            'Cadastrado com sucesso!!',
+            [
+              {
+                text: 'Ok',
+                onPress: async () => {
+                  const Response = await logIn(
+                    response.data.cpf_cnpj,
+                    password,
+                  );
+                  const { responseState, responseStatus } = Response;
+
+                  if (!responseState) {
+                    setLoading(false);
+                    Alert.alert(
+                      'Aviso',
+                      'Erro inesperado, reinicie a aplicação!',
+                    );
+                  }
+                },
+                style: 'default',
+              },
+            ],
+            { cancelable: false },
           );
-    } 
+        } else {
+          Alert.alert(
+            'Aviso',
+            'Cadastrado com sucesso!!',
+            [
+              {
+                text: 'Ok',
+                onPress: () => navigation.navigate('WarningValidation'),
+                style: 'default',
+              },
+            ],
+            { cancelable: false },
+          );
+        }
+      } catch (error) {
+        setLoading(false);
+        if (error.message === 'Network Error') {
+          Alert.alert('Verifique sua conexão de internet e tente novamente!!');
+        } else {
+          console.log(JSON.stringify(error, null, 2));
+          console.log(error, 'jonathan');
+          console.log(Object(error.response), 'salve');
+          Alert.alert(error.response.data.error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        }
+      }
+
+      /* fetch('https://fapeap.colares.net.br/fornecedor', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+        .then(
+          (response) => response.json(), // if the response is a JSON object
+        )
+        .then(
+          (success) => console.log(success), // Handle the success response object
+        )
+        .catch(
+          (error) => console.log(JSON.stringify(error, null, 2)), // Handle the error response object
+        ); */
+    }
   }
 
   return (
     <Container>
       <KeyboardAwareScrollView>
+        <Loader loading={loading} />
         <Header>
           <BackButtonWrapper onPress={() => navigation.goBack()}>
             <Icon color="#84378F" size={28} name="chevron-left" />
@@ -301,34 +388,43 @@ const Register: React.FC = ({ navigation }) => {
           <Input placeholder="Email" onChangeText={(text) => setEmail(text)} />
           <Input
             placeholder="Senha"
+            keyboardType="email-address"
             onChangeText={(text) => setPassword(text)}
           />
           <Input
+            placeholder="CPF/CNPJ"
+            keyboardType="number-pad"
+            onChangeText={(text) => setCpfCnpj(text)}
+          />
+          <Input
             placeholder="Telefone"
+            keyboardType="number-pad"
             onChangeText={(text) => setPhone(text)}
           />
           <Input
             placeholder="Contato whatsapp"
+            keyboardType="number-pad"
             onChangeText={(text) => setPhoneWhatsapp(text)}
           />
 
-          <Input
-            placeholder="CPF/CNPJ"
-            onChangeText={(text) => setCpfCnpj(text)}
-          />
           <Input
             placeholder="Endereço"
             onChangeText={(text) => setAddress(text)}
           />
           <Input
             placeholder="Número"
+            keyboardType="number-pad"
             onChangeText={(text) => setNumber(text)}
           />
           <Input
             placeholder="Bairro"
             onChangeText={(text) => setNeighborhood(text)}
           />
-          <Input placeholder="CEP" onChangeText={(text) => setCep(text)} />
+          <Input
+            placeholder="CEP"
+            onChangeText={(text) => setCep(text)}
+            keyboardType="number-pad"
+          />
           <DropdownWrappeer>
             <Dropdown
               selectedValue={showExtraInput}
@@ -344,6 +440,7 @@ const Register: React.FC = ({ navigation }) => {
           {delivery ? (
             <Input
               placeholder="Qual a taxa de entrega?"
+              keyboardType="number-pad"
               onChangeText={(text) => setDeliveryTax(text)}
             />
           ) : null}

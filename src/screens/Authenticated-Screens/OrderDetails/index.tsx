@@ -39,7 +39,7 @@ import {
   ListWrapperItem,
 } from './styles';
 
-const OrderDetails: React.FC = () => {
+const OrderDetails: React.FC = ({ navigation }) => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   // const [pictures, setPictures] = useState([5]);
@@ -54,11 +54,13 @@ const OrderDetails: React.FC = () => {
     <Container>
       <KeyboardAwareScrollView>
         <Header>
-          <BackButtonWrapper>
+          <BackButtonWrapper
+            onPress={() => navigation.navigate('BottomTabRoutes')}
+          >
             <Icon color="#FFF" size={28} name="chevron-left" />
           </BackButtonWrapper>
           <HeaderTextWrapper>
-            <HeaderText>Detalhes Pedidos</HeaderText>
+            <HeaderText>Detalhes do Pedido</HeaderText>
           </HeaderTextWrapper>
         </Header>
         <ClientInformation>

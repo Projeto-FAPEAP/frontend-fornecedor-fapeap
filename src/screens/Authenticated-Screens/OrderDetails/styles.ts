@@ -40,9 +40,9 @@ export const ClientInformation = styled.View`
   align-items: center;
   flex-direction: column;
   height: ${hp('35%')}px;
-border-bottom-width:1px
+  border-bottom-width: 1px;
   background: #f5f5f5;
-  border-color:#ECE7E7
+  border-color: #bdc8d0;
 `;
 
 export const ClientInformationImageWrapper = styled.View`
@@ -117,6 +117,7 @@ export const OrderInformation = styled.View`
   justify-content: center;
   border-width: 1px;
   padding: ${hp('1%')}px;
+  border-color: #f0f0f0;
 `;
 
 export const OrderRecipe = styled.View`

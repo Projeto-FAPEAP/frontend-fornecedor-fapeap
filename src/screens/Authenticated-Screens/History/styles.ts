@@ -220,6 +220,7 @@ export const ListWrapper = styled.View`
   padding: ${hp('2%')}px;
   align-items: center;
   background: #f2f1f7;
+  height: ${hp('81%')}px;
 `;
 
 export const ListRow = styled.View`

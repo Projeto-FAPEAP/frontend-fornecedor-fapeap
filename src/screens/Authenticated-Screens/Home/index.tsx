@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useContext,
+} from 'react';
 import {
   View,
   Text,
@@ -15,12 +21,17 @@ import ImagePicker, {
   ImagePickerOptions,
 } from 'react-native-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import GestureRecognizer, {
+  swipeDirections,
+} from 'react-native-swipe-gestures';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import axios from 'axios';
-import Loader from '../../utils/index'
+
+import AuthContext from '../../../contexts/auth';
 import api from '../../../services/api';
+import Loader from '../../utils/index';
 import {
   Container,
   Title,
@@ -76,26 +87,49 @@ import {
   MediaWrapper,
   RemoveMedia,
   RemoveMediaButtonWrapper,
-  FormScroll,RemoveProductButton,WrapperButtons
+  FormScroll,
+  RemoveProductButton,
+  WrapperButtons,
+  ListWrapperOrders,
+  FormSearchProduct,
+  SearchTextInner,
+  SearchInputButton,
+  HeaderSearchProductInnerSearch,
+  HeaderSearchProductInnerIcon,
+  HeaderSearchProduct,
+  ListWrapperSearchProduct,
+  ModalBackgroundSearch,
 } from './styles';
 
-interface Products{
-  id:string
-  nome:string;
-  preco:string;
-  status_produto:number;
-estoque_produto:number;
-unidade_medida:string|number;
+interface Products {
+  id: string;
+  nome: string;
+  preco: string;
+  status_produto: number;
+  estoque_produto: number;
+  unidade_medida: string | number;
 }
 
+interface Orders {
+  id: string;
+  status_pedido: string;
+  tipo_da_compra: boolean;
+  total: number;
+  consumidor: {
+    nome: string;
+  };
+}
 
+const Home: React.FC = ({ navigation }) => {
+  // Recebe Usuário
+  const { user } = useContext(AuthContext);
+  /// ///////////////////////////////////////////
 
-const Home: React.FC = () => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   // const [pictures, setPictures] = useState([5]);
   const [showExtraInput, setShowExtraInput] = useState(0);
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
   const [video, setVideo] = useState({});
   const [videoSelected, setVideoSelected] = useState(false);
@@ -112,14 +146,24 @@ const Home: React.FC = () => {
   const [productphotoList, setProductphotoList] = useState<
     ImagePickerResponse[]
   >([]);
-  ///////////////////////////////////////////////
-  //variáveis referentes a listagem de produtos
- const[productsList,setProductsList] = useState<Products[]>([])
-  ////////////////////////////////////////////////
+  /// ////////////////////////////////////////////
+  // variáveis referentes a listagem de produtos
+  const [productsList, setProductsList] = useState<Products[] | undefined>([]);
+  /// /////////////////////////////////////////////
 
-  //Variaveis referentes ao delete de produtos
-  const[selectedProduct,setSelectedProduct] = useState('') 
-  ////////////////////////////////////////////
+  // Variaveis referentes a busca de Produtos
+  const [openSearchModal, setOpenSearchModal] = useState(false);
+  const [search, setSearch] = useState('');
+  const [orderDataAux, setOrderDataAux] = useState<Orders[] | undefined>([]);
+  // ////////////////////////////////////////////
+  // Variaveis referentes ao delete de produtos
+  const [selectedProduct, setSelectedProduct] = useState('');
+  /// /////////////////////////////////////////
+
+  // Variáveis referentes a listagem de pedidos
+  const [ordersData, setOrdersData] = useState<Orders[] | undefined>([]);
+  const [pendingLength, setPendingLength] = useState(0);
+  // //////////////////////////////////////////
   const [learning, setLearning] = useState(false);
   function changeToOrders(): void {
     setShowOrders(true);
@@ -130,9 +174,12 @@ const Home: React.FC = () => {
     setShowOrders(false);
   }
 
-useEffect(()=>{
-  getAllProducts()
-},[])
+  useEffect(() => {
+    setTimeout(function () {
+      getAllOrders();
+      getAllProducts();
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     if (showExtraInput === 1) {
@@ -141,10 +188,6 @@ useEffect(()=>{
       setDelivery(false);
     }
   }, [showExtraInput]);
-
-  /*  useLayoutEffect(() => {
-    Alert.alert('item adicionado');
-  }, [photoList]); */
 
   function removePhoto(index: number): void {
     // Alert.alert('Jonathan');
@@ -224,7 +267,6 @@ useEffect(()=>{
   }
 
   async function addProduct(): Promise<void> {
-
     if (
       (productName || productPrice || itemsNumber) === '' ||
       (availability || measurement) === 0 ||
@@ -232,7 +274,7 @@ useEffect(()=>{
     ) {
       Alert.alert('Aviso', 'Preencha todos os campos!!');
     } else {
-      setLoading(true)
+      setLoading(true);
       const formData = new FormData();
 
       const photoListArray = productphotoList;
@@ -240,51 +282,63 @@ useEffect(()=>{
       console.log(token, 'Jonathan');
       const image = {};
 
-
-      /* formData.append('nome', productName);
-      formData.append('preco', productPrice);
+      formData.append('nome', productName);
+      formData.append('preco', parseFloat(productPrice));
       formData.append('estoque_produto', itemsNumber);
       formData.append('status_produto', availability);
 
-      formData.append('unidade_medida', measurement); */
+      formData.append('unidade_medida', measurement);
 
-
-      /*  for (let i = 0; i < productphotoList.length; i += 1) {
-        image = {
-          uri: photoListArray[i].uri,
-          type: photoListArray[i].type,
-          name: photoListArray[i].fileName,
-        };
-        formData.append('imagem', image);
-      } */
+      for (let i = 0; i < productphotoList.length; i += 1) {
+        formData.append('file', photoListArray[i]);
+      }
       console.log(productPrice);
+
+      /* fetch('https://fapeap.colares.net.br/fornecedor', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+        .then(
+          (response) => response.json(), // if the response is a JSON object
+        )
+        .then(
+          (success) => console.log(success), // Handle the success response object
+        )
+        .catch(
+          (error) => console.log(JSON.stringify(error, null, 2)), // Handle the error response object
+        ); */
+
       try {
         const response = await api.post(
           `${api.defaults.baseURL}/produto`,
-          {nome: productName,
-          preco: parseFloat(productPrice),
-        status_produto:availability === 1?true:false,
-      estoque_produto:itemsNumber,
-    unidade_medida:measurement,
-  },
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
         );
         console.log(response.data);
-        setProductName('')
-    setItemsNumber('')
-    setAvailability(0)
-    setMeasurement(0)
-    setProductPrice('')
-    setProductphotoList([])
-    setAddProductModal(false)
-        getAllProducts()
-        setLoading(false)
+        setProductName('');
+        setItemsNumber('');
+        setAvailability(0);
+        setMeasurement(0);
+        setProductPrice('');
+        setProductphotoList([]);
+        setAddProductModal(false);
+        getAllProducts();
+        setLoading(false);
         Alert.alert('Adicionado com Sucesso!!');
       } catch (error) {
-        setLoading(false)
-        console.log(JSON.stringify(error,null,2))
+        setLoading(false);
+        console.log(JSON.stringify(error, null, 2));
         console.log(error, 'jonathan');
         console.log(Object(error.response), 'salve');
-       
+
         Alert.alert(error.response.data.error);
         if (error.response) {
           // The request was made and the server responded with a status code
@@ -306,53 +360,49 @@ useEffect(()=>{
     }
   }
 
-
-
-
-  async function getProduct(idProduct:string): Promise<void> {
-    setLoading(true)
-    console.log(idProduct,'getr')
-      try {
-        const response = await api.get(
-          `${api.defaults.baseURL}/produto/${idProduct}`,
-        );
-        const available = response.data[0].status_produto?1:2;
-        setProductName(response.data[0].nome)
-        setProductPrice(response.data[0].preco)
-        setAvailability(available)
-        setMeasurement(parseInt(response.data[0].unidade_medida))
-        setItemsNumber(response.data[0].estoque_produto.toString())
-        setSelectedProduct(response.data[0].id)
-        setLoading(false)
-        setEditProductModal(true)
-        //setProductphotoList(response[0].data.imagens)
-      } catch (error) {
-        setLoading(false)
-        console.log(error, 'jonathan');
-        console.log(Object(error.response), 'salve');
-        Alert.alert(error.response.data.error);
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
-        }
-        console.log(error.config);
+  async function getProduct(idProduct: string): Promise<void> {
+    setLoading(true);
+    console.log(idProduct, 'getr');
+    try {
+      const response = await api.get(
+        `${api.defaults.baseURL}/produto/${idProduct}`,
+      );
+      const available = response.data[0].status_produto ? 1 : 2;
+      setProductName(response.data[0].nome);
+      setProductPrice(response.data[0].preco);
+      setAvailability(available);
+      setMeasurement(parseInt(response.data[0].unidade_medida));
+      setItemsNumber(response.data[0].estoque_produto.toString());
+      setSelectedProduct(response.data[0].id);
+      setLoading(false);
+      setEditProductModal(true);
+      console.log(JSON.stringify(response.data, null, 2));
+      // setProductphotoList(response[0].data.imagens)
+    } catch (error) {
+      setLoading(false);
+      console.log(error, 'jonathan');
+      console.log(Object(error.response), 'salve');
+      Alert.alert(error.response.data.error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
       }
-    
+      console.log(error.config);
+    }
   }
 
   async function editProduct(): Promise<void> {
-    
     if (
       (productName || productPrice || itemsNumber) === '' ||
       (availability || measurement) === 0 ||
@@ -360,7 +410,7 @@ useEffect(()=>{
     ) {
       Alert.alert('Aviso', 'Preencha todos os campos!!');
     } else {
-      setLoading(true)
+      setLoading(true);
       const formData = new FormData();
 
       const photoListArray = productphotoList;
@@ -385,22 +435,23 @@ useEffect(()=>{
       try {
         const response = await api.put(
           `${api.defaults.baseURL}/produto/${selectedProduct}`,
-          {nome: productName,
-          preco: parseFloat(productPrice),
-        status_produto:availability === 1?true:false,
-      estoque_produto:itemsNumber,
-    unidade_medida:measurement,
-  },
+          {
+            nome: productName,
+            preco: parseFloat(productPrice),
+            status_produto: availability === 1,
+            estoque_produto: itemsNumber,
+            unidade_medida: measurement,
+          },
         );
-        console.log(JSON.stringify(response.data,null,2))
+        console.log(JSON.stringify(response.data, null, 2));
 
-        getAllProducts()
-        setLoading(false)
-        setEditProductModal(false)
+        getAllProducts();
+        setLoading(false);
+        setEditProductModal(false);
         Alert.alert('Atualizado com Sucesso!!');
       } catch (error) {
-        setLoading(false)
-        console.log(JSON.stringify(error,null,2))
+        setLoading(false);
+        console.log(JSON.stringify(error, null, 2));
         console.log(error, 'jonathan');
         console.log(Object(error.response), 'salve');
         Alert.alert(error.response.data.error);
@@ -424,77 +475,63 @@ useEffect(()=>{
     }
   }
 
-
-  
-
   async function getAllProducts(): Promise<void> {
-    const tokenLoaded = await AsyncStorage.getItem(
-      '@QueroAçaí-Fornecedor:token',
-    );
-    console.log("jonf")
-    setLoading(true)
-      try {
-        const response = await api.get(
-          `${api.defaults.baseURL}/produto`,
-        
-        
-        );
-        console.log(JSON.stringify(response.data,null,2));
-        handleMeasurement(response.data)
-        console.log('jjjjjjjjjjjjjjjj')
-        setLoading(false)
-        console.log(loading)
-      } catch (error) {
-        setLoading(false)
-        if(error.message === 'Network Error'){
-Alert.alert("Verifique sua conexão de internet e tente novamente!!")
-        }else{
-          console.log(JSON.stringify(error,null,2))
-          console.log(error, 'jonathan');
-          console.log(Object(error.response), 'salve');
-          Alert.alert(error.response.data.error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-          }
-          console.log(error.config);
+    setLoading(true);
+    try {
+      const response = await api.get(`${api.defaults.baseURL}/produto`);
+      /* console.log(JSON.stringify(response.data, null, 2)); */
+      handleMeasurement(response.data);
+
+      console.log('jjjjjjjjjjjjjjjj');
+      setLoading(false);
+      console.log(loading);
+    } catch (error) {
+      setLoading(false);
+      if (error.message === 'Network Error') {
+        Alert.alert('Verifique sua conexão de internet e tente novamente!!');
+      } else {
+        console.log(JSON.stringify(error, null, 2));
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
         }
-        
-      }
-    
-  }
-
-  function handleMeasurement(data:Array<Products>):void{
-    
-    for(let i = 0; i< data.length;i+=1){
-      if(data[i].unidade_medida === '1'){
-        data[i].unidade_medida = '1 kg'
-      }else if(data[i].unidade_medida ==='2'){
-        data[i].unidade_medida = '1 Litro'
-      }else if(data[i].unidade_medida ==='3'){
-        data[i].unidade_medida = '500 gramas'
-
-      }else if(data[i].unidade_medida ==='4'){
-        data[i].unidade_medida = '500 ml'
+        console.log(error.config);
       }
     }
-    setProductsList(data)
+  }
+
+  function handleMeasurement(data: Array<Products>): void {
+    for (let i = 0; i < data.length; i += 1) {
+      if (data[i].unidade_medida === '1') {
+        data[i].unidade_medida = '1 kg';
+      } else if (data[i].unidade_medida === '2') {
+        data[i].unidade_medida = '1 Litro';
+      } else if (data[i].unidade_medida === '3') {
+        data[i].unidade_medida = '500 gramas';
+      } else if (data[i].unidade_medida === '4') {
+        data[i].unidade_medida = '500 ml';
+      }
+    }
+    setProductsList(data);
   }
 
   async function deleteProduct(): Promise<void> {
     Alert.alert(
-      'Remover Video',
+      'Remover Produto',
       'Quer mesmo remover?',
       [
         {
@@ -504,24 +541,21 @@ Alert.alert("Verifique sua conexão de internet e tente novamente!!")
         },
         {
           text: 'Sim',
-          onPress: async() => {
-            setLoading(true)
-            console.log(selectedProduct,'getr')
+          onPress: async () => {
+            setLoading(true);
+            console.log(selectedProduct, 'getr');
             try {
               const response = await api.delete(
                 `${api.defaults.baseURL}/produto/${selectedProduct}`,
-                
-               
-                
               );
-              getAllProducts()
-              setEditProductModal(false)
+              getAllProducts();
+              setEditProductModal(false);
               setLoading(false);
-              Alert.alert('Removido com sucesso!!')
-              //setProductphotoList(response[0].data.imagens)
+              Alert.alert('Removido com sucesso!!');
+              // setProductphotoList(response[0].data.imagens)
             } catch (error) {
-              setLoading(false)
-              console.log(JSON.stringify(error,null,2))
+              setLoading(false);
+              console.log(JSON.stringify(error, null, 2));
               console.log(error, 'jonathan');
               console.log(Object(error.response), 'salve');
               Alert.alert(error.response.data.error);
@@ -547,69 +581,259 @@ Alert.alert("Verifique sua conexão de internet e tente novamente!!")
       ],
       { cancelable: false },
     );
-    
-    
   }
 
-  function openAddProductModal():void{
-    
-    setProductName('')
-    setItemsNumber('')
-    setAvailability(0)
-    setMeasurement(0)
-    setProductPrice('')
-    setProductphotoList([])
-setAddProductModal(true)
+  function openAddProductModal(): void {
+    setProductName('');
+    setItemsNumber('');
+    setAvailability(0);
+    setMeasurement(0);
+    setProductPrice('');
+    setProductphotoList([]);
+    setAddProductModal(true);
   }
 
+  async function getAllOrders(): Promise<void> {
+    setLoading(true);
+    try {
+      const response = await api.get(
+        `${api.defaults.baseURL}/fornecedor/pedidos`,
+      );
+      /*  console.log(JSON.stringify(response.data, null, 2)); */
+      /* const a = [
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          consumidor: {
+            nome: 'teste',
+          },
+        },
+        {
+          total: '35.63',
+          status_pedido: 'Confirmado',
+          tipo_da_compra: false,
+          consumidor: {
+            nome: 'teste',
+          },
+        },
+        {
+          total: '35.63',
+          status_pedido: 'Confirmado',
+          tipo_da_compra: false,
+          consumidor: {
+            nome: 'teste',
+          },
+        },
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          consumidor: {
+            nome: 'teste',
+          },
+        },
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          consumidor: {
+            nome: 'teste',
+          },
+        },
+      ]; */
+      /* setOrdersData(a); */
+      handleOrderList(response.data);
+
+      setLoading(false);
+      console.log(loading);
+    } catch (error) {
+      setLoading(false);
+      if (error.message === 'Network Error') {
+        Alert.alert('Verifique sua conexão de internet e tente novamente!!');
+      } else {
+        console.log(JSON.stringify(error, null, 2));
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+      }
+    }
+  }
+
+  function handleOrderList(array: Orders[]): void {
+    const ordersdata: Orders[] = array;
+    const pending = [];
+    const confirmed = [];
+    const total: Orders[] = array;
+    let j = 0;
+    let k = 0;
+
+    for (let i = 0; i < ordersdata.length; i += 1) {
+      if (ordersdata[i].status_pedido === 'Pendente') {
+        pending[j] = ordersdata[i];
+        j += 1;
+      } else {
+        confirmed[k] = ordersdata[i];
+        k += 1;
+      }
+    }
+
+    for (let i = 0; i < array.length; i += 1) {
+      if (pending.length - 1 >= i) {
+        total[i] = pending[i];
+      } else {
+        total[i] = confirmed[i - pending.length];
+      }
+    }
+
+    setPendingLength(pending.length);
+    setOrdersData(total);
+  }
+
+  function handleSearch(): void {
+    const orderList = ordersData;
+  }
+
+  useEffect(() => {
+    if (search !== '') {
+      handleSearch();
+    }
+  }, [search]);
 
   return (
     <Container>
       {/* <KeyboardAwareScrollView> */}
-        <Loader loading={loading}/>
-        <Header>
-          <WelcomeText>Olá, Usuário</WelcomeText>
-        </Header>
+      <Loader loading={loading} />
+      <Header>
+        <WelcomeText>{`Olá, ${user.nome}`}</WelcomeText>
+      </Header>
 
-        <TopTabMenu>
-          <OrderButton onPress={() => changeToOrders()}>
-            {showOrders ? (
-              <TopTabMenuInWrapper>
-                <Icon name="shopping-cart" size={32} color="#84378F" />
-                <TopTabMenuTextActived>Pedidos</TopTabMenuTextActived>
-              </TopTabMenuInWrapper>
-            ) : (
-              <TopTabMenuInWrapper>
-                <Icon name="shopping-cart" size={32} color="#666666" />
-                <TopTabMenuTextInActived>Pedidos</TopTabMenuTextInActived>
-              </TopTabMenuInWrapper>
-            )}
-          </OrderButton>
+      <TopTabMenu>
+        <OrderButton onPress={() => changeToOrders()}>
+          {showOrders ? (
+            <TopTabMenuInWrapper>
+              <Icon name="shopping-cart" size={32} color="#84378F" />
+              <TopTabMenuTextActived>Pedidos</TopTabMenuTextActived>
+            </TopTabMenuInWrapper>
+          ) : (
+            <TopTabMenuInWrapper>
+              <Icon name="shopping-cart" size={32} color="#666666" />
+              <TopTabMenuTextInActived>Pedidos</TopTabMenuTextInActived>
+            </TopTabMenuInWrapper>
+          )}
+        </OrderButton>
 
-          <ProductsButton onPress={() => changeToProducts()}>
-            {showProducts ? (
-              <TopTabMenuInWrapper>
-                <Icon name="list" size={32} color="#84378F" />
-                <TopTabMenuTextActived>Produtos</TopTabMenuTextActived>
-              </TopTabMenuInWrapper>
-            ) : (
-              <TopTabMenuInWrapper>
-                <Icon name="list" size={32} color="#666666" />
-                <TopTabMenuTextInActived>Produtos</TopTabMenuTextInActived>
-              </TopTabMenuInWrapper>
-            )}
-          </ProductsButton>
-        </TopTabMenu>
-        {showProducts ? (
-          <View>
-            <Modal
-              transparent
-              animationType="none"
-              visible={addProductModal}
-              onRequestClose={() => {
-                setAddProductModal(false);
-              }}
-            >
+        <ProductsButton onPress={() => changeToProducts()}>
+          {showProducts ? (
+            <TopTabMenuInWrapper>
+              <Icon name="list" size={32} color="#84378F" />
+              <TopTabMenuTextActived>Produtos</TopTabMenuTextActived>
+            </TopTabMenuInWrapper>
+          ) : (
+            <TopTabMenuInWrapper>
+              <Icon name="list" size={32} color="#666666" />
+              <TopTabMenuTextInActived>Produtos</TopTabMenuTextInActived>
+            </TopTabMenuInWrapper>
+          )}
+        </ProductsButton>
+      </TopTabMenu>
+      {showProducts ? (
+        <Animatable.View animation="fadeIn">
+          <Modal
+            transparent
+            animationType="none"
+            visible={openSearchModal}
+            onRequestClose={() => {
+              setOpenSearchModal(false);
+            }}
+          >
+            <ModalBackgroundSearch>
+              <FormSearchProduct>
+                <HeaderSearchProduct>
+                  <HeaderSearchProductInnerIcon>
+                    <CloseButtonAddProduct
+                      onPress={() => {
+                        setOpenSearchModal(false);
+                      }}
+                    >
+                      <Icon name="chevron-left" size={28} color="#84378F" />
+                    </CloseButtonAddProduct>
+                  </HeaderSearchProductInnerIcon>
+                  <HeaderSearchProductInnerSearch>
+                    <SearchInput
+                      onChangeText={(text) => setSearch(text)}
+                      placeholder="Buscar Produto"
+                    />
+                  </HeaderSearchProductInnerSearch>
+                </HeaderSearchProduct>
+
+                <ListWrapperSearchProduct>
+                  <FlatList
+                    scrollEnabled={false}
+                    data={productsList}
+                    refreshing={false}
+                    onRefresh={() => getAllProducts()}
+                    renderItem={({ item, index }) => (
+                      <ListProducts onPress={() => getProduct(item.id)}>
+                        <ListProductsImageWrapper
+                          source={require('../../../assets/acai_1.jpg')}
+                          resizeMode="contain"
+                        />
+                        <ListProductsTextWrapper>
+                          <ListRowTitle>{item.nome}</ListRowTitle>
+                          <ListRowSubTitle>
+                            {`${item.unidade_medida} R$ ${item.preco}`}
+                          </ListRowSubTitle>
+                          {item.status_produto ? (
+                            <ListRowSubTitle>
+                              <Icon
+                                name="check-circle"
+                                color="green"
+                                size={20}
+                              />
+                              {' ' + 'Disponivel'}
+                            </ListRowSubTitle>
+                          ) : (
+                            <ListRowSubTitle>
+                              <Icon name="ban" color="red" size={20} />
+                              {' ' + 'Indisponivel'}
+                            </ListRowSubTitle>
+                          )}
+                        </ListProductsTextWrapper>
+                      </ListProducts>
+                    )}
+                    keyExtractor={(item, index) => String(index)}
+                  />
+                </ListWrapperSearchProduct>
+              </FormSearchProduct>
+            </ModalBackgroundSearch>
+          </Modal>
+
+          <Modal
+            transparent
+            animationType="none"
+            visible={addProductModal}
+            onRequestClose={() => {
+              setAddProductModal(false);
+            }}
+          >
+            <KeyboardAwareScrollView>
               <ModalBackground>
                 <FormAddProduct>
                   <HeaderAddProduct>
@@ -626,112 +850,111 @@ setAddProductModal(true)
                       </CloseButtonAddProduct>
                     </HeaderAddProductInnerIcon>
                   </HeaderAddProduct>
-                  <FormScroll>
-                    <Input
-                      placeholder="Nome do Produto"
-                      onChangeText={(text) => setProductName(text)}
-                    />
-                    <Input
-                      placeholder="Preço do Produto"
-                      onChangeText={(text) => setProductPrice(text)}
-                    />
-                    <Input
-                      placeholder="Número de items do produto"
-                      onChangeText={(text) => setItemsNumber(text)}
-                    />
-                    <DropdownWrappeer>
-                      <Dropdown
-                        selectedValue={availability}
-                        onValueChange={(itemValue, itemIndex) =>
-                          setAvailability(itemValue)
-                        }
-                      >
-                        <Dropdown.Item label="Disponibilidade?" value={0} />
-                        <Dropdown.Item label="Disponível" value={1} />
-                        <Dropdown.Item label="Indisponível" value={2} />
-                      </Dropdown>
-                    </DropdownWrappeer>
-                    <DropdownWrappeer>
-                      <Dropdown
-                        selectedValue={measurement}
-                        onValueChange={(itemValue, itemIndex) =>
-                          setMeasurement(itemValue)
-                        }
-                      >
-                        <Dropdown.Item label="Unidade de Medida?" value={0} />
-                        <Dropdown.Item label="1 Quilograma (kg)" value={1} />
-                        <Dropdown.Item label="1 Litro (l)" value={2} />
-                        <Dropdown.Item label="500 Gramas (g)" value={3} />
-                        <Dropdown.Item label="500 Mililitros (ml)" value={4} />
-                      </Dropdown>
-                    </DropdownWrappeer>
-                    <P>Fotos do Produto (até 2 fotos)</P>
 
-                    <WrapperListAddProduct>
-                      <FlatList
-                        horizontal
-                        data={productphotoList}
-                        extraData={extraPhoto}
-                        ListFooterComponent={() => (
-                          <MediaSpotButtonAddProduct
-                            onPress={() => handleChoosePhoto()}
+                  <Input
+                    placeholder="Nome do Produto"
+                    onChangeText={(text) => setProductName(text)}
+                  />
+                  <Input
+                    placeholder="Preço do Produto"
+                    onChangeText={(text) => setProductPrice(text)}
+                    keyboardType="number-pad"
+                  />
+                  <Input
+                    placeholder="Número de items do produto"
+                    keyboardType="number-pad"
+                    onChangeText={(text) => setItemsNumber(text)}
+                  />
+                  <DropdownWrappeer>
+                    <Dropdown
+                      selectedValue={availability}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setAvailability(itemValue)
+                      }
+                    >
+                      <Dropdown.Item label="Disponibilidade?" value={0} />
+                      <Dropdown.Item label="Disponível" value={1} />
+                      <Dropdown.Item label="Indisponível" value={2} />
+                    </Dropdown>
+                  </DropdownWrappeer>
+                  <DropdownWrappeer>
+                    <Dropdown
+                      selectedValue={measurement}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setMeasurement(itemValue)
+                      }
+                    >
+                      <Dropdown.Item label="Unidade de Medida?" value={0} />
+                      <Dropdown.Item label="1 Quilograma (kg)" value={1} />
+                      <Dropdown.Item label="1 Litro (l)" value={2} />
+                      <Dropdown.Item label="500 Gramas (g)" value={3} />
+                      <Dropdown.Item label="500 Mililitros (ml)" value={4} />
+                    </Dropdown>
+                  </DropdownWrappeer>
+                  <P>Fotos do Produto (até 2 fotos)</P>
+
+                  <WrapperListAddProduct>
+                    <FlatList
+                      horizontal
+                      data={productphotoList}
+                      extraData={extraPhoto}
+                      ListFooterComponent={() => (
+                        <MediaSpotButtonAddProduct
+                          onPress={() => handleChoosePhoto()}
+                        >
+                          <AddMediaButtonWrapperAddProduct>
+                            <Icon color="#84378F" size={35} name="plus" />
+                          </AddMediaButtonWrapperAddProduct>
+                        </MediaSpotButtonAddProduct>
+                      )}
+                      /* ListEmptyComponent={() => <View />} */
+                      renderItem={({ item, index }) => (
+                        <MediaWrapper>
+                          <RemoveMediaButtonWrapper
+                            source={item}
+                            resizeMode="contain"
                           >
-                            <AddMediaButtonWrapperAddProduct>
-                              <Icon color="#84378F" size={35} name="plus" />
-                            </AddMediaButtonWrapperAddProduct>
-                          </MediaSpotButtonAddProduct>
-                        )}
-                        /* ListEmptyComponent={() => <View />} */
-                        renderItem={({ item, index }) => (
-                          <MediaWrapper>
-                            <RemoveMediaButtonWrapper
-                              source={item}
-                              resizeMode="contain"
-                            >
-                              {learning ? (
-                                <Animatable.View
-                                  animation="slideInRight"
-                                  iterationCount={5}
-                                >
-                                  <Image
-                                    source={require('../../../assets/learn.png')}
-                                  />
-                                </Animatable.View>
-                              ) : null}
-                              <RemoveMedia onPress={() => removePhoto(index)}>
-                                <Icon
-                                  color="#EA3232"
-                                  size={35}
-                                  name="trash-o"
+                            {learning ? (
+                              <Animatable.View
+                                animation="slideInRight"
+                                iterationCount={5}
+                              >
+                                <Image
+                                  source={require('../../../assets/learn.png')}
                                 />
-                              </RemoveMedia>
-                            </RemoveMediaButtonWrapper>
-                          </MediaWrapper>
-                        )}
-                        keyExtractor={(index) => String(index.uri)}
-                      />
-                    </WrapperListAddProduct>
-                  </FormScroll>
+                              </Animatable.View>
+                            ) : null}
+                            <RemoveMedia onPress={() => removePhoto(index)}>
+                              <Icon color="#EA3232" size={35} name="trash-o" />
+                            </RemoveMedia>
+                          </RemoveMediaButtonWrapper>
+                        </MediaWrapper>
+                      )}
+                      keyExtractor={(index) => String(index.uri)}
+                    />
+                  </WrapperListAddProduct>
+
                   <WrapperButtons>
-                  <AddProductButton onPress={() => addProduct()}>
-                    <AddProductButtonText>
-                      Adicionar Produto
-                    </AddProductButtonText>
-                  </AddProductButton>
+                    <AddProductButton onPress={() => addProduct()}>
+                      <AddProductButtonText>
+                        Adicionar Produto
+                      </AddProductButtonText>
+                    </AddProductButton>
                   </WrapperButtons>
                 </FormAddProduct>
               </ModalBackground>
-            </Modal>
-            <Modal
-              transparent
-              animationType="none"
-              visible={editProductModal}
-              onRequestClose={() => {
-                setEditProductModal(false);
-              }}
-            >
+            </KeyboardAwareScrollView>
+          </Modal>
+          <Modal
+            transparent
+            animationType="none"
+            visible={editProductModal}
+            onRequestClose={() => {
+              setEditProductModal(false);
+            }}
+          >
+            <KeyboardAwareScrollView>
               <ModalBackground>
-                
                 <FormAddProduct>
                   <HeaderAddProduct>
                     <HeaderAddProductInnerTitle>
@@ -747,119 +970,115 @@ setAddProductModal(true)
                       </CloseButtonAddProduct>
                     </HeaderAddProductInnerIcon>
                   </HeaderAddProduct>
-              
-                  <FormScroll>
-                    <Input
-                      placeholder="Nome do Produto"
-                      value={productName}
-                      onChangeText={(text) => setProductName(text)}
-                    />
-                    <Input
-                      placeholder="Preço do Produto"
-                      value={productPrice}
-                      onChangeText={(text) => setProductPrice(text)}
-                    />
-                    <Input
-                      placeholder="Número de items do produto"
-                      value={itemsNumber}
-                      onChangeText={(text) => setItemsNumber(text)}
-                    />
-                    <DropdownWrappeer>
-                      <Dropdown
-                        selectedValue={availability}
-                        onValueChange={(itemValue, itemIndex) =>
-                          setAvailability(itemValue)
-                        }
-                      >
-                        <Dropdown.Item label="Disponibilidade?" value={0} />
-                        <Dropdown.Item label="Disponível" value={1} />
-                        <Dropdown.Item label="Indisponível" value={2} />
-                      </Dropdown>
-                    </DropdownWrappeer>
-                    <DropdownWrappeer>
-                      <Dropdown
-                        selectedValue={measurement}
-                        onValueChange={(itemValue, itemIndex) =>
-                          setMeasurement(itemValue)
-                        }
-                      >
-                        <Dropdown.Item label="Unidade de Medida?" value={0} />
-                        <Dropdown.Item label="1 Quilograma (kg)" value={1} />
-                        <Dropdown.Item label="1 Litro (l)" value={2} />
-                        <Dropdown.Item label="500 Gramas (g)" value={3} />
-                        <Dropdown.Item label="500 Mililitros (ml)" value={4} />
-                      </Dropdown>
-                    </DropdownWrappeer>
-                    <P>Fotos do Produto (até 2 fotos)</P>
 
-                    <WrapperListAddProduct>
-                      <FlatList
-                        horizontal
-                        data={productphotoList}
-                        extraData={extraPhoto}
-                        ListFooterComponent={() => (
-                          <MediaSpotButtonAddProduct
-                            onPress={() => handleChoosePhoto()}
+                  <Input
+                    placeholder="Nome do Produto"
+                    value={productName}
+                    onChangeText={(text) => setProductName(text)}
+                  />
+                  <Input
+                    placeholder="Preço do Produto"
+                    value={productPrice}
+                    keyboardType="number-pad"
+                    onChangeText={(text) => setProductPrice(text)}
+                  />
+                  <Input
+                    placeholder="Número de items do produto"
+                    value={itemsNumber}
+                    keyboardType="number-pad"
+                    onChangeText={(text) => setItemsNumber(text)}
+                  />
+                  <DropdownWrappeer>
+                    <Dropdown
+                      selectedValue={availability}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setAvailability(itemValue)
+                      }
+                    >
+                      <Dropdown.Item label="Disponibilidade?" value={0} />
+                      <Dropdown.Item label="Disponível" value={1} />
+                      <Dropdown.Item label="Indisponível" value={2} />
+                    </Dropdown>
+                  </DropdownWrappeer>
+                  <DropdownWrappeer>
+                    <Dropdown
+                      selectedValue={measurement}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setMeasurement(itemValue)
+                      }
+                    >
+                      <Dropdown.Item label="Unidade de Medida?" value={0} />
+                      <Dropdown.Item label="1 Quilograma (kg)" value={1} />
+                      <Dropdown.Item label="1 Litro (l)" value={2} />
+                      <Dropdown.Item label="500 Gramas (g)" value={3} />
+                      <Dropdown.Item label="500 Mililitros (ml)" value={4} />
+                    </Dropdown>
+                  </DropdownWrappeer>
+                  <P>Fotos do Produto (até 2 fotos)</P>
+
+                  <WrapperListAddProduct>
+                    <FlatList
+                      horizontal
+                      data={productphotoList}
+                      extraData={extraPhoto}
+                      ListFooterComponent={() => (
+                        <MediaSpotButtonAddProduct
+                          onPress={() => handleChoosePhoto()}
+                        >
+                          <AddMediaButtonWrapperAddProduct>
+                            <Icon color="#84378F" size={35} name="plus" />
+                          </AddMediaButtonWrapperAddProduct>
+                        </MediaSpotButtonAddProduct>
+                      )}
+                      /* ListEmptyComponent={() => <View />} */
+                      renderItem={({ item, index }) => (
+                        <MediaWrapper>
+                          <RemoveMediaButtonWrapper
+                            source={item}
+                            resizeMode="contain"
                           >
-                            <AddMediaButtonWrapperAddProduct>
-                              <Icon color="#84378F" size={35} name="plus" />
-                            </AddMediaButtonWrapperAddProduct>
-                          </MediaSpotButtonAddProduct>
-                        )}
-                        /* ListEmptyComponent={() => <View />} */
-                        renderItem={({ item, index }) => (
-                          <MediaWrapper>
-                            <RemoveMediaButtonWrapper
-                              source={item}
-                              resizeMode="contain"
-                            >
-                              {learning ? (
-                                <Animatable.View
-                                  animation="slideInRight"
-                                  iterationCount={5}
-                                >
-                                  <Image
-                                    source={require('../../../assets/learn.png')}
-                                  />
-                                </Animatable.View>
-                              ) : null}
-                              <RemoveMedia onPress={() => removePhoto(index)}>
-                                <Icon
-                                  color="#EA3232"
-                                  size={35}
-                                  name="trash-o"
+                            {learning ? (
+                              <Animatable.View
+                                animation="slideInRight"
+                                iterationCount={5}
+                              >
+                                <Image
+                                  source={require('../../../assets/learn.png')}
                                 />
-                              </RemoveMedia>
-                            </RemoveMediaButtonWrapper>
-                          </MediaWrapper>
-                        )}
-                        keyExtractor={(index) => String(index.uri)}
-                      />
-                    </WrapperListAddProduct>
-                  </FormScroll>
-            
-<WrapperButtons>
-
-
-                  <AddProductButton onPress={() => editProduct()}>
-                    <AddProductButtonText>
-                      Atualizar
-                    </AddProductButtonText>
-                  </AddProductButton>
-                  <RemoveProductButton>
-                  <AddProductButtonText onPress={()=>{
-                    deleteProduct()
-                  }}>
-                      Excluir
-                    </AddProductButtonText>
-                  </RemoveProductButton>
+                              </Animatable.View>
+                            ) : null}
+                            <RemoveMedia onPress={() => removePhoto(index)}>
+                              <Icon color="#EA3232" size={35} name="trash-o" />
+                            </RemoveMedia>
+                          </RemoveMediaButtonWrapper>
+                        </MediaWrapper>
+                      )}
+                      keyExtractor={(index) => String(index.uri)}
+                    />
+                  </WrapperListAddProduct>
+                  <WrapperButtons>
+                    <AddProductButton onPress={() => editProduct()}>
+                      <AddProductButtonText>Atualizar</AddProductButtonText>
+                    </AddProductButton>
+                    <RemoveProductButton>
+                      <AddProductButtonText
+                        onPress={() => {
+                          deleteProduct();
+                        }}
+                      >
+                        Excluir
+                      </AddProductButtonText>
+                    </RemoveProductButton>
                   </WrapperButtons>
                 </FormAddProduct>
-                
               </ModalBackground>
-            </Modal>
+            </KeyboardAwareScrollView>
+          </Modal>
+          <GestureRecognizer onSwipeRight={() => changeToOrders()}>
             <SearchWrapper>
-              <SearchInput placeholder="Buscar Produto" />
+              <SearchInputButton onPress={() => setOpenSearchModal(true)}>
+                <SearchTextInner>Buscar Produto</SearchTextInner>
+              </SearchInputButton>
               <AddButton
                 onPress={() => {
                   openAddProductModal();
@@ -870,10 +1089,10 @@ setAddProductModal(true)
             </SearchWrapper>
             <ListWrapper>
               <FlatList
-            scrollEnabled
-                
+                scrollEnabled
                 data={productsList}
-                
+                refreshing={false}
+                onRefresh={() => getAllProducts()}
                 /* ListFooterComponent={() => (
                   <View style={{ backgroundColor: '#F2F1F7' }}>
                     <ListProducts>
@@ -935,125 +1154,77 @@ setAddProductModal(true)
                   </View>
                 )} */
                 renderItem={({ item, index }) => (
-                  <ListProducts onPress={()=>getProduct(item.id)}>
-                      <ListProductsImageWrapper
-                        source={require('../../../assets/acai_1.jpg')}
-                        resizeMode="contain"
-                      />
-                      <ListProductsTextWrapper>
-                <ListRowTitle>{item.nome}</ListRowTitle>
-                <ListRowSubTitle>{item.unidade_medida+" R$ "+item.preco}</ListRowSubTitle>
-                {item.status_produto?(
-                   <ListRowSubTitle>
-                   <Icon name="check-circle" color="green" size={20} />
-                   {' ' + 'Disponivel'}
-                 </ListRowSubTitle>
-                  
-
-                ):(
-                  <ListRowSubTitle>
-                  <Icon name="ban" color="red" size={20} />
-                  {' ' + 'Indisponivel'}
-                </ListRowSubTitle>
+                  <ListProducts onPress={() => getProduct(item.id)}>
+                    <ListProductsImageWrapper
+                      source={require('../../../assets/acai_1.jpg')}
+                      resizeMode="contain"
+                    />
+                    <ListProductsTextWrapper>
+                      <ListRowTitle>{item.nome}</ListRowTitle>
+                      <ListRowSubTitle>
+                        {`${item.unidade_medida} R$ ${item.preco}`}
+                      </ListRowSubTitle>
+                      {item.status_produto ? (
+                        <ListRowSubTitle>
+                          <Icon name="check-circle" color="green" size={20} />
+                          {' ' + 'Disponivel'}
+                        </ListRowSubTitle>
+                      ) : (
+                        <ListRowSubTitle>
+                          <Icon name="ban" color="red" size={20} />
+                          {' ' + 'Indisponivel'}
+                        </ListRowSubTitle>
+                      )}
+                    </ListProductsTextWrapper>
+                  </ListProducts>
                 )}
-                        
-                      </ListProductsTextWrapper>
-                    </ListProducts>
-                )}
-                keyExtractor={(item,index) => String(index)}
+                keyExtractor={(item, index) => String(index)}
               />
             </ListWrapper>
-          </View>
-        ) : null}
-        {showOrders ? (
-          <View>
-            <Section>
-              <SectionTitle> Pedidos Pendentes</SectionTitle>
-            </Section>
-            <ListWrapper>
+          </GestureRecognizer>
+        </Animatable.View>
+      ) : null}
+      {showOrders ? (
+        <Animatable.View animation="fadeIn">
+          <GestureRecognizer onSwipeLeft={() => changeToProducts()}>
+            <ListWrapperOrders>
               <FlatList
-                scrollEnabled={false}
-                horizontal
-                data={photoList}
-                extraData={extraPhoto}
-                ListFooterComponent={() => (
+                data={ordersData}
+                refreshing={false}
+                onRefresh={() => getAllOrders()}
+                renderItem={({ item, index }) => (
                   <View style={{ backgroundColor: '#F2F1F7' }}>
-                    <ListRow>
-                      <ListRowTitle>Nome do cliente</ListRowTitle>
-                      <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                      <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                    {index === 0 ? (
+                      <Section>
+                        <SectionTitle> Pedidos Pendentes</SectionTitle>
+                      </Section>
+                    ) : null}
+                    {index === pendingLength ? (
+                      <Section>
+                        <SectionTitle> Pedidos Confirmados</SectionTitle>
+                      </Section>
+                    ) : null}
+                    <ListRow
+                      onPress={() => navigation.navigate('OrderDetails')}
+                    >
+                      <ListRowTitle>{item.consumidor.nome}</ListRowTitle>
+                      <ListRowSubTitle>{`Total: R$ ${item.total}`}</ListRowSubTitle>
+                      <ListRowSubTitle>{`Status: R$ ${item.status_pedido}`}</ListRowSubTitle>
                       <ListRowSubTitle>
-                        Tipo de Pedido: Delivery
-                      </ListRowSubTitle>
-                    </ListRow>
-                    <ListRow>
-                      <ListRowTitle>Nome do cliente</ListRowTitle>
-                      <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                      <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                      <ListRowSubTitle>
-                        Tipo de Pedido: Delivery
+                        {`Tipo de Pedido: ${
+                          item.tipo_da_compra ? 'Delivery' : ' Reserva'
+                        }`}
                       </ListRowSubTitle>
                     </ListRow>
                   </View>
                 )}
-                renderItem={({ item, index }) => (
-                  <MediaSpotButton onPress={() => removePhoto(index)}>
-                    <RemoveMediaButtonWrapper
-                      source={item}
-                      resizeMode="contain"
-                    >
-                      <Icon color="#EA3232" size={35} name="trash-o" />
-                    </RemoveMediaButtonWrapper>
-                  </MediaSpotButton>
-                )}
-                keyExtractor={(index) => String(index.uri)}
+                keyExtractor={(item, index) => String(index)}
               />
-            </ListWrapper>
-            <Section>
-              <SectionTitle> Pedidos Confirmados</SectionTitle>
-            </Section>
-            <ListWrapper>
-              <FlatList
-                scrollEnabled={false}
-                horizontal
-                data={photoList}
-                extraData={extraPhoto}
-                ListFooterComponent={() => (
-                  <View style={{ backgroundColor: '#F2F1F7' }}>
-                    <ListRow>
-                      <ListRowTitle>Nome do cliente</ListRowTitle>
-                      <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                      <ListRowSubTitle>Status: Entregando</ListRowSubTitle>
-                      <ListRowSubTitle>
-                        Tipo de Pedido: Delivery
-                      </ListRowSubTitle>
-                    </ListRow>
-                    <ListRow>
-                      <ListRowTitle>Nome do cliente</ListRowTitle>
-                      <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                      <ListRowSubTitle>
-                        Status: Á espera do cliente
-                      </ListRowSubTitle>
-                      <ListRowSubTitle>Tipo de Pedido: Reserva</ListRowSubTitle>
-                    </ListRow>
-                  </View>
-                )}
-                renderItem={({ item, index }) => (
-                  <MediaSpotButton onPress={() => removePhoto(index)}>
-                    <RemoveMediaButtonWrapper
-                      source={item}
-                      resizeMode="contain"
-                    >
-                      <Icon color="#EA3232" size={35} name="trash-o" />
-                    </RemoveMediaButtonWrapper>
-                  </MediaSpotButton>
-                )}
-                keyExtractor={(index) => String(index.uri)}
-              />
-            </ListWrapper>
-          </View>
-        ) : null}
-        {/* <Section>
+            </ListWrapperOrders>
+          </GestureRecognizer>
+        </Animatable.View>
+      ) : null}
+      {/* <Section>
           <SectionTitle> Pedidos Pendentes</SectionTitle>
         </Section>
         <ListWrapper>
@@ -1123,7 +1294,7 @@ setAddProductModal(true)
             keyExtractor={(index) => String(index.uri)}
           />
         </ListWrapper> */}
-        {/* <Form>
+      {/* <Form>
           <Input placeholder="Seu nome" />
           <Input placeholder="Nome do estabelecimento" />
           <Input placeholder="CPF/CNPJ" />

@@ -221,11 +221,15 @@ export const TopTabMenuInWrapper = styled.View`
 export const ListWrapper = styled.View`
   align-items: center;
   background: #f2f1f7;
-  height:${hp('65%')}px;
- 
+  height: ${hp('63%')}px;
+`;
+export const ListWrapperOrders = styled.View`
+  align-items: center;
+  background: #f2f1f7;
+  height: ${hp('72.5%')}px;
 `;
 
-export const ListRow = styled.View`
+export const ListRow = styled.TouchableOpacity`
   justify-content: center;
   height: ${hp('17%')}px;
   width: ${wp('95%')}px;
@@ -254,14 +258,32 @@ export const SearchWrapper = styled.View`
   height: ${hp('10%')}px;
   align-items: center;
 `;
+
+export const SearchInputButton = styled.TouchableOpacity`
+  width: ${wp('65%')}px;
+  background: #fff;
+  border-radius: 22px;
+  border-width: 1px;
+  border-color: #e4e4e6;
+  justify-content: center;
+  height: ${hp('7%')}px;
+  padding-left: ${hp('1.5%')}px;
+`;
+
 export const SearchInput = styled.TextInput`
   width: ${wp('65%')}px;
   background: #fff;
   border-radius: 22px;
   border-width: 1px;
   border-color: #e4e4e6;
-  padding: ${hp('1.5%')}px;
+  justify-content: center;
   height: ${hp('7%')}px;
+  padding-left: ${hp('1.5%')}px;
+`;
+
+export const SearchTextInner = styled.Text`
+  color: #878787;
+  font-size: ${hp('2%')}px;
 `;
 export const AddButton = styled.TouchableOpacity`
   justify-content: center;
@@ -313,7 +335,7 @@ export const FormAddProduct = styled.View`
   align-items: center;
   flex-direction: column;
   background-color: #ffffff;
-  height: ${hp('95%')}px;
+  min-height: ${hp('95%')}px;
   width: ${wp('90%')}px;
   border-radius: 10px;
 
@@ -344,7 +366,7 @@ export const AddProductButton = styled.TouchableOpacity`
   width: ${wp('40%')}px;
   border-radius: 22px;
   height: ${hp('6%')}px;
-  
+
   justify-content: center;
   background: ${(props) => props.theme.colors.primary};
   margin-bottom: ${hp('1.8%')}px;
@@ -370,9 +392,9 @@ export const RemoveProductButton = styled.TouchableOpacity`
   width: ${wp('40%')}px;
   border-radius: 22px;
   height: ${hp('6%')}px;
- 
+
   justify-content: center;
-  background: #EB5757;
+  background: #eb5757;
   margin-bottom: ${hp('1.8%')}px;
 `;
 
@@ -441,4 +463,55 @@ export const RemoveMedia = styled.TouchableOpacity`
 
 export const FormScroll = styled.ScrollView`
   width: 100%;
+  height:${hp('100%')}px;
+  border-width:1px
+  border-color:red
+`;
+
+// Buscar Produtos
+
+export const ModalBackgroundSearch = styled.View`
+  flex: 1;
+  align-items: center;
+  flex-direction: column;
+  background: #f2f1f7;
+  justify-content: center;
+`;
+
+export const FormSearchProduct = styled.View`
+  flex-direction: column;
+  background: #f2f1f7;
+  min-height: 100%;
+  width: ${wp('100%')}px;
+  border-radius: 10px;
+`;
+
+export const HeaderSearchProduct = styled.View`
+  align-self: flex-end;
+  flex-direction: row;
+  background: #f2f1f7;
+  height: 150px
+  width: ${wp('100%')}px;
+  
+  padding-top: 70px;
+`;
+
+export const HeaderSearchProductInnerSearch = styled.View`
+  align-items: center;
+  align-self: center;
+  width: 75%;
+  justify-content: center;
+`;
+
+export const HeaderSearchProductInnerIcon = styled.View`
+  align-items: center;
+  justify-content: center;
+  width: 15%;
+  align-self: center;
+`;
+
+export const ListWrapperSearchProduct = styled.View`
+  align-items: center;
+  background: #f2f1f7;
+  min-height: 250px;
 `;

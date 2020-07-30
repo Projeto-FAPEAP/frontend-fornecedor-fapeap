@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import History from '../../../screens/Authenticated-Screens/History';
 import Home from '../../../screens/Authenticated-Screens/Home';
-import Settings from '../../../screens/Authenticated-Screens/Settings';
+import User from '../../../screens/Authenticated-Screens/User';
 
 const Tab = createBottomTabNavigator();
 
@@ -51,7 +51,7 @@ const BottomTabRoutes: React.FC = () => {
       />
       <Tab.Screen
         name="Perfil"
-        component={Settings}
+        component={User}
         options={{
           tabBarIcon: ({ focused, size = 32 }) => (
             <Icon

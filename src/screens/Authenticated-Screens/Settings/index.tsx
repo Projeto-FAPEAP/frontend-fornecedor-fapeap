@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
 
 import AuthContext from '../../../contexts/auth';
+import Loader from '../../utils';
 import {
   Container,
   Title,
@@ -46,12 +47,24 @@ import {
 const Settings: React.FC = ({ navigation }) => {
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
-  // const [pictures, setPictures] = useState([5]);
   const [showExtraInput, setShowExtraInput] = useState(0);
   const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
-  const [video, setVideo] = useState({});
+  const [videoState, setVideoState] = useState<ImagePickerResponse[]>([]);
   const [videoSelected, setVideoSelected] = useState(false);
   const [learning, setLearning] = useState(false);
+  const [name, setName] = useState('');
+  const [storeName, setStoreName] = useState('');
+  const [cpfCnpj, setCpfCnpj] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [phoneWhatsapp, setPhoneWhatsapp] = useState('');
+  const [deliveryTax, setDeliveryTax] = useState('');
+  const [address, setAddress] = useState('');
+  const [number, setNumber] = useState('');
+  const [neighborhood, setNeighborhood] = useState('');
+  const [cep, setCep] = useState('');
+  const [loading, setLoading] = useState(false);
   const { logOut } = useContext(AuthContext);
   useEffect(() => {
     if (showExtraInput === 1) {
@@ -209,18 +222,63 @@ const Settings: React.FC = ({ navigation }) => {
   return (
     <Container>
       <KeyboardAwareScrollView>
+        <Loader loading={loading} />
         <Header>
-          <BackButtonWrapper onPress={() => logOutt()}>
-            <Text>Sair</Text>
+          <BackButtonWrapper onPress={() => navigation.goBack()}>
+            <Icon color="#84378F" size={28} name="chevron-left" />
           </BackButtonWrapper>
-          <Title>Editar conta</Title>
+          <Title>Editar sua conta</Title>
         </Header>
-
         <Form>
-          <Input placeholder="Seu nome" />
-          <Input placeholder="Nome do estabelecimento" />
-          <Input placeholder="CPF/CNPJ" />
-          <Input placeholder="Endereço" />
+          <Input
+            placeholder="Seu nome"
+            onChangeText={(text) => setName(text)}
+          />
+          <Input
+            placeholder="Nome do estabelecimento"
+            onChangeText={(text) => setStoreName(text)}
+          />
+
+          <Input placeholder="Email" onChangeText={(text) => setEmail(text)} />
+          <Input
+            placeholder="Senha"
+            keyboardType="email-address"
+            onChangeText={(text) => setPassword(text)}
+          />
+          <Input
+            placeholder="CPF/CNPJ"
+            keyboardType="number-pad"
+            onChangeText={(text) => setCpfCnpj(text)}
+          />
+          <Input
+            placeholder="Telefone"
+            keyboardType="number-pad"
+            onChangeText={(text) => setPhone(text)}
+          />
+          <Input
+            placeholder="Contato whatsapp"
+            keyboardType="number-pad"
+            onChangeText={(text) => setPhoneWhatsapp(text)}
+          />
+
+          <Input
+            placeholder="Endereço"
+            onChangeText={(text) => setAddress(text)}
+          />
+          <Input
+            placeholder="Número"
+            keyboardType="number-pad"
+            onChangeText={(text) => setNumber(text)}
+          />
+          <Input
+            placeholder="Bairro"
+            onChangeText={(text) => setNeighborhood(text)}
+          />
+          <Input
+            placeholder="CEP"
+            onChangeText={(text) => setCep(text)}
+            keyboardType="number-pad"
+          />
           <DropdownWrappeer>
             <Dropdown
               selectedValue={showExtraInput}
@@ -233,8 +291,14 @@ const Settings: React.FC = ({ navigation }) => {
               <Dropdown.Item label="Não" value={2} />
             </Dropdown>
           </DropdownWrappeer>
-          {delivery ? <Input placeholder="Qual a taxa de entrega?" /> : null}
-          <Input placeholder="Contato whatsapp" />
+          {delivery ? (
+            <Input
+              placeholder="Qual a taxa de entrega?"
+              keyboardType="number-pad"
+              onChangeText={(text) => setDeliveryTax(text)}
+            />
+          ) : null}
+
           <P>Fotos do Estabelecimento(até 4 fotos)</P>
 
           <WrapperList>
@@ -270,19 +334,19 @@ const Settings: React.FC = ({ navigation }) => {
               keyExtractor={(index) => String(index.uri)}
             />
           </WrapperList>
-          <P>Video do Estabelecimento(até 1 minuto)</P>
+          <P>Video do Processo Produtivo(até 1 minuto)</P>
           {videoSelected ? (
             <MediaWrapper>
-              {!isEmpty(video) ? (
+              {!isEmpty(videoState) ? (
                 <Video
-                  source={{ uri: video }}
+                  source={{ uri: videoState[0].uri }}
                   style={{
                     width: '100%',
                     height: '100%',
 
                     position: 'absolute',
                   }}
-                  poster={video}
+                  poster={videoState[0].uri}
                   resizeMode="contain"
                   controls
                 />
@@ -300,7 +364,7 @@ const Settings: React.FC = ({ navigation }) => {
           )}
 
           <RegisterButton>
-            <RegisterButtonText>Registre-me</RegisterButtonText>
+            <RegisterButtonText>Atualizar dados</RegisterButtonText>
           </RegisterButton>
         </Form>
       </KeyboardAwareScrollView>

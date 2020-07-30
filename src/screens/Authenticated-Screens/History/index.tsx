@@ -63,63 +63,61 @@ const History: React.FC = () => {
 
   return (
     <Container>
-      <KeyboardAwareScrollView>
-        <Header>
-          <SearchInput placeholder="Buscar Histórico" />
-        </Header>
-        <ListWrapper>
-          <FlatList
-            ListFooterComponent={() => (
-              <View style={{ backgroundColor: '#F2F1F7' }}>
-                <ListRow>
-                  <ListRowTitle>Nome do cliente</ListRowTitle>
-                  <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                  <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                  <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
-                </ListRow>
-                <ListRow>
-                  <ListRowTitle>Nome do cliente</ListRowTitle>
-                  <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                  <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                  <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
-                </ListRow>
-                <ListRow>
-                  <ListRowTitle>Nome do cliente</ListRowTitle>
-                  <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                  <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                  <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
-                </ListRow>
-                <ListRow>
-                  <ListRowTitle>Nome do cliente</ListRowTitle>
-                  <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                  <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                  <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
-                </ListRow>
-                <ListRow>
-                  <ListRowTitle>Nome do cliente</ListRowTitle>
-                  <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                  <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                  <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
-                </ListRow>
-                <ListRow>
-                  <ListRowTitle>Nome do cliente</ListRowTitle>
-                  <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
-                  <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
-                  <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
-                </ListRow>
-              </View>
-            )}
-            renderItem={({ item, index }) => (
-              <MediaSpotButton onPress={() => removePhoto(index)}>
-                <RemoveMediaButtonWrapper source={item} resizeMode="contain">
-                  <Icon color="#EA3232" size={35} name="trash-o" />
-                </RemoveMediaButtonWrapper>
-              </MediaSpotButton>
-            )}
-            keyExtractor={(index) => String(index.uri)}
-          />
-        </ListWrapper>
-      </KeyboardAwareScrollView>
+      <Header>
+        <SearchInput placeholder="Buscar Histórico" />
+      </Header>
+      <ListWrapper>
+        <FlatList
+          ListFooterComponent={() => (
+            <View style={{ backgroundColor: '#F2F1F7' }}>
+              <ListRow>
+                <ListRowTitle>Nome do cliente</ListRowTitle>
+                <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
+                <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
+              </ListRow>
+              <ListRow>
+                <ListRowTitle>Nome do cliente</ListRowTitle>
+                <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
+                <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
+              </ListRow>
+              <ListRow>
+                <ListRowTitle>Nome do cliente</ListRowTitle>
+                <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
+                <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
+              </ListRow>
+              <ListRow>
+                <ListRowTitle>Nome do cliente</ListRowTitle>
+                <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
+                <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
+              </ListRow>
+              <ListRow>
+                <ListRowTitle>Nome do cliente</ListRowTitle>
+                <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
+                <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
+              </ListRow>
+              <ListRow>
+                <ListRowTitle>Nome do cliente</ListRowTitle>
+                <ListRowSubTitle>Total: R$25.00</ListRowSubTitle>
+                <ListRowSubTitle>Status: Pendente</ListRowSubTitle>
+                <ListRowSubTitle>Tipo de Pedido: Delivery</ListRowSubTitle>
+              </ListRow>
+            </View>
+          )}
+          renderItem={({ item, index }) => (
+            <MediaSpotButton onPress={() => removePhoto(index)}>
+              <RemoveMediaButtonWrapper source={item} resizeMode="contain">
+                <Icon color="#EA3232" size={35} name="trash-o" />
+              </RemoveMediaButtonWrapper>
+            </MediaSpotButton>
+          )}
+          keyExtractor={(index) => String(index.uri)}
+        />
+      </ListWrapper>
     </Container>
   );
 };

@@ -33,7 +33,6 @@ export const AuthProvider: React.FC = ({ children }) => {
       );
       console.log(userLoaded, tokenLoaded);
       if (userLoaded && tokenLoaded) {
-      
         setUser(JSON.parse(userLoaded));
         console.log(JSON.parse(userLoaded), 'joantahn');
       }
@@ -41,22 +40,22 @@ export const AuthProvider: React.FC = ({ children }) => {
     loadData();
   }, []);
 
-  async function logIn(email: string, password: string): Promise<Response> {
-    console.log(email, password, 'teste');
+  async function logIn(cpfCnpj: string, password: string): Promise<Response> {
+    console.log(cpfCnpj, password, 'teste');
 
     try {
       const response = await api.post(
         `${api.defaults.baseURL}/sessao/fornecedor`,
 
         {
-          cpf_cnpj: email,
+          cpf_cnpj: cpfCnpj,
           senha: password,
         },
       );
-      console.log(response,'shhhhhhhhhhhhh');
-      
+      console.log(response, 'shhhhhhhhhhhhh');
+
       setUser(response.data.fornecedor);
-    
+
       await AsyncStorage.setItem(
         '@QueroAçaí-Fornecedor:user',
         JSON.stringify(response.data.fornecedor),
@@ -72,25 +71,24 @@ export const AuthProvider: React.FC = ({ children }) => {
         });
       });
     } catch (error) {
-if(error.message === 'Network Error'){
-  console.log('auiiiiiiii')
-  return new Promise((resolve) => {
-    resolve({
-      responseState: false,
-      responseStatus: 'Verifique sua conexão de internet e tente novamente!!',
-    });
-  });
-}else{
-  console.log(error);
-  return new Promise((resolve) => {
-    resolve({
-      responseState: false,
-      responseStatus: error.response.data.error,
-    });
-  });
-}
-}
-      
+      if (error.message === 'Network Error') {
+        console.log('auiiiiiiii');
+        return new Promise((resolve) => {
+          resolve({
+            responseState: false,
+            responseStatus:
+              'Verifique sua conexão de internet e tente novamente!!',
+          });
+        });
+      }
+      console.log(error);
+      return new Promise((resolve) => {
+        resolve({
+          responseState: false,
+          responseStatus: error.response.data.error,
+        });
+      });
+    }
   }
   function logOut(): void {
     AsyncStorage.clear().then(() => {

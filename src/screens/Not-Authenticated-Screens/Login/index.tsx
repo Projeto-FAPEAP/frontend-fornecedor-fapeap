@@ -54,7 +54,7 @@ conta`}
         </Header>
         <Form>
           <Input
-            placeholder="Seu email"
+            placeholder="Seu CPF/CNPJ"
             onChangeText={(text) => setEmail(text)}
           />
           <Input
