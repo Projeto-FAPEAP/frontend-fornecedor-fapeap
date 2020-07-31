@@ -27,7 +27,13 @@ const AppRoutes: React.FC = () => {
           },
         }}
       >
-        <Stack.Screen name="Olá, Manoel Gomes" component={BottomTabRoutes} />
+        <Stack.Screen
+          name="Index"
+          options={{
+            headerTitle: 'Olá, Manoel Gomes',
+          }}
+          component={BottomTabRoutes}
+        />
       </Stack.Navigator>
     </>
   );

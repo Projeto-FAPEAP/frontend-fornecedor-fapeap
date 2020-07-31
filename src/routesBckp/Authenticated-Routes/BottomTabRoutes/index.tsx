@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import History from '../../../screens/Authenticated-Screens/History';
+import History from '../../../screens/Authenticated-Screens/History2';
 import Home from '../../../screens/Authenticated-Screens/Home';
 import User from '../../../screens/Authenticated-Screens/User';
 

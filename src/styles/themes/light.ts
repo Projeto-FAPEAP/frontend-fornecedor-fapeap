@@ -12,9 +12,10 @@ export default {
     warning: '#FFD500',
 
     background: '#E5E5E5',
+    border: '#eee',
 
-    title: '#455A64',
-    subtitle: '#B0BEC5',
+    title: '#444',
+    subtitle: '#666',
 
     transparent: 'transparent',
     darkTransparent: 'rgba(0, 0, 0, 0.6)',

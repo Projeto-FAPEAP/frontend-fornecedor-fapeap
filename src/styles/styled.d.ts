@@ -12,6 +12,7 @@ declare module 'styled-components' {
       warning: string;
 
       background: string;
+      border: string;
 
       title: string;
       subtitle: string;
