@@ -16,8 +16,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import MediaMeta from 'react-native-media-meta';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
-
-import AuthContext from '../../../contexts/auth';
+import { useNavigation } from '@react-navigation/native';
 import Loader from '../../utils';
 import {
   Container,
@@ -44,43 +43,18 @@ import {
   RemoveMedia,
 } from './styles';
 
-const Settings: React.FC = ({ navigation }) => {
-  const [delivery, setDelivery] = useState(false);
+const Settings: React.FC = () => {
+  const navigation = useNavigation();
   const [extraPhoto, setExtraPhoto] = useState(false);
   const [showExtraInput, setShowExtraInput] = useState(0);
   const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
   const [videoState, setVideoState] = useState<ImagePickerResponse[]>([]);
   const [videoSelected, setVideoSelected] = useState(false);
   const [learning, setLearning] = useState(false);
-  const [name, setName] = useState('');
-  const [storeName, setStoreName] = useState('');
-  const [cpfCnpj, setCpfCnpj] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [phoneWhatsapp, setPhoneWhatsapp] = useState('');
-  const [deliveryTax, setDeliveryTax] = useState('');
-  const [address, setAddress] = useState('');
-  const [number, setNumber] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const [cep, setCep] = useState('');
   const [loading, setLoading] = useState(false);
-  const { logOut } = useContext(AuthContext);
-  useEffect(() => {
-    if (showExtraInput === 1) {
-      setDelivery(true);
-    } else {
-      setDelivery(false);
-    }
-  }, [showExtraInput]);
+  
 
-  /*  useLayoutEffect(() => {
-    Alert.alert('item adicionado');
-  }, [photoList]); */
-  function logOutt(): void {
-    console.log('oiiiiiii');
-    logOut();
-  }
+
   function removePhoto(index: number): void {
     // Alert.alert('Jonathan');
     Alert.alert(
@@ -223,12 +197,12 @@ const Settings: React.FC = ({ navigation }) => {
     <Container>
       <KeyboardAwareScrollView>
         <Loader loading={loading} />
-        <Header>
+        {/* <Header>
           <BackButtonWrapper onPress={() => navigation.goBack()}>
             <Icon color="#84378F" size={28} name="chevron-left" />
           </BackButtonWrapper>
           <Title>Editar sua conta</Title>
-        </Header>
+        </Header> */}
         <Form>
           <P>Fotos (até 4 fotos)</P>
 

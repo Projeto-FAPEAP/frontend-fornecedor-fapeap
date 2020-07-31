@@ -16,6 +16,7 @@ const BottomTabRoutes: React.FC = () => {
 
   return (
     <Tab.Navigator
+
       tabBarOptions={{
         inactiveTintColor: colors.title,
         activeTintColor: colors.primary,

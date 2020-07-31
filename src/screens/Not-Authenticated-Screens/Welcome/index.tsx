@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-
+import { useNavigation } from '@react-navigation/native';
 import {
   Container,
   Title,
@@ -15,7 +15,8 @@ import {
   TextBetweenButtons,
 } from './styles';
 
-const Welcome: React.FC = ({ navigation }) => {
+const Welcome: React.FC = () => {
+  const navigation = useNavigation();
   return (
     <Container>
       <IconSpace />

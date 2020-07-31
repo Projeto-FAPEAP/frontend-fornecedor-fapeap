@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import { useNavigation } from '@react-navigation/native';
 import {
   Container,
   Title,
@@ -20,7 +20,8 @@ import {
   BackButtonWrapper,
 } from './styles';
 
-const RecoveryPassword: React.FC = ({ navigation }) => {
+const RecoveryPassword: React.FC = () => {
+  const navigation = useNavigation();
   return (
     <Container>
       <KeyboardAwareScrollView>

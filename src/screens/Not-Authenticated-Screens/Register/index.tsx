@@ -18,12 +18,12 @@ import RNPickerSelect from 'react-native-picker-select';
 import { useSafeArea } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
-
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 import AuthContext from '../../../contexts/auth';
 import api from '../../../services/api';
-import Loader from '../../utils/index.js';
+import Loader from '../../utils/';
 import {
   Container,
   Title,
@@ -49,7 +49,8 @@ import {
   RemoveMedia,
 } from './styles';
 
-const Register: React.FC = ({ navigation }) => {
+const Register: React.FC = () => {
+  const navigation = useNavigation()
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   const [showExtraInput, setShowExtraInput] = useState(0);

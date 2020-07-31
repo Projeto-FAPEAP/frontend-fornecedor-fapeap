@@ -13,7 +13,7 @@ interface AuthContextData {
   signed: boolean;
   user: any | null;
   loading: boolean;
-  logIn(email: string, password: string): Promise<Response>;
+  logIn(cpfCnpj: string, password: string): Promise<Response>;
   logOut(): void;
 }
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -22,7 +22,6 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     async function loadData(): Promise<void> {
-      console.log('passsei qui');
       const userLoaded = await AsyncStorage.getItem(
         '@QueroAçaí-Fornecedor:user',
       );
@@ -32,14 +31,14 @@ export const AuthProvider: React.FC = ({ children }) => {
       console.log(userLoaded, tokenLoaded);
       if (userLoaded && tokenLoaded) {
         setUser(JSON.parse(userLoaded));
-        console.log(JSON.parse(userLoaded), 'joantahn');
+
       }
     }
     loadData();
   }, []);
 
   async function logIn(cpfCnpj: string, password: string): Promise<Response> {
-    console.log(cpfCnpj, password, 'teste');
+   
 
     try {
       const response = await api.post(
@@ -50,7 +49,7 @@ export const AuthProvider: React.FC = ({ children }) => {
           senha: password,
         },
       );
-      console.log(response, 'shhhhhhhhhhhhh');
+     
 
       setUser(response.data.fornecedor);
 
@@ -70,7 +69,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       });
     } catch (error) {
       if (error.message === 'Network Error') {
-        console.log('auiiiiiiii');
+
         return new Promise((resolve) => {
           resolve({
             responseState: false,

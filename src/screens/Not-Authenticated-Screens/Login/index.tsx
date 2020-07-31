@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
+import { useNavigation } from '@react-navigation/native';
 import AuthContext from '../../../contexts/auth';
 import Loader from '../../utils';
+import {Alert} from 'react-native'
 import {
   Container,
   Title,
@@ -19,7 +20,8 @@ import {
   RegisterButtonText,
 } from './styles';
 
-const Login: React.FC = ({ navigation }) => {
+const Login: React.FC = () => {
+  const navigation =  useNavigation()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { logIn } = useContext(AuthContext);

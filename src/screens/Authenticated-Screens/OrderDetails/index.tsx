@@ -1,18 +1,9 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
-import ImagePicker, {
-  ImagePickerResponse,
-  ImagePickerOptions,
-} from 'react-native-image-picker';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { View, Text, SafeAreaView, FlatList, Alert, Image,ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import {
   Container,
-  Header,
-  BackButtonWrapper,
-  HeaderTextWrapper,
-  HeaderText,
   ClientInformation,
   ClientInformationImageWrapper,
   ClientInformationImage,
@@ -39,30 +30,14 @@ import {
   ListWrapperItem,
 } from './styles';
 
-const OrderDetails: React.FC = ({ navigation }) => {
-  const [delivery, setDelivery] = useState(false);
-  const [extraPhoto, setExtraPhoto] = useState(false);
-  // const [pictures, setPictures] = useState([5]);
-  const [showExtraInput, setShowExtraInput] = useState(0);
-  const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
-  const [video, setVideo] = useState({});
-  const [videoSelected, setVideoSelected] = useState(false);
-  const [showProducts, setShowProducts] = useState(false);
-  const [showOrders, setShowOrders] = useState(true);
+const OrderDetails: React.FC = () => {
+
 
   return (
     <Container>
-      <KeyboardAwareScrollView>
-        <Header>
-          <BackButtonWrapper
-            onPress={() => navigation.navigate('BottomTabRoutes')}
-          >
-            <Icon color="#FFF" size={28} name="chevron-left" />
-          </BackButtonWrapper>
-          <HeaderTextWrapper>
-            <HeaderText>Detalhes do Pedido</HeaderText>
-          </HeaderTextWrapper>
-        </Header>
+      <ScrollView>
+
+      
         <ClientInformation>
           <ClientInformationImageWrapper>
             <ClientInformationImage
@@ -96,8 +71,7 @@ const OrderDetails: React.FC = ({ navigation }) => {
               <FlatList
                 scrollEnabled={false}
                 horizontal
-                data={photoList}
-                extraData={extraPhoto}
+           
                 ListFooterComponent={() => (
                   <View>
                     <ListWrapperItem>
@@ -171,7 +145,7 @@ const OrderDetails: React.FC = ({ navigation }) => {
             </ButtonCancel>
           </ButtonWrapper>
         </OrderInformation>
-      </KeyboardAwareScrollView>
+        </ScrollView>
     </Container>
   );
 };
