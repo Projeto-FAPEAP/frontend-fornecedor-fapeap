@@ -1,35 +1,14 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useLayoutEffect,
-  useContext,
-} from 'react';
-import {
-  View,
-  Text,
-  SafeAreaView,
-  FlatList,
-  Alert,
-  Image,
-  Modal,
-  ScrollView,
-} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, FlatList, Alert, Image, Modal } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { createNativeWrapper } from 'react-native-gesture-handler';
-import ImagePicker, {
-  ImagePickerResponse,
-  ImagePickerOptions,
-} from 'react-native-image-picker';
+import ImagePicker, { ImagePickerResponse } from 'react-native-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import RNPickerSelect from 'react-native-picker-select';
-import GestureRecognizer, {
-  swipeDirections,
-} from 'react-native-swipe-gestures';
+import GestureRecognizer from 'react-native-swipe-gestures';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import AsyncStorage from '@react-native-community/async-storage';
-import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 import AuthContext from '../../../contexts/auth';
 import api from '../../../services/api';
@@ -122,8 +101,9 @@ interface Orders {
   };
 }
 
-const Home: React.FC = ({ navigation }) => {
+const Home: React.FC = () => {
   // Recebe Usuário
+  const navigation = useNavigation();
   const { user } = useContext(AuthContext);
   /// ///////////////////////////////////////////
 
@@ -1297,7 +1277,7 @@ const Home: React.FC = ({ navigation }) => {
                     <ListRow
                       onPress={() => navigation.navigate('OrderDetails')}
                     >
-                      <ListRowTitle>{item.consumidor.nome}</ListRowTitle>
+                      {/* <ListRowTitle>{item.consumidor.nome}</ListRowTitle> */}
                       <ListRowSubTitle>{`Total: R$ ${item.total}`}</ListRowSubTitle>
                       <ListRowSubTitle>{`Status: R$ ${item.status_pedido}`}</ListRowSubTitle>
                       <ListRowSubTitle>

@@ -37,6 +37,11 @@ export default {
       bold: 'OpenSans-Bold',
       semiBold: 'OpenSans-semiBold',
     },
+    Ubuntu: {
+      normal: 'Ubuntu-Regular',
+      bold: 'Ubuntu-Bold',
+      semiBold: 'Ubuntu-Medium',
+    },
   },
 
   screen: {

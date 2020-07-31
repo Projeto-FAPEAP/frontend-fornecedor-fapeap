@@ -38,7 +38,9 @@
     "baseUrl": "./",
     "paths": {
       "@hooks/*": ["src/hooks/*"],
+      "@contexts/*": ["src/contexts/*"],
       "@components/*": ["src/components/*"],
+      "@screens/*": ["src/screens/*"],
       "@pages/*": ["src/pages/*"],
       "@services/*": ["src/services/*"]
     },

@@ -37,6 +37,11 @@ declare module 'styled-components' {
         bold: string;
         semiBold: string;
       };
+      Ubuntu: {
+        normal: string;
+        bold: string;
+        semiBold: string;
+      };
     };
 
     screen: {

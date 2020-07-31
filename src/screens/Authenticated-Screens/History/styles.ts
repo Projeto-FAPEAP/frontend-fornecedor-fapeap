@@ -33,7 +33,7 @@ export const TopTabMenu = styled.View`
 
 export const Header = styled.View`
   justify-content: center;
-align-items:center
+  align-items: center;
   height: ${hp('7.5%')}px;
   background: ${(props) => props.theme.colors.primary};
 `;
@@ -271,22 +271,22 @@ export const AddButton = styled.TouchableOpacity`
 `;
 
 export const AddButtonText = styled.Text`
-  text-align:center
-    width: ${wp('25%')}px;
-    color: #fff;
-  `;
+  text-align: center;
+  width: ${wp('25%')}px;
+  color: #fff;
+`;
 
 export const ListProducts = styled.View`
-  justify-content:space-around
-    align-items: center;
-    flex-direction: row;
-    background: #fff;
-    height: ${hp('17%')}px;
-    width: ${wp('95%')}px;
-    margin-bottom: ${hp('1%')}px;
-    border-width: 1px;
-    border-color: #e4e4e6;
-  `;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: row;
+  background: #fff;
+  height: ${hp('17%')}px;
+  width: ${wp('95%')}px;
+  margin-bottom: ${hp('1%')}px;
+  border-width: 1px;
+  border-color: #e4e4e6;
+`;
 
 export const ListProductsImageWrapper = styled.Image`
   height: ${hp('23%')}px;

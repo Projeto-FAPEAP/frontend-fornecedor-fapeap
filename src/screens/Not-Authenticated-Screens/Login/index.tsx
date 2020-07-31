@@ -1,10 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Text, SafeAreaView, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Icon from 'react-native-vector-icons/Feather';
 
 import AuthContext from '../../../contexts/auth';
-import Loader from '../../utils/index.js';
+import Loader from '../../utils';
 import {
   Container,
   Title,
@@ -48,7 +46,7 @@ const Login: React.FC = ({ navigation }) => {
         <Loader loading={loading} />
         <Header>
           <Title>
-            {`Entre com sua 
+            {`Entre com sua
 conta`}
           </Title>
         </Header>

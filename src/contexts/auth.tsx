@@ -1,8 +1,6 @@
-import React, { useState, createContext, useEffect } from 'react';
-import { Alert } from 'react-native';
+import React, { useState, createContext, useEffect, useContext } from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
-import axios from 'axios';
 
 import api from '../services/api';
 
@@ -13,14 +11,14 @@ interface Response {
 
 interface AuthContextData {
   signed: boolean;
-  user: object | null;
+  user: any | null;
   loading: boolean;
   logIn(email: string, password: string): Promise<Response>;
   logOut(): void;
 }
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC = ({ children }) => {
-  const [user, setUser] = useState<object | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     async function loadData(): Promise<void> {
@@ -103,5 +101,11 @@ export const AuthProvider: React.FC = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export function useAuth(): AuthContextData {
+  const context = useContext(AuthContext);
+
+  return context;
+}
 
 export default AuthContext;
