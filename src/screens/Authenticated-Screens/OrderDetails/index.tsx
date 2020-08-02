@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image,ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import api from '../../../services/api';
+import { useNavigation,useRoute, NavigationContainer } from '@react-navigation/native';
+import Loader from '../../utils/index';
 import {
   Container,
   ClientInformation,
@@ -31,12 +33,52 @@ import {
 } from './styles';
 
 const OrderDetails: React.FC = () => {
-
+  const route = useRoute();
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const { itemId } = route.params;
+  async function confirmOrder():Promise<void>{
+    try{
+      const response = await api.put(`${api.defaults.baseURL}/validarpedidos/${itemId}`)
+      console.log(JSON.stringify(response.data, null, 2));
+  
+    
+      setLoading(false);
+      
+      Alert.alert('Aviso', 'Pedido Confirmado!',[{
+        text: 'Ok',
+        onPress: () => navigation.navigate('Index'),
+        style: 'default',
+      },]);
+    }catch(error){
+      setLoading(false);
+      console.log(JSON.stringify(error, null, 2));
+      console.log(error, 'jonathan');
+      console.log(Object(error.response), 'salve');
+      Alert.alert(error.response.data.error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
+  }
 
   return (
     <Container>
       <ScrollView>
-
+        <Loader loading={loading} />
       
         <ClientInformation>
           <ClientInformationImageWrapper>
@@ -137,7 +179,7 @@ const OrderDetails: React.FC = () => {
             </TotalSpan>
           </OrderRecipe>
           <ButtonWrapper>
-            <Button>
+            <Button onPress={()=>confirmOrder()}>
               <ButtonText>Confirmar Pedido</ButtonText>
             </Button>
             <ButtonCancel>
