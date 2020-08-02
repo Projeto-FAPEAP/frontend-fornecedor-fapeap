@@ -10,10 +10,11 @@ interface IButtonProps extends RectButtonProperties {
   children: string | number;
   loading?: boolean;
   disabled?: boolean;
+  colorText?: string;
 }
 
 const Button: React.FC<IButtonProps> = (props) => {
-  const { children, loading, disabled, ...buttonProps } = props;
+  const { children, loading, disabled, colorText, ...buttonProps } = props;
   const { colors } = useTheme();
 
   const enabled = React.useMemo(() => {
@@ -29,7 +30,7 @@ const Button: React.FC<IButtonProps> = (props) => {
       {loading ? (
         <ActivityIndicator size="small" color={colors.white} />
       ) : (
-        <S.ButtonText>{children}</S.ButtonText>
+        <S.ButtonText color={colorText}>{children}</S.ButtonText>
       )}
     </S.Container>
   );

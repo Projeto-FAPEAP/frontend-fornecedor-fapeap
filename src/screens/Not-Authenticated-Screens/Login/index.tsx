@@ -29,25 +29,28 @@ const Login: React.FC = () => {
   const formRef = React.useRef<FormHandles>(null);
   const { logIn, loading } = useAuth();
 
-  const handleSubmit = React.useCallback(async (data: ISubmitForm) => {
-    formRef.current?.setErrors({});
-    try {
-      const schema = Yup.object().shape({
-        cpf_cnpj: Yup.string().required('CPF ou CNPJ é obrigatório'),
-        password: Yup.string().required('Senha é obrigatória'),
-      });
+  const handleSubmit = React.useCallback(
+    async (data: ISubmitForm) => {
+      formRef.current?.setErrors({});
+      try {
+        const schema = Yup.object().shape({
+          cpf_cnpj: Yup.string().required('CPF ou CNPJ é obrigatório'),
+          password: Yup.string().required('Senha é obrigatória'),
+        });
 
-      await schema.validate(data, { abortEarly: false });
+        await schema.validate(data, { abortEarly: false });
 
-      const { cpf_cnpj, password } = data;
-      logIn(cpf_cnpj, password);
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
+        const { cpf_cnpj, password } = data;
+        logIn(cpf_cnpj, password);
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
       }
-    }
-  }, []);
+    },
+    [logIn],
+  );
 
   const focusTargetInput = React.useCallback((field: string) => {
     const nameInput = formRef.current?.getFieldRef(field);

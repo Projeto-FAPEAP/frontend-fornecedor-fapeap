@@ -1,42 +1,42 @@
 import React from 'react';
-import { Text, SafeAreaView } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+
 import { useNavigation } from '@react-navigation/native';
-import {
-  Container,
-  Title,
-  Span,
-  IconSpace,
-  P,
-  LoginButton,
-  LoginButtonText,
-  RegisterButton,
-  RegisterButtonText,
-  TextBetweenButtons,
-} from './styles';
+import { useTheme } from 'styled-components';
+
+import * as S from './styles';
 
 const Welcome: React.FC = () => {
   const navigation = useNavigation();
+  const { colors } = useTheme();
+
+  const navigateToLogin = React.useCallback(() => {
+    navigation.navigate('Login');
+  }, [navigation]);
+
+  const navigateToRegister = React.useCallback(() => {
+    navigation.navigate('Register');
+  }, [navigation]);
+
   return (
-    <Container>
-      <IconSpace />
-      <Span>
-        <Title>Quero Açaí </Title>
-        <P>
-          Descubra uma nova forma de conectar-se com seus clientes e embarque no
-          digital.
-        </P>
-        <LoginButton>
-          <LoginButtonText onPress={() => navigation.navigate('Login')}>
-            Faça Login
-          </LoginButtonText>
-        </LoginButton>
-        <TextBetweenButtons>ou</TextBetweenButtons>
-        <RegisterButton onPress={() => navigation.navigate('Register')}>
-          <RegisterButtonText>Registre-se</RegisterButtonText>
-        </RegisterButton>
-      </Span>
-    </Container>
+    <S.Container>
+      <S.IconSpace />
+      <S.Footer>
+        <S.ContentFooter>
+          <S.Title>Quero Açaí</S.Title>
+          <S.P>
+            Descubra uma nova forma de conectar-se com seus clientes e embarque
+            no digital.
+          </S.P>
+          <S.LoginButton colorText={colors.primary} onPress={navigateToLogin}>
+            Fazer login
+          </S.LoginButton>
+          <S.TextBetweenButtons>ou</S.TextBetweenButtons>
+          <S.RegisterButton onPress={navigateToRegister}>
+            Registre-se
+          </S.RegisterButton>
+        </S.ContentFooter>
+      </S.Footer>
+    </S.Container>
   );
 };
 
