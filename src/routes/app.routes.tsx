@@ -1,15 +1,17 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTheme } from 'styled-components/native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import BottomTabRoutes from './bottomTab.routes';
+
 import AddProduct from '../screens/Authenticated-Screens/AddProduct';
 import EditProduct from '../screens/Authenticated-Screens/EditProduct';
 import OrderDetails from '../screens/Authenticated-Screens/OrderDetails';
-import Settings from '../screens/Authenticated-Screens/Settings';
 import SearchProduct from '../screens/Authenticated-Screens/SearchProduct';
+import Settings from '../screens/Authenticated-Screens/Settings';
+import BottomTabRoutes from './bottomTab.routes';
+
 const Stack = createStackNavigator();
 
 const AppRoutes: React.FC = () => {
@@ -17,7 +19,11 @@ const AppRoutes: React.FC = () => {
 
   return (
     <>
-      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
+      <StatusBar
+        backgroundColor={colors.primary}
+        barStyle="light-content"
+        translucent
+      />
       <Stack.Navigator
         screenOptions={{
           headerBackTitleVisible: false,
@@ -26,8 +32,21 @@ const AppRoutes: React.FC = () => {
           headerTitleStyle: {
             fontFamily: fonts.Ubuntu.bold,
           },
+          cardStyle: {
+            backgroundColor: colors.background,
+          },
           headerStyle: {
             backgroundColor: colors.primary,
+            borderBottomWidth: 0,
+            borderBottomColor: colors.primary,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            elevation: 3,
+            shadowOpacity: 0.22,
+            shadowRadius: 2.22,
           },
         }}
       >

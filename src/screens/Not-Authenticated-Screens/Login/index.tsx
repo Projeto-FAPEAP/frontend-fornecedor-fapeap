@@ -1,90 +1,115 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import React from 'react';
+
+import Input from '@components/Input';
+import KeyboardView from '@components/KeyboardView';
+import { useAuth } from '@contexts/auth';
 import { useNavigation } from '@react-navigation/native';
-import AuthContext from '../../../contexts/auth';
-import Loader from '../../utils';
-import {Alert} from 'react-native'
+import { FormHandles } from '@unform/core';
+import { Form as FormProvider } from '@unform/mobile';
+import getValidationErrors from '@utils/getValidationErrors';
+import * as Yup from 'yup';
+
 import {
-  Container,
-  Title,
-  Input,
-  LoginButton,
-  LoginButtonText,
   RetrievePasswordButton,
   RetrievePasswordText,
-  Form,
-  Header,
   Footer,
   RegisterButton,
   RegularText,
   RegisterButtonText,
 } from './styles';
+import * as S from './styles';
+
+interface ISubmitForm {
+  cpf_cnpj: string;
+  password: string;
+}
 
 const Login: React.FC = () => {
-  const navigation =  useNavigation()
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { logIn } = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
+  const formRef = React.useRef<FormHandles>(null);
+  const { logIn, loading } = useAuth();
 
-  useEffect(() => {
-    async function logInLocal(): Promise<void> {
-      const Response = await logIn(email, password);
-      const { responseState, responseStatus } = Response;
+  const handleSubmit = React.useCallback(async (data: ISubmitForm) => {
+    formRef.current?.setErrors({});
+    try {
+      const schema = Yup.object().shape({
+        cpf_cnpj: Yup.string().required('CPF ou CNPJ é obrigatório'),
+        password: Yup.string().required('Senha é obrigatória'),
+      });
 
-      if (!responseState) {
-        setLoading(false);
-        Alert.alert('Aviso', responseStatus);
+      await schema.validate(data, { abortEarly: false });
+
+      const { cpf_cnpj, password } = data;
+      logIn(cpf_cnpj, password);
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+        formRef.current?.setErrors(errors);
       }
     }
-    if (loading) {
-      logInLocal();
-    }
-  }, [loading]);
+  }, []);
+
+  const focusTargetInput = React.useCallback((field: string) => {
+    const nameInput = formRef.current?.getFieldRef(field);
+    nameInput.focus();
+  }, []);
+
+  const navigateToResetPassword = React.useCallback(() => {
+    navigation.navigate('RecoveryPassword');
+  }, [navigation]);
 
   return (
-    <Container>
-      <KeyboardAwareScrollView>
-        <Loader loading={loading} />
-        <Header>
-          <Title>
-            {`Entre com sua
-conta`}
-          </Title>
-        </Header>
-        <Form>
-          <Input
-            placeholder="Seu CPF/CNPJ"
-            onChangeText={(text) => setEmail(text)}
-          />
-          <Input
-            placeholder="Sua senha"
-            secureTextEntry
-            onChangeText={(text) => setPassword(text)}
-          />
-          <LoginButton
-            onPress={() =>
-              email && password !== ''
-                ? setLoading(true)
-                : Alert.alert('Aviso', 'Preencha todos os campos!')
-            }
-          >
-            <LoginButtonText>Entrar</LoginButtonText>
-          </LoginButton>
-          <RetrievePasswordButton
-            onPress={() => navigation.navigate('RecoveryPassword')}
-          >
-            <RetrievePasswordText>Esqueceu a senha?</RetrievePasswordText>
-          </RetrievePasswordButton>
-        </Form>
+    <KeyboardView>
+      <S.Container>
+        <S.Title>Entre com sua{'\n'}conta</S.Title>
+        <FormProvider onSubmit={handleSubmit} ref={formRef}>
+          <S.Form>
+            <Input
+              icon="user"
+              label="Sua credencial"
+              name="cpf_cnpj"
+              placeholder="Seu CPF ou CNPJ"
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              returnKeyType="next"
+              onSubmitEditing={() => focusTargetInput('password')}
+              containerStyle={{
+                maxWidth: 350,
+              }}
+            />
+            <Input
+              containerStyle={{
+                marginTop: 15,
+                maxWidth: 350,
+              }}
+              icon="lock"
+              label="Sua senha"
+              name="password"
+              placeholder="Sua senha secreta"
+              autoCapitalize="none"
+              secureTextEntry
+              returnKeyType="send"
+            />
+            <S.ButtonSignIn
+              onPress={() => formRef.current?.submitForm()}
+              loading={loading}
+            >
+              Entrar
+            </S.ButtonSignIn>
+
+            <RetrievePasswordButton onPress={navigateToResetPassword}>
+              <RetrievePasswordText>Esqueceu a senha?</RetrievePasswordText>
+            </RetrievePasswordButton>
+          </S.Form>
+        </FormProvider>
         <Footer>
           <RegularText>Não tem uma conta?</RegularText>
           <RegisterButton onPress={() => navigation.navigate('Register')}>
             <RegisterButtonText>Registre-se aqui</RegisterButtonText>
           </RegisterButton>
         </Footer>
-      </KeyboardAwareScrollView>
-    </Container>
+      </S.Container>
+    </KeyboardView>
   );
 };
 

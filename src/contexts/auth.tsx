@@ -1,26 +1,70 @@
-import React, { useState, createContext, useEffect, useContext } from 'react';
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
+import { Alert } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
 import api from '../services/api';
+
+interface IUser {
+  id: string;
+  nome: string;
+  email: string;
+  telefone_whatsapp: string;
+  logradouro: string;
+  numero_local: string;
+  bairro: string;
+  cep: string;
+  created_at: string;
+  updated_at: string;
+  nome_fantasia: string;
+  cpf_cnpj: string;
+  telefone: string;
+  taxa_delivery?: string;
+  verificado: boolean;
+}
 
 interface Response {
   responseState: boolean;
   responseStatus: string;
 }
 
+interface IResponseFornecedor {
+  fornecedor: IUser;
+  tokenFornecedor: string;
+}
+
 interface AuthContextData {
   signed: boolean;
-  user: any | null;
+  user: IUser | null;
   loading: boolean;
-  logIn(cpfCnpj: string, password: string): Promise<Response>;
+  logIn(cpfCnpj: string, password: string): Promise<void>;
   logOut(): void;
 }
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC = ({ children }) => {
-  const [user, setUser] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<IUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    api.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (error) => {
+        if (error.message === 'Network Error') {
+          Alert.alert('Erro de conexão', 'Verifique sua internet');
+        }
+
+        return Promise.reject(error);
+      },
+    );
+
     async function loadData(): Promise<void> {
       const userLoaded = await AsyncStorage.getItem(
         '@QueroAçaí-Fornecedor:user',
@@ -28,65 +72,53 @@ export const AuthProvider: React.FC = ({ children }) => {
       const tokenLoaded = await AsyncStorage.getItem(
         '@QueroAçaí-Fornecedor:token',
       );
-      console.log(userLoaded, tokenLoaded);
-      if (userLoaded && tokenLoaded) {
-        setUser(JSON.parse(userLoaded));
 
+      if (userLoaded && tokenLoaded) {
+        api.defaults.headers.authorization = `Bearer ${tokenLoaded}`;
+        setUser(JSON.parse(userLoaded));
       }
+
+      setLoading(false);
     }
     loadData();
   }, []);
 
-  async function logIn(cpfCnpj: string, password: string): Promise<Response> {
-   
+  const handleLogin = useCallback(
+    async (cpfCnpj: string, password: string): Promise<void> => {
+      setLoading(true);
+      try {
+        const response = await api.post<IResponseFornecedor>(
+          `/sessao/fornecedor`,
+          {
+            cpf_cnpj: cpfCnpj,
+            senha: password,
+          },
+        );
 
-    try {
-      const response = await api.post(
-        `${api.defaults.baseURL}/sessao/fornecedor`,
+        const { fornecedor, tokenFornecedor } = response.data;
 
-        {
-          cpf_cnpj: cpfCnpj,
-          senha: password,
-        },
-      );
-     
+        setUser(fornecedor);
+        api.defaults.headers.authorization = `Bearer ${tokenFornecedor}`;
 
-      setUser(response.data.fornecedor);
-
-      await AsyncStorage.setItem(
-        '@QueroAçaí-Fornecedor:user',
-        JSON.stringify(response.data.fornecedor),
-      );
-      await AsyncStorage.setItem(
-        '@QueroAçaí-Fornecedor:token',
-        response.data.tokenFornecedor,
-      );
-      return new Promise((resolve) => {
-        resolve({
-          responseState: true,
-          responseStatus: '',
-        });
-      });
-    } catch (error) {
-      if (error.message === 'Network Error') {
-
-        return new Promise((resolve) => {
-          resolve({
-            responseState: false,
-            responseStatus:
-              'Verifique sua conexão de internet e tente novamente!!',
-          });
-        });
+        await AsyncStorage.setItem(
+          '@QueroAçaí-Fornecedor:user',
+          JSON.stringify(fornecedor),
+        );
+        await AsyncStorage.setItem(
+          '@QueroAçaí-Fornecedor:token',
+          tokenFornecedor,
+        );
+      } catch (error) {
+        const hasResponse = error.response?.data?.error;
+        if (hasResponse) {
+          Alert.alert('Ocorreu um erro', hasResponse);
+        }
       }
-      console.log(error);
-      return new Promise((resolve) => {
-        resolve({
-          responseState: false,
-          responseStatus: error.response.data.error,
-        });
-      });
-    }
-  }
+      setLoading(false);
+    },
+    [],
+  );
+
   function logOut(): void {
     AsyncStorage.clear().then(() => {
       setUser(null);
@@ -94,7 +126,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   }
   return (
     <AuthContext.Provider
-      value={{ signed: !!user, user, logIn, logOut, loading }}
+      value={{ signed: !!user, user, logIn: handleLogin, logOut, loading }}
     >
       {children}
     </AuthContext.Provider>

@@ -37,11 +37,11 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
-      "@hooks/*": ["src/hooks/*"],
       "@contexts/*": ["src/contexts/*"],
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
-      "@pages/*": ["src/pages/*"],
+      "@utils/*": ["src/utils/*"],
+      "@assets/*": ["src/assets/*"],
       "@services/*": ["src/services/*"]
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */

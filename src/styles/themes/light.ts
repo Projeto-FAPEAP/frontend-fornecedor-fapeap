@@ -45,6 +45,10 @@ export default {
     },
   },
 
+  metrics: {
+    border: 10,
+  },
+
   screen: {
     width: width < height ? width : height,
     height: width < height ? height : width,

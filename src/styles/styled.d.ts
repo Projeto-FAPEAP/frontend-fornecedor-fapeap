@@ -45,6 +45,10 @@ declare module 'styled-components' {
       };
     };
 
+    metrics: {
+      border: number;
+    };
+
     screen: {
       width: number;
       height: number;
