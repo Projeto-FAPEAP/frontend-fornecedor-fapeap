@@ -45,14 +45,14 @@ export const Footer = styled.View`
 `;
 
 export const RetrievePasswordText = styled.Text`
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
   font-family: ${({ theme }) => theme.fonts.Ubuntu.normal};
   color: ${(props) => props.theme.colors.primary};
 `;
 
 export const RegularText = styled.Text`
-  font-size: 14px;
+  font-size: 16px;
   font-family: ${({ theme }) => theme.fonts.Ubuntu.normal};
   color: ${(props) => props.theme.colors.darker};
 `;
@@ -64,7 +64,7 @@ export const RegisterButton = styled.TouchableOpacity.attrs({
 `;
 
 export const RegisterButtonText = styled.Text`
-  font-size: 14px;
+  font-size: 16px;
   font-family: ${({ theme }) => theme.fonts.Ubuntu.normal};
   color: ${(props) => props.theme.colors.primary};
 `;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, Keyboard } from 'react-native';
 import { DocumentPickerResponse } from 'react-native-document-picker';
 import { ImagePickerResponse } from 'react-native-image-picker';
 
@@ -64,6 +64,7 @@ const Login: React.FC = () => {
   const [subtitle, setSubtitle] = React.useState('');
   const [images, setImages] = React.useState<ImagePickerResponse[]>([]);
   const [video, setVideo] = React.useState<DocumentPickerResponse>();
+  const [keyboardIsOpen, setKeyboardIsOpen] = React.useState(false);
 
   const [dataStep1, setDataStep1] = React.useState<IFormDataStep1>(
     {} as IFormDataStep1,
@@ -108,6 +109,24 @@ const Login: React.FC = () => {
       formRef.current?.setErrors({});
     }
   }, [formData, step]);
+
+  React.useEffect(() => {
+    function onKeyboardDidShow(): void {
+      setKeyboardIsOpen(true);
+    }
+
+    function onKeyboardDidHide(): void {
+      setKeyboardIsOpen(false);
+    }
+
+    Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
+    Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+
+    return (): void => {
+      Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow);
+      Keyboard.removeListener('keyboardDidHide', onKeyboardDidHide);
+    };
+  }, [keyboardIsOpen]);
 
   const handleSubmit = React.useCallback(
     async (data: ISubmitForm) => {
@@ -237,12 +256,12 @@ const Login: React.FC = () => {
           );
           return;
         }
-        // if (!video) {
-        //   Alert.alert(
-        //     'Atenção',
-        //     'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
-        //   );
-        // }
+        if (!video) {
+          Alert.alert(
+            'Atenção',
+            'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
+          );
+        }
 
         setLoading(true);
 
@@ -269,6 +288,7 @@ const Login: React.FC = () => {
           if (hasResponse) {
             Alert.alert('Ocorreu um erro', hasResponse);
           }
+          console.log(error);
         }
         setLoading(false);
       }
@@ -329,6 +349,8 @@ const Login: React.FC = () => {
             )}
             {step === 4 && (
               <FormStep4
+                images={images}
+                video={video}
                 handleSetImages={setImages}
                 handleSetVideo={setVideo}
               />
@@ -337,33 +359,39 @@ const Login: React.FC = () => {
         </FormProvider>
       </KeyboardView>
 
-      <S.Footer>
-        <S.DotsContainer>
-          <S.Dots onPress={() => nextStep(1)} isFilled color={colors.primary} />
-          <S.Dots
-            onPress={() => nextStep(2)}
-            isFilled={step >= 2}
-            color={darken(0.05, colors.primary)}
-          />
-          <S.Dots
-            onPress={() => nextStep(3)}
-            isFilled={step >= 3}
-            color={darken(0.1, colors.primary)}
-          />
-          <S.Dots
-            onPress={() => nextStep(4)}
-            isFilled={step >= 4}
-            color={darken(0.15, colors.primary)}
-          />
-        </S.DotsContainer>
+      {!keyboardIsOpen && (
+        <S.Footer>
+          <S.DotsContainer>
+            <S.Dots
+              onPress={() => nextStep(1)}
+              isFilled
+              color={colors.primary}
+            />
+            <S.Dots
+              onPress={() => nextStep(2)}
+              isFilled={step >= 2}
+              color={darken(0.05, colors.primary)}
+            />
+            <S.Dots
+              onPress={() => nextStep(3)}
+              isFilled={step >= 3}
+              color={darken(0.1, colors.primary)}
+            />
+            <S.Dots
+              onPress={() => nextStep(4)}
+              isFilled={step >= 4}
+              color={darken(0.15, colors.primary)}
+            />
+          </S.DotsContainer>
 
-        <S.ButtonSignIn
-          onPress={() => formRef.current?.submitForm()}
-          loading={loading}
-        >
-          Avancar
-        </S.ButtonSignIn>
-      </S.Footer>
+          <S.ButtonSignIn
+            onPress={() => formRef.current?.submitForm()}
+            loading={loading}
+          >
+            Avancar
+          </S.ButtonSignIn>
+        </S.Footer>
+      )}
     </S.Container>
   );
 };

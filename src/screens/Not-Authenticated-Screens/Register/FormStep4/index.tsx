@@ -10,6 +10,8 @@ import { useTheme } from 'styled-components';
 import * as S from './styles';
 
 interface IFormStep4Props {
+  images: ImagePickerResponse[];
+  video: DocumentPickerResponse | undefined;
   handleSetImages: React.Dispatch<React.SetStateAction<ImagePickerResponse[]>>;
   handleSetVideo: React.Dispatch<
     React.SetStateAction<DocumentPickerResponse | undefined>
@@ -18,40 +20,31 @@ interface IFormStep4Props {
 
 const FormStep4: React.FC<IFormStep4Props> = (props) => {
   const { handleSetImages, handleSetVideo } = props;
+  const { images, video } = props;
   const { colors } = useTheme();
-  const [images, setImages] = React.useState<ImagePickerResponse[]>([]);
-  const [video, setVideo] = React.useState<DocumentPickerResponse>();
   const [loadingImage, setLoadingImage] = React.useState(false);
   const [loadingVideo, setLoadingVideo] = React.useState(false);
 
   const qntImages = React.useMemo(() => images.length, [images]);
   const qntVideo = React.useMemo(() => (video ? 1 : 0), [video]);
 
-  React.useEffect(() => {
-    handleSetImages(images);
-  }, [images, handleSetImages]);
-
-  React.useEffect(() => {
-    handleSetVideo(video);
-  }, [video, handleSetVideo]);
-
   const handleSelectImage = React.useCallback(async () => {
     setLoadingImage(true);
     const document = await SelectPhoto();
     if (document) {
-      setImages((state) => [...state, document]);
+      handleSetImages((state) => [...state, document]);
     }
     setLoadingImage(false);
-  }, []);
+  }, [handleSetImages]);
 
   const handleSelectVideo = useCallback(async () => {
     setLoadingVideo(true);
     const document = await SelectDocument();
     if (document) {
-      setVideo(video);
+      handleSetVideo(document);
     }
     setLoadingVideo(false);
-  }, [video]);
+  }, [handleSetVideo]);
 
   return (
     <S.ContainerDocuments>

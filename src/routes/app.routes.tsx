@@ -19,11 +19,6 @@ const AppRoutes: React.FC = () => {
 
   return (
     <>
-      <StatusBar
-        backgroundColor={colors.primary}
-        barStyle="light-content"
-        translucent
-      />
       <Stack.Navigator
         screenOptions={{
           headerBackTitleVisible: false,

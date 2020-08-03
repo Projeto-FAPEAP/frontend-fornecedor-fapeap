@@ -13,7 +13,7 @@ export const Container = styled.SafeAreaView`
 `;
 
 export const Header = styled.View`
-  margin: 20px 0;
+  margin: 50px 0 20px;
 `;
 
 export const Title = styled.Text`

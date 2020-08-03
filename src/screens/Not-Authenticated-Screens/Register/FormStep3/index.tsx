@@ -50,7 +50,6 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         label="Bairro"
         name="bairro"
         placeholder="Bairro"
-        keyboardType="number-pad"
         returnKeyType="send"
         onSubmitEditing={() => focusTargetInput('numero_local')}
       />
