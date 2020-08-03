@@ -1,0 +1,125 @@
+import React, { useCallback } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { DocumentPickerResponse } from 'react-native-document-picker';
+import { ImagePickerResponse } from 'react-native-image-picker';
+
+import SelectDocument from '@libs/SelectDocument';
+import SelectPhoto from '@libs/SelectPhoto';
+import { useTheme } from 'styled-components';
+
+import * as S from './styles';
+
+interface IFormStep4Props {
+  handleSetImages: React.Dispatch<React.SetStateAction<ImagePickerResponse[]>>;
+  handleSetVideo: React.Dispatch<
+    React.SetStateAction<DocumentPickerResponse | undefined>
+  >;
+}
+
+const FormStep4: React.FC<IFormStep4Props> = (props) => {
+  const { handleSetImages, handleSetVideo } = props;
+  const { colors } = useTheme();
+  const [images, setImages] = React.useState<ImagePickerResponse[]>([]);
+  const [video, setVideo] = React.useState<DocumentPickerResponse>();
+  const [loadingImage, setLoadingImage] = React.useState(false);
+  const [loadingVideo, setLoadingVideo] = React.useState(false);
+
+  const qntImages = React.useMemo(() => images.length, [images]);
+  const qntVideo = React.useMemo(() => (video ? 1 : 0), [video]);
+
+  React.useEffect(() => {
+    handleSetImages(images);
+  }, [images, handleSetImages]);
+
+  React.useEffect(() => {
+    handleSetVideo(video);
+  }, [video, handleSetVideo]);
+
+  const handleSelectImage = React.useCallback(async () => {
+    setLoadingImage(true);
+    const document = await SelectPhoto();
+    if (document) {
+      setImages((state) => [...state, document]);
+    }
+    setLoadingImage(false);
+  }, []);
+
+  const handleSelectVideo = useCallback(async () => {
+    setLoadingVideo(true);
+    const document = await SelectDocument();
+    if (document) {
+      setVideo(video);
+    }
+    setLoadingVideo(false);
+  }, [video]);
+
+  return (
+    <S.ContainerDocuments>
+      <S.ContentDocument>
+        <S.Title>Fotos do estabelecimento ({qntImages}/4) </S.Title>
+
+        {images.map((image) => (
+          <S.ItemDocument key={image.uri}>
+            <S.Icon name="check-circle" />
+            <S.ItemNameDocument numberOfLines={1}>
+              {image.fileName || 'Arquivo imagem'}
+            </S.ItemNameDocument>
+            <S.ButtonRemove
+              onPress={() => {
+                //
+              }}
+            >
+              <S.IconTrash />
+            </S.ButtonRemove>
+          </S.ItemDocument>
+        ))}
+        {qntImages < 4 && (
+          <S.ButtonUpload onPress={handleSelectImage}>
+            {loadingImage ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <>
+                <S.IconUpload />
+                <S.ButtonUploadName>Adicionar</S.ButtonUploadName>
+              </>
+            )}
+          </S.ButtonUpload>
+        )}
+      </S.ContentDocument>
+
+      <S.ContentDocument>
+        <S.Title>Vídeo do processo produtivo ({qntVideo}/1)</S.Title>
+
+        {video && (
+          <S.ItemDocument>
+            <S.Icon name="check-circle" />
+            <S.ItemNameDocument numberOfLines={1}>
+              {video.name}
+            </S.ItemNameDocument>
+            <S.ButtonRemove
+              onPress={() => {
+                //
+              }}
+            >
+              <S.IconTrash />
+            </S.ButtonRemove>
+          </S.ItemDocument>
+        )}
+        {!video && (
+          <S.ButtonUpload onPress={handleSelectVideo}>
+            {loadingVideo ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <>
+                <S.IconUpload />
+                <S.ButtonUploadName>Adicionar</S.ButtonUploadName>
+              </>
+            )}
+          </S.ButtonUpload>
+        )}
+      </S.ContentDocument>
+    </S.ContainerDocuments>
+  );
+};
+
+export default FormStep4;

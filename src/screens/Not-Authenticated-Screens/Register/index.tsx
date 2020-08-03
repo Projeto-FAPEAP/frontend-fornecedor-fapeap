@@ -1,543 +1,371 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useLayoutEffect,
-  useContext,
-} from 'react';
-import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import DocumentPicker from 'react-native-document-picker';
-import ImagePicker, {
-  ImagePickerResponse,
-  ImagePickerOptions,
-} from 'react-native-image-picker';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import MediaMeta from 'react-native-media-meta';
-import RNPickerSelect from 'react-native-picker-select';
-import { useSafeArea } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Video from 'react-native-video';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import React from 'react';
+import { Alert } from 'react-native';
+import { DocumentPickerResponse } from 'react-native-document-picker';
+import { ImagePickerResponse } from 'react-native-image-picker';
 
-import AuthContext from '../../../contexts/auth';
-import api from '../../../services/api';
-import Loader from '../../utils/';
-import {
-  Container,
-  Title,
-  Input,
-  RetrievePasswordButton,
-  RetrievePasswordText,
-  Form,
-  Header,
-  RegisterButton,
-  RegularText,
-  RegisterButtonText,
-  P,
-  BackButtonWrapper,
-  Footer,
-  Dropdown,
-  DropdownWrappeer,
-  MediaSpot,
-  MediaSpotButton,
-  WrapperList,
-  AddMediaButtonWrapper,
-  RemoveMediaButtonWrapper,
-  MediaWrapper,
-  RemoveMedia,
-} from './styles';
+import KeyboardView from '@components/KeyboardView';
+import { useNavigation, StackActions } from '@react-navigation/native';
+import api from '@services/api';
+import { FormHandles } from '@unform/core';
+import { Form as FormProvider } from '@unform/mobile';
+import getValidationErrors from '@utils/getValidationErrors';
+import { darken } from 'polished';
+import { useTheme } from 'styled-components';
+import * as Yup from 'yup';
 
-const Register: React.FC = () => {
-  const navigation = useNavigation()
-  const [delivery, setDelivery] = useState(false);
-  const [extraPhoto, setExtraPhoto] = useState(false);
-  const [showExtraInput, setShowExtraInput] = useState(0);
-  const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
-  const [videoState, setVideoState] = useState<ImagePickerResponse[]>([]);
-  const [videoSelected, setVideoSelected] = useState(false);
-  const [learning, setLearning] = useState(false);
-  const [name, setName] = useState('');
-  const [storeName, setStoreName] = useState('');
-  const [cpfCnpj, setCpfCnpj] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [phoneWhatsapp, setPhoneWhatsapp] = useState('');
-  const [deliveryTax, setDeliveryTax] = useState('');
-  const [address, setAddress] = useState('');
-  const [number, setNumber] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const [cep, setCep] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { logIn } = useContext(AuthContext);
-  useEffect(() => {
-    if (showExtraInput === 1) {
-      setDelivery(true);
-    } else {
-      setDelivery(false);
-    }
-  }, [showExtraInput]);
+import FormStep1 from './FormStep1';
+import FormStep2 from './FormStep2';
+import FormStep3 from './FormStep3';
+import FormStep4 from './FormStep4';
+import * as S from './styles';
 
-  function removePhoto(index: number): void {
-    Alert.alert(
-      'Remover foto',
-      'Quer mesmo remover?',
-      [
-        {
-          text: 'Não',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'Sim',
-          onPress: () => {
-            const oldPhotosList = photoList;
-            const newPhotoList = [];
-            let j = 0;
-            for (let i = 0; i < photoList.length; i += 1) {
-              if (i !== index) {
-                newPhotoList[j] = oldPhotosList[i];
-                j += 1;
-              }
-            }
+interface ISubmitForm {
+  nome: string;
+  email: string;
+  senha: string;
+  password_confirmation: string;
+  cpf_cnpj: string;
+  nome_fantasia: string;
+  telefone: string;
+  telefone_whatsapp: string;
+  cep: string;
+  logradouro: string;
+  numero_local: string;
+  bairro: string;
+}
 
-            setPhotoList(newPhotoList);
-            Alert.alert('Removido com Sucesso!');
-          },
-        },
-      ],
-      { cancelable: false },
-    );
-  }
+interface IFormDataStep1 {
+  nome: string;
+  email: string;
+  cpf_cnpj: string;
+  senha: string;
+  password_confirmation: string;
+}
 
-  function learn(): void {
-    setTimeout(function () {
-      setLearning(false);
-    }, 5000);
-  }
+interface IFormDataStep2 {
+  nome_fantasia: string;
+  telefone: string;
+  telefone_whatsapp: string;
+}
 
-  function handleChoosePhoto(): void {
-    if (photoList.length < 5) {
-      const photos = photoList;
-      let Repeat = false;
-      const options = {};
-      ImagePicker.launchImageLibrary(options, (Response) => {
-        if (Response.uri) {
-          for (let i = 0; i < photoList.length; i += 1) {
-            if (String(photos[i].uri) === Response.uri) {
-              Repeat = true;
-            }
-          }
+interface IFormDataStep3 {
+  cep: string;
+  logradouro: string;
+  numero_local: string;
+  bairro: string;
+}
 
-          if (Repeat) {
-            Alert.alert(
-              'Aviso',
-              'Você já adicionou essa imagem, evite adicionar imagens repetidas!',
-            );
-          } else {
-            photos.push(Object(Response));
+const Login: React.FC = () => {
+  const navigation = useNavigation();
+  const formRef = React.useRef<FormHandles>(null);
+  const { colors } = useTheme();
+  const [loading, setLoading] = React.useState(false);
+  const [step, setStep] = React.useState(1);
+  const [subtitle, setSubtitle] = React.useState('');
+  const [images, setImages] = React.useState<ImagePickerResponse[]>([]);
+  const [video, setVideo] = React.useState<DocumentPickerResponse>();
 
-            setPhotoList(photos);
-            setExtraPhoto(true);
-            setLearning(true);
-            learn();
-            Alert.alert('Adicionado com Sucesso!');
-            setExtraPhoto(false);
-          }
-        }
-      });
-    } else {
-      Alert.alert(
-        'Aviso',
-        'Você chegou ao limite de fotos inseridas, caso queira adicionar novas, exclua alguma!',
-      );
-    }
-  }
+  const [dataStep1, setDataStep1] = React.useState<IFormDataStep1>(
+    {} as IFormDataStep1,
+  );
+  const [dataStep2, setDataStep2] = React.useState<IFormDataStep2>(
+    {} as IFormDataStep2,
+  );
+  const [dataStep3, setDataStep3] = React.useState<IFormDataStep3>(
+    {} as IFormDataStep3,
+  );
 
-  async function handleChooseVideo(): Promise<void> {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.video],
-      });
-      const videoAux = videoState;
-      const teste = {
-        a: res.uri,
-        b: res.type, // mime type
-        c: res.name,
-        d: res.size,
-      };
-      console.log(JSON.stringify(teste, null, 2));
-      videoAux[0] = Object(res);
-      setVideoState(videoAux);
-      console.log(videoState);
-      setVideoSelected(true);
-      Alert.alert('Adicionado com Sucesso!');
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker, exit any dialogs or menus and move on
-      } else {
-        throw err;
-      }
-    }
-  }
-  function removeVideo(): void {
-    Alert.alert(
-      'Remover Video',
-      'Quer mesmo remover?',
-      [
-        {
-          text: 'Não',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'Sim',
-          onPress: () => {
-            setVideoState([]);
-            setVideoSelected(false);
-            Alert.alert('Removido com Sucesso!');
-          },
-        },
-      ],
-      { cancelable: false },
-    );
-  }
+  const formData = React.useMemo(
+    () => ({ ...dataStep1, ...dataStep2, ...dataStep3 }),
+    [dataStep1, dataStep2, dataStep3],
+  );
 
-  function isEmpty(obj: object): boolean {
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) return false;
-    }
-    return true;
-  }
-
-  async function register(): Promise<void> {
-    if (
-      (name ||
-        storeName ||
-        cpfCnpj ||
-        email ||
-        password ||
-        phone ||
-        phoneWhatsapp ||
-        address ||
-        number ||
-        neighborhood ||
-        cep) === '' ||
-      showExtraInput === 0 ||
-      photoList.length === 0 ||
-      isEmpty(videoState)
-    ) {
-      Alert.alert('Aviso', 'Preencha todos os campos');
-    } else if (showExtraInput === 1 && deliveryTax === '') {
-      Alert.alert('Aviso', 'Preencha todos os campos');
-    } else {
-      setLoading(true);
-      const formData = new FormData();
-      const photoListArray = photoList;
-      const videoAux = videoState;
-      formData.append('nome', name);
-      formData.append('nome_fantasia', storeName);
-      formData.append('cpf_cnpj', parseInt(cpfCnpj));
-      formData.append('email', email);
-      formData.append('senha', password);
-      formData.append('telefone', parseInt(phone));
-      formData.append('telefone_whatsapp', parseInt(phoneWhatsapp));
-      deliveryTax !== ''
-        ? formData.append('taxa_delivery', parseFloat(deliveryTax))
-        : null;
-      formData.append('logradouro', address);
-      formData.append('numero_local', parseInt(number));
-      formData.append('bairro', neighborhood);
-      formData.append('cep', parseInt(cep));
-      for (let i = 0; i < photoList.length; i += 1) {
-        formData.append('files', photoListArray[i]);
-      }
-      formData.append('file', videoAux[0]);
-      console.log(JSON.stringify(formData, null, 2));
-      try {
-        const response = await axios.post(
-          'https://fapeap.colares.net.br/fornecedor',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
+  React.useEffect(() => {
+    switch (step) {
+      case 1:
+        setSubtitle(
+          'Primeiramente, precisamos de seus dados pessoais e de acesso',
         );
-        /* const response = await fetch(
-          'https://fapeap.colares.net.br/fornecedor',
-          {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        ); */
-        setLoading(false);
-        console.log(JSON.stringify(response, null, 2));
-        if (response.data.verificado) {
-          console.log(response.data.cpf_cnpj, 'hhhhhhhhhhhhh');
-          Alert.alert(
-            'Aviso',
-            'Cadastrado com sucesso!!',
-            [
-              {
-                text: 'Ok',
-                onPress: async () => {
-                  const Response = await logIn(
-                    response.data.cpf_cnpj,
-                    password,
-                  );
-                  const { responseState, responseStatus } = Response;
-
-                  if (!responseState) {
-                    setLoading(false);
-                    Alert.alert(
-                      'Aviso',
-                      'Erro inesperado, reinicie a aplicação!',
-                    );
-                  }
-                },
-                style: 'default',
-              },
-            ],
-            { cancelable: false },
-          );
-        } else {
-          Alert.alert(
-            'Aviso',
-            'Cadastrado com sucesso!!',
-            [
-              {
-                text: 'Ok',
-                onPress: () => navigation.navigate('WarningValidation'),
-                style: 'default',
-              },
-            ],
-            { cancelable: false },
-          );
-        }
-      } catch (error) {
-        setLoading(false);
-        if (error.message === 'Network Error') {
-          Alert.alert('Verifique sua conexão de internet e tente novamente!!');
-        } else {
-          console.log(JSON.stringify(error, null, 2));
-          console.log(error, 'jonathan');
-          console.log(Object(error.response), 'salve');
-          Alert.alert(error.response.data.error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-          }
-          console.log(error.config);
-        }
-      }
-
-      /* fetch('https://fapeap.colares.net.br/fornecedor', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-        .then(
-          (response) => response.json(), // if the response is a JSON object
-        )
-        .then(
-          (success) => console.log(success), // Handle the success response object
-        )
-        .catch(
-          (error) => console.log(JSON.stringify(error, null, 2)), // Handle the error response object
-        ); */
+        break;
+      case 2:
+        setSubtitle('Agora precisamos dos dados de seu estabelecimento');
+        break;
+      case 3:
+        setSubtitle('Onde seu estabelecimento fica localizado?');
+        break;
+      case 4:
+        setSubtitle(
+          'Agora precisamos que você nos envie algumas fotos do seu estabelecimento e um vídeo de até 1 minuto do processo produtivo',
+        );
+        break;
+      default:
+        setSubtitle('Etapa não identificada');
+        break;
     }
-  }
+
+    if (step < 4) {
+      formRef.current?.setData(formData);
+      formRef.current?.setErrors({});
+    }
+  }, [formData, step]);
+
+  const handleSubmit = React.useCallback(
+    async (data: ISubmitForm) => {
+      formRef.current?.setErrors({});
+      if (step === 1) {
+        try {
+          const schemaStep1 = Yup.object().shape({
+            nome: Yup.string().required('Campo obrigatório'),
+            email: Yup.string()
+              .email('Informe um email válido')
+              .required('Campo obrigatório'),
+            cpf_cnpj: Yup.string().required('Campo obrigatório'),
+            senha: Yup.string()
+              .min(3, 'Você deve informar no mínimo 4 caracteres')
+              .required('Senha é obrigatória'),
+            password_confirmation: Yup.string()
+              .oneOf([Yup.ref('senha')], 'Senhas não coincidem')
+              .required('A confirmação da senha é obrigatória'),
+          });
+
+          const objectFormData = Object.assign(formData, {
+            nome: data.nome,
+            email: data.email,
+            cpf_cnpj: data.cpf_cnpj,
+            senha: data.senha,
+            password_confirmation: data.password_confirmation,
+          });
+
+          const { nome, email, cpf_cnpj } = objectFormData;
+          const { senha, password_confirmation } = objectFormData;
+
+          console.log(objectFormData);
+
+          await schemaStep1.validate(
+            { nome, email, senha, password_confirmation, cpf_cnpj },
+            { abortEarly: false },
+          );
+          setDataStep1({ nome, cpf_cnpj, email, senha, password_confirmation });
+
+          setStep(step + 1);
+        } catch (err) {
+          if (err instanceof Yup.ValidationError) {
+            const errors = getValidationErrors(err);
+            formRef.current?.setErrors(errors);
+          }
+        }
+      } else if (step === 2) {
+        try {
+          const schemaStep2 = Yup.object().shape({
+            nome_fantasia: Yup.string().required('Campo obrigatório'),
+            telefone: Yup.string().required('Campo obrigatório'),
+            telefone_whatsapp: Yup.string().required('Campo obrigatório'),
+          });
+
+          const objectFormData = Object.assign(formData, {
+            nome_fantasia: data.nome_fantasia,
+            telefone: data.telefone,
+            telefone_whatsapp: data.telefone_whatsapp,
+          });
+
+          const { nome_fantasia } = objectFormData;
+          const { telefone, telefone_whatsapp } = objectFormData;
+
+          console.log(objectFormData);
+
+          await schemaStep2.validate(
+            { nome_fantasia, telefone, telefone_whatsapp },
+            { abortEarly: false },
+          );
+          setDataStep2({
+            nome_fantasia,
+            telefone,
+            telefone_whatsapp,
+          });
+
+          setStep(step + 1);
+        } catch (err) {
+          if (err instanceof Yup.ValidationError) {
+            const errors = getValidationErrors(err);
+            formRef.current?.setErrors(errors);
+          }
+        }
+      } else if (step === 3) {
+        try {
+          const schemaStep3 = Yup.object().shape({
+            cep: Yup.string().required('Campo obrigatório'),
+            logradouro: Yup.string().required('Campo obrigatório'),
+            bairro: Yup.string().required('Campo obrigatório'),
+            numero_local: Yup.string().required('Campo obrigatório'),
+          });
+
+          const objectFormData = Object.assign(formData, {
+            cep: data.cep,
+            logradouro: data.logradouro,
+            bairro: data.bairro,
+            numero_local: data.numero_local,
+          });
+
+          const { cep, logradouro } = objectFormData;
+          const { bairro, numero_local } = objectFormData;
+
+          console.log(objectFormData);
+
+          await schemaStep3.validate(
+            { cep, logradouro, bairro, numero_local },
+            { abortEarly: false },
+          );
+          setDataStep3({
+            cep,
+            logradouro,
+            bairro,
+            numero_local,
+          });
+
+          setStep(step + 1);
+        } catch (err) {
+          if (err instanceof Yup.ValidationError) {
+            const errors = getValidationErrors(err);
+            formRef.current?.setErrors(errors);
+          }
+        }
+      } else if (step === 4) {
+        if (images.length === 0) {
+          Alert.alert(
+            'Atenção',
+            'Você deve nos enviar pelo menos uma imagem de seu estabelecimento ',
+          );
+          return;
+        }
+        // if (!video) {
+        //   Alert.alert(
+        //     'Atenção',
+        //     'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
+        //   );
+        // }
+
+        setLoading(true);
+
+        try {
+          const { password_confirmation, ...dataObj } = formData;
+
+          const formBodyData = new FormData();
+
+          Object.keys(dataObj).forEach((key: string) => {
+            formBodyData.append(key, dataObj[key]);
+          });
+
+          formBodyData.append('file', video);
+
+          images.forEach((image) => {
+            formBodyData.append('file', image);
+          });
+
+          await api.post('/fornecedor', formBodyData);
+
+          navigation.dispatch(StackActions.replace('SuccessSubmit'));
+        } catch (error) {
+          const hasResponse = error.response?.data?.error;
+          if (hasResponse) {
+            Alert.alert('Ocorreu um erro', hasResponse);
+          }
+        }
+        setLoading(false);
+      }
+    },
+    [formData, images, navigation, step, video],
+  );
+
+  const submitForm = React.useCallback(() => {
+    formRef.current?.submitForm();
+  }, []);
+
+  const focusTargetInput = React.useCallback((field: string) => {
+    const nameInput = formRef.current?.getFieldRef(field);
+    nameInput.focus();
+  }, []);
+
+  const nextStep = React.useCallback(
+    (targetStep: number) => {
+      if (targetStep > step) {
+        Alert.alert(
+          'Um momento',
+          'Você deve preencher corretamente o formulário e clicar em continuar para ir para a próxima etapa.',
+        );
+        return;
+      }
+      setStep(targetStep);
+    },
+    [step],
+  );
 
   return (
-    <Container>
-      <KeyboardAwareScrollView>
-        <Loader loading={loading} />
-        <Header>
-          <BackButtonWrapper onPress={() => navigation.goBack()}>
-            <Icon color="#84378F" size={28} name="chevron-left" />
-          </BackButtonWrapper>
-          <Title>Crie sua conta</Title>
-        </Header>
-        <Form>
-          <Input
-            placeholder="Seu nome"
-            onChangeText={(text) => setName(text)}
-          />
-          <Input
-            placeholder="Nome do estabelecimento"
-            onChangeText={(text) => setStoreName(text)}
-          />
+    <S.Container>
+      <KeyboardView>
+        <S.Header>
+          <S.Title>Crie sua conta</S.Title>
+          <S.Subtitle>{subtitle}</S.Subtitle>
+        </S.Header>
 
-          <Input placeholder="Email" onChangeText={(text) => setEmail(text)} />
-          <Input
-            placeholder="Senha"
-            keyboardType="email-address"
-            onChangeText={(text) => setPassword(text)}
-          />
-          <Input
-            placeholder="CPF/CNPJ"
-            keyboardType="number-pad"
-            onChangeText={(text) => setCpfCnpj(text)}
-          />
-          <Input
-            placeholder="Telefone"
-            keyboardType="number-pad"
-            onChangeText={(text) => setPhone(text)}
-          />
-          <Input
-            placeholder="Contato whatsapp"
-            keyboardType="number-pad"
-            onChangeText={(text) => setPhoneWhatsapp(text)}
-          />
+        <FormProvider onSubmit={handleSubmit} ref={formRef}>
+          <S.Form>
+            {step === 1 && (
+              <FormStep1
+                onSubmitForm={submitForm}
+                focusTargetInput={focusTargetInput}
+              />
+            )}
+            {step === 2 && (
+              <FormStep2
+                onSubmitForm={submitForm}
+                focusTargetInput={focusTargetInput}
+              />
+            )}
+            {step === 3 && (
+              <FormStep3
+                onSubmitForm={submitForm}
+                focusTargetInput={focusTargetInput}
+              />
+            )}
+            {step === 4 && (
+              <FormStep4
+                handleSetImages={setImages}
+                handleSetVideo={setVideo}
+              />
+            )}
+          </S.Form>
+        </FormProvider>
+      </KeyboardView>
 
-          <Input
-            placeholder="Endereço"
-            onChangeText={(text) => setAddress(text)}
+      <S.Footer>
+        <S.DotsContainer>
+          <S.Dots onPress={() => nextStep(1)} isFilled color={colors.primary} />
+          <S.Dots
+            onPress={() => nextStep(2)}
+            isFilled={step >= 2}
+            color={darken(0.05, colors.primary)}
           />
-          <Input
-            placeholder="Número"
-            keyboardType="number-pad"
-            onChangeText={(text) => setNumber(text)}
+          <S.Dots
+            onPress={() => nextStep(3)}
+            isFilled={step >= 3}
+            color={darken(0.1, colors.primary)}
           />
-          <Input
-            placeholder="Bairro"
-            onChangeText={(text) => setNeighborhood(text)}
+          <S.Dots
+            onPress={() => nextStep(4)}
+            isFilled={step >= 4}
+            color={darken(0.15, colors.primary)}
           />
-          <Input
-            placeholder="CEP"
-            onChangeText={(text) => setCep(text)}
-            keyboardType="number-pad"
-          />
-          <DropdownWrappeer>
-            <RNPickerSelect
-              value={showExtraInput}
-              onValueChange={(itemValue, itemIndex) =>
-                setShowExtraInput(itemValue)
-              }
-              style={{
-                placeholder: {
-                  color: '#2e2e2e',
-                },
-              }}
-              placeholder={{
-                label: 'Faz delivery?',
-                value: 0,
-                color: '#9EA0A4',
-              }}
-              items={[
-                { label: 'Sim, faço delivery', value: 1 },
-                { label: 'Não', value: 2 },
-              ]}
-            />
-            {/* <Dropdown
-              selectedValue={showExtraInput}
-              onValueChange={(itemValue, itemIndex) =>
-                setShowExtraInput(itemValue)
-              }
-            >
-              <Dropdown.Item label="Faz delivery?" value={0} />
-              <Dropdown.Item label="Sim, faço delivery" value={1} />
-              <Dropdown.Item label="Não" value={2} />
-            </Dropdown> */}
-          </DropdownWrappeer>
-          {delivery ? (
-            <Input
-              placeholder="Qual a taxa de entrega?"
-              keyboardType="number-pad"
-              onChangeText={(text) => setDeliveryTax(text)}
-            />
-          ) : null}
+        </S.DotsContainer>
 
-          <P>Fotos (até 4 fotos)</P>
-
-          <WrapperList>
-            <FlatList
-              horizontal
-              data={photoList}
-              extraData={extraPhoto}
-              ListFooterComponent={() => (
-                <MediaSpotButton onPress={() => handleChoosePhoto()}>
-                  <AddMediaButtonWrapper>
-                    <Icon color="#84378F" size={35} name="plus" />
-                  </AddMediaButtonWrapper>
-                </MediaSpotButton>
-              )}
-              /* ListEmptyComponent={() => <View />} */
-              renderItem={({ item, index }) => (
-                <MediaWrapper>
-                  <RemoveMediaButtonWrapper source={item} resizeMode="contain">
-                    {learning ? (
-                      <Animatable.View
-                        animation="slideInRight"
-                        iterationCount={5}
-                      >
-                        <Image source={require('../../../assets/learn.png')} />
-                      </Animatable.View>
-                    ) : null}
-                    <RemoveMedia onPress={() => removePhoto(index)}>
-                      <Icon color="#EA3232" size={35} name="trash-o" />
-                    </RemoveMedia>
-                  </RemoveMediaButtonWrapper>
-                </MediaWrapper>
-              )}
-              keyExtractor={(index) => String(index.uri)}
-            />
-          </WrapperList>
-          <P>Video do Processo Produtivo(até 1 minuto)</P>
-          {videoSelected ? (
-            <MediaWrapper>
-              {!isEmpty(videoState) ? (
-                <Video
-                  source={{ uri: videoState[0].uri }}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-
-                    position: 'absolute',
-                  }}
-                  poster={videoState[0].uri}
-                  resizeMode="contain"
-                  controls
-                />
-              ) : null}
-              <RemoveMedia onPress={() => removeVideo()}>
-                <Icon color="#EA3232" size={35} name="trash-o" />
-              </RemoveMedia>
-            </MediaWrapper>
-          ) : (
-            <MediaSpotButton onPress={() => handleChooseVideo()}>
-              <AddMediaButtonWrapper>
-                <Icon color="#84378F" size={35} name="plus" />
-              </AddMediaButtonWrapper>
-            </MediaSpotButton>
-          )}
-
-          <RegisterButton onPress={() => register()}>
-            <RegisterButtonText>Registre-me</RegisterButtonText>
-          </RegisterButton>
-        </Form>
-      </KeyboardAwareScrollView>
-    </Container>
+        <S.ButtonSignIn
+          onPress={() => formRef.current?.submitForm()}
+          loading={loading}
+        >
+          Avancar
+        </S.ButtonSignIn>
+      </S.Footer>
+    </S.Container>
   );
 };
 
-export default Register;
+export default Login;

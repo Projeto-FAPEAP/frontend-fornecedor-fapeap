@@ -4,7 +4,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import Login from '../../screens/Not-Authenticated-Screens/Login';
 import RecoveryPassword from '../../screens/Not-Authenticated-Screens/RecoveryPassword';
-import Register from '../../screens/Not-Authenticated-Screens/Register';
 import WarningValidation from '../../screens/Not-Authenticated-Screens/WarningValidation';
 import Welcome from '../../screens/Not-Authenticated-Screens/Welcome';
 

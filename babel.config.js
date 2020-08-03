@@ -17,6 +17,7 @@ module.exports = {
           '@components': './src/components',
           '@services': './src/services',
           '@utils': './src/utils',
+          '@libs': './src/libs',
           '@assets': './src/assets',
         },
       },
