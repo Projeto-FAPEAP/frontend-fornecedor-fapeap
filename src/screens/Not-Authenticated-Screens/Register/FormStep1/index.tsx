@@ -1,15 +1,18 @@
 import React from 'react';
+import { MaskService } from 'react-native-masked-text';
 
 import Input from '@components/Input';
+import { FormHandles } from '@unform/core';
 
 interface IFormStep1Props {
   focusTargetInput(name: string): void;
   onSubmitForm(): void;
+  formRef: React.RefObject<FormHandles>;
 }
 
 const FormStep1: React.FC<IFormStep1Props> = (props) => {
   const { focusTargetInput } = props;
-  const { onSubmitForm } = props;
+  const { onSubmitForm, formRef } = props;
 
   return (
     <>
@@ -52,6 +55,18 @@ const FormStep1: React.FC<IFormStep1Props> = (props) => {
         containerStyle={{
           marginTop: 15,
           maxWidth: 350,
+        }}
+        onChangeText={(text) => {
+          const size = text.length;
+          let formatted = text;
+
+          if (size <= 14) {
+            formatted = MaskService.toMask('cpf', text);
+          } else {
+            formatted = MaskService.toMask('cnpj', text);
+          }
+
+          formRef.current?.setFieldValue('cpf_cnpj', formatted);
         }}
       />
 

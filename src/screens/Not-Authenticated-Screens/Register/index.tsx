@@ -331,18 +331,21 @@ const Login: React.FC = () => {
           <S.Form>
             {step === 1 && (
               <FormStep1
+                formRef={formRef}
                 onSubmitForm={submitForm}
                 focusTargetInput={focusTargetInput}
               />
             )}
             {step === 2 && (
               <FormStep2
+                formRef={formRef}
                 onSubmitForm={submitForm}
                 focusTargetInput={focusTargetInput}
               />
             )}
             {step === 3 && (
               <FormStep3
+                formRef={formRef}
                 onSubmitForm={submitForm}
                 focusTargetInput={focusTargetInput}
               />

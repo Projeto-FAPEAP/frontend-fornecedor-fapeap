@@ -1,15 +1,18 @@
 import React from 'react';
+import { MaskService } from 'react-native-masked-text';
 
 import Input from '@components/Input';
+import { FormHandles } from '@unform/core';
 
 interface IFormStep2Props {
   focusTargetInput(name: string): void;
   onSubmitForm(): void;
+  formRef: React.RefObject<FormHandles>;
 }
 
 const FormStep2: React.FC<IFormStep2Props> = (props) => {
   const { focusTargetInput } = props;
-  const { onSubmitForm } = props;
+  const { onSubmitForm, formRef } = props;
 
   return (
     <>
@@ -40,6 +43,14 @@ const FormStep2: React.FC<IFormStep2Props> = (props) => {
         keyboardType="number-pad"
         returnKeyType="next"
         onSubmitEditing={() => focusTargetInput('telefone_whatsapp')}
+        onChangeText={(text) => {
+          const formatted = MaskService.toMask('cel-phone', text, {
+            maskType: 'BRL',
+            withDDD: true,
+            dddMask: '(99) ',
+          });
+          formRef.current?.setFieldValue('telefone', formatted);
+        }}
       />
 
       <Input
@@ -54,6 +65,14 @@ const FormStep2: React.FC<IFormStep2Props> = (props) => {
         keyboardType="number-pad"
         returnKeyType="send"
         onSubmitEditing={onSubmitForm}
+        onChangeText={(text) => {
+          const formatted = MaskService.toMask('cel-phone', text, {
+            maskType: 'BRL',
+            withDDD: true,
+            dddMask: '(99) ',
+          });
+          formRef.current?.setFieldValue('telefone_whatsapp', formatted);
+        }}
       />
     </>
   );

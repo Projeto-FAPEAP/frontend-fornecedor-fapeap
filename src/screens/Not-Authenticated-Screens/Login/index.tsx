@@ -1,4 +1,5 @@
 import React from 'react';
+import { MaskService } from 'react-native-masked-text';
 
 import Input from '@components/Input';
 import KeyboardView from '@components/KeyboardView';
@@ -78,6 +79,18 @@ const Login: React.FC = () => {
               onSubmitEditing={() => focusTargetInput('password')}
               containerStyle={{
                 maxWidth: 350,
+              }}
+              onChangeText={(text) => {
+                const size = text.length;
+                let formatted = text;
+
+                if (size <= 14) {
+                  formatted = MaskService.toMask('cpf', text);
+                } else {
+                  formatted = MaskService.toMask('cnpj', text);
+                }
+
+                formRef.current?.setFieldValue('cpf_cnpj', formatted);
               }}
             />
             <Input
