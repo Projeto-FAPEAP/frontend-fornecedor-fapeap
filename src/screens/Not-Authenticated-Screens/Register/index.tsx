@@ -256,12 +256,13 @@ const Login: React.FC = () => {
           );
           return;
         }
-        if (!video) {
-          Alert.alert(
-            'Atenção',
-            'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
-          );
-        }
+        // if (!video) {
+        //   Alert.alert(
+        //     'Atenção',
+        //     'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
+        //   );
+        //   return
+        // }
 
         setLoading(true);
 
@@ -274,11 +275,19 @@ const Login: React.FC = () => {
             formBodyData.append(key, dataObj[key]);
           });
 
-          formBodyData.append('file', video);
-
           images.forEach((image) => {
-            formBodyData.append('file', image);
+            const { type, fileName, fileSize, uri } = image;
+
+            formBodyData.append('file', {
+              type,
+              size: fileSize,
+              name: fileName,
+              uri,
+              fileCopyUri: uri,
+            });
           });
+
+          formBodyData.append('file', video);
 
           await api.post('/fornecedor', formBodyData);
 

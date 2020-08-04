@@ -25,7 +25,7 @@ const FormStep2: React.FC<IFormStep2Props> = (props) => {
         label="Nome fantasia"
         name="nome_fantasia"
         placeholder="Nome fantasia"
-        autoCapitalize="none"
+        autoCapitalize="words"
         autoCorrect={false}
         onSubmitEditing={() => focusTargetInput('telefone')}
         returnKeyType="next"

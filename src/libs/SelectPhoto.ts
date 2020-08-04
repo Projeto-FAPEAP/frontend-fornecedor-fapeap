@@ -68,17 +68,15 @@ export default async function SelectPhoto(): Promise<ImagePickerResponse | null>
     });
 
   const image = await imageSelected();
+
   if (!image) return null;
 
-  const imageResized = await resizeImage(image);
-
-  if (imageResized.fileSize > maxFileSize) {
+  if (image.fileSize > maxFileSize) {
     Toast.show('Limite máximo permitido para envio é de 10MB', Toast.SHORT, [
       'UIAlertController',
     ]);
-
     return null;
   }
 
-  return imageResized;
+  return image;
 }
