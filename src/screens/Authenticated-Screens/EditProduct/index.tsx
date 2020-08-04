@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { View, FlatList, Alert, Image, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation,useRoute, NavigationContainer } from '@react-navigation/native';
@@ -8,7 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as Animatable from 'react-native-animatable';
 import ImagePicker, { ImagePickerResponse } from 'react-native-image-picker';
 import RNPickerSelect from 'react-native-picker-select';
-
+import AuthContext from '../../../contexts/auth';
 import {
     Container,
     Input,
@@ -42,6 +42,7 @@ const AddProducts: React.FC = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { itemId } = route.params;
+    const {user } = useContext(AuthContext);
     const [extraPhoto, setExtraPhoto] = useState(false);
     const [loading, setLoading] = useState(false);
     const [productName, setProductName] = useState('');
@@ -281,8 +282,9 @@ const AddProducts: React.FC = () => {
       console.log(idProduct, 'getr');
       try {
         const response = await api.get(
-          `${api.defaults.baseURL}/produto/${idProduct}`,
+          `${api.defaults.baseURL}/produto/${user.id}/${idProduct}`,
         );
+        console.log(JSON.stringify(response.data,null,2))
         console.log(response.data.status_produto,'tedst')
         const available = response.data.status_produto ? 2 : 3;
         const Measurement = parseInt(response.data.unidade_medida) + 1;

@@ -59,7 +59,7 @@ import {
   export const SearchInputButton = styled.TouchableOpacity`
     width: ${wp('65%')}px;
     background: #fff;
-    border-radius: 22px;
+    border-radius: 12px;
     border-width: 1px;
     border-color: #e4e4e6;
     justify-content: center;

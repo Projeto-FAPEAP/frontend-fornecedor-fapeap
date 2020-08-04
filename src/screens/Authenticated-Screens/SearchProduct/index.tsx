@@ -1,61 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import {FlatList, Alert} from 'react-native';
+import React, { useState, useEffect,useContext } from 'react';
+import {FlatList, Alert,Text} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import api from '../../../services/api';
 import Loader from '../../utils/index';
+import AuthContext from '../../../contexts/auth';
 import {
     Container,
-    Title,
-    Input,
-    P,
-    DropdownWrappeer,
-    WelcomeText,
-    TopTabMenu,
-    OrderButton,
-    ProductsButton,
-    TopTabMenuTextActived,
-    TopTabMenuTextInActived,
-    TopTabMenuInWrapper,
-    Section,
-    SectionTitle,
-    ListRow,
-    ListWrapper,
     ListRowTitle,
     ListRowSubTitle,
     SearchInput,
-    SearchWrapper,
-    AddButton,
-    AddButtonText,
     ListProducts,
     ListProductsImageWrapper,
     ListProductsTextWrapper,
-    ModalBackground,
-    FormAddProduct,
-    HeaderAddProduct,
-    HeaderAddProductInnerTitle,
-    HeaderAddProductInnerIcon,
-    AddProductButton,
-    AddProductButtonText,
-    WrapperListAddProduct,
-    MediaSpotButtonAddProduct,
-    AddMediaButtonWrapperAddProduct,
-    CloseButtonAddProduct,
-    MediaWrapper,
-    RemoveMedia,
-    RemoveMediaButtonWrapper,
-    RemoveProductButton,
-    WrapperButtons,
-    ListWrapperOrders,
-    FormSearchProduct,
-    SearchTextInner,
-    SearchInputButton,
-    HeaderSearchProductInnerSearch,
-    HeaderSearchProductInnerIcon,
     HeaderSearchProduct,
     ListWrapperSearchProduct,
-    ModalBackgroundSearch,
-
+    NothingFound,
 } from './styles';
 
 // import * as S from './styles';
@@ -71,12 +31,12 @@ const Products: React.FC = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [productsList, setProductsList] = useState<Products[] | undefined>([]);
+  const [productsListResult, setProductsListResult] = useState<Products[] | undefined>([]);
   const [search, setSearch] = useState('');
+  const [found,setFound] = useState(false);
+  const {user } = useContext(AuthContext);
   useEffect(() => {
-    setTimeout(function () {
-
-      getAllProducts();
-    }, 1000);
+    getAllProducts();
   }, []);
 
   function handleMeasurement(data: Array<Products>): void {
@@ -92,12 +52,14 @@ const Products: React.FC = () => {
       }
     }
     setProductsList(data);
+    setProductsListResult(data)
   }
 
   async function getAllProducts(): Promise<void> {
     setLoading(true);
+    console.log(user.id,'teste')
     try {
-      const response = await api.get(`${api.defaults.baseURL}/produto`);
+      const response = await api.get(`${api.defaults.baseURL}/produto/${user.id}`);
       handleMeasurement(response.data);
       setLoading(false);
       console.log(loading);
@@ -131,37 +93,60 @@ const Products: React.FC = () => {
   }
 
   function handleSearch(): void {
-    /* const orderList = ordersData; */
+    let aux: Products[] = [];
+    let k = 0;
+    for(let i = 0; i< productsList.length;i+=1){
+      if(productsList[i].nome.match(`^${search}`)){
+        console.log(i,productsList[i].nome)
+
+        aux[k] = productsList[i];
+        k+=1;
+        console.log(JSON.stringify(aux[i],null,2))
+      }
+    }
+    if(aux.length ===0){
+      setFound(true)
+      setProductsListResult(aux)
+    }else{
+      setFound(false)
+      setProductsListResult(aux)
+    }
+    console.log(aux.length)
+    
   }
 
   useEffect(() => {
     if (search !== '') {
-      handleSearch();
+      handleSearch()
+    }else{
+      setProductsListResult(productsList)
     }
   }, [search]);
   return (
     <>
       <Container>
         <Loader loading={loading}/>
-       
-             
                 <HeaderSearchProduct>
-                  <HeaderSearchProductInnerSearch>
+               
                     <SearchInput
+                      autoFocus
                       onChangeText={(text) => setSearch(text)}
                       placeholder="Buscar Produto"
                     />
-                  </HeaderSearchProductInnerSearch>
+              
                 </HeaderSearchProduct>
-
+                {found?(<NothingFound>Nada encontrado!</NothingFound>)
+                :null}
                 <ListWrapperSearchProduct>
                   <FlatList
                     scrollEnabled={false}
-                    data={productsList}
+                    data={productsListResult}
                     refreshing={false}
                     onRefresh={() => getAllProducts()}
                     renderItem={({ item, index }) => (
-                      <ListProducts onPress={() => getProduct(item.id)}>
+                      <ListProducts onPress={() =>  navigation.navigate('EditProduct', {
+                        itemId: item.id,
+                      })}>
                         <ListProductsImageWrapper
                           source={require('../../../assets/acai_1.jpg')}
                           resizeMode="contain"
@@ -192,9 +177,6 @@ const Products: React.FC = () => {
                     keyExtractor={(item, index) => String(index)}
                   />
                 </ListWrapperSearchProduct>
-            
-          
-        
         </Container>
     </>
   );
