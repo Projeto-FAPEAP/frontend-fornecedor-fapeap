@@ -406,7 +406,7 @@ const AddProducts: React.FC = () => {
                       ]}
                     />
                   </DropdownWrappeer>
-                  <P>Fotos do Produto (até 2 fotos)</P>
+                  <P>Fotos (até 2 fotos)</P>
 
                   <WrapperListAddProduct>
                     <FlatList

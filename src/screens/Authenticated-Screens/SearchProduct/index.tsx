@@ -95,11 +95,11 @@ const Products: React.FC = () => {
   function handleSearch(): void {
     let aux: Products[] = [];
     let k = 0;
-    for(let i = 0; i< productsList.length;i+=1){
-      if(productsList[i].nome.match(`^${search}`)){
-        console.log(i,productsList[i].nome)
+    for(let i = 0; i< productsList!.length;i+=1){
+      if(productsList![i].nome.match(`^${search}`)){
+        console.log(i,productsList![i].nome)
 
-        aux[k] = productsList[i];
+        aux[k] = productsList![i];
         k+=1;
         console.log(JSON.stringify(aux[i],null,2))
       }

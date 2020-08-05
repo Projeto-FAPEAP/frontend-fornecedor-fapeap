@@ -43,6 +43,7 @@ export const ButtonWrapperText = styled.View`
 export const ButtonText = styled.Text`
   color: #7d7d7d;
   font-size: ${hp('2.8%')}px;
+  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
 `;
 export const ButtonIcon = styled.View`
   width: 15%;
@@ -53,4 +54,5 @@ export const StoreName = styled.Text`
   color: #fff;
   font-size: ${hp('3.5%')}px;
   padding: ${hp('3.5%')}px;
+  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
 `;

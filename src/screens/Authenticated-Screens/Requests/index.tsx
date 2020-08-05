@@ -6,10 +6,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import RNPickerSelect from 'react-native-picker-select';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
 import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation } from '@react-navigation/native';
-
+import { 
+  format,
+} from 'date-fns';
+import formatPrice from '../../../utils/formatPrice'
+import pt from 'date-fns/locale/pt-BR';
 import AuthContext from '../../../contexts/auth';
 import api from '../../../services/api';
 import Loader from '../../utils/index';
@@ -21,6 +24,11 @@ import {
   ListRowTitle,
   ListRowSubTitle,
   ListWrapperOrders,
+  ListRowInnerLeft,
+  ListRowInnerRight,
+  ListRowPending,
+  ListRowConfirmed,
+  ListRowTotal
 } from './styles';
 
 interface Orders {
@@ -31,9 +39,9 @@ interface Orders {
   consumidor: {
     nome: string;
   };
+  created_at:string;
 }
 
-// import * as S from './styles';
 
 const Requests: React.FC = () => {
   const navigation = useNavigation();
@@ -187,14 +195,28 @@ const Requests: React.FC = () => {
                       onPress={() => navigation.navigate('OrderDetails', {
                         itemId: item.id,
                       })}>
-                      <ListRowTitle>{item.consumidor.nome}</ListRowTitle>
-                      <ListRowSubTitle>{`Total: R$ ${item.total}`}</ListRowSubTitle>
-                      <ListRowSubTitle>{`Status: R$ ${item.status_pedido}`}</ListRowSubTitle>
+                        <ListRowInnerLeft>
+                        <ListRowTitle numberOfLines={1} >{item.consumidor.nome}</ListRowTitle>
+                      
                       <ListRowSubTitle>
                         {`Tipo de Pedido: ${
                           item.tipo_da_compra ? 'Delivery' : ' Reserva'
                         }`}
                       </ListRowSubTitle>
+                      <ListRowTotal numberOfLines={1}>{`Total: R$ ${item.total}`}</ListRowTotal>
+                        </ListRowInnerLeft>
+                        <ListRowInnerRight>
+                          {item.status_pedido === 'Pendente'?(
+                          <ListRowPending>{item.status_pedido}</ListRowPending>):(
+                          <ListRowConfirmed>{item.status_pedido}</ListRowConfirmed>)}
+                        <ListRowSubTitle>
+                        {format(
+                         Date.parse(item.created_at), 
+                          "'Dia' dd 'de' MMMM', às ' HH:mm'h'",{ locale: pt }
+                        )}
+                      </ListRowSubTitle>
+                        </ListRowInnerRight>
+                      
                     </ListRow>
                   </View>
                 )}

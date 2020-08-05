@@ -127,7 +127,7 @@ const Products: React.FC = () => {
                     <ListProductsTextWrapper>
                       <ListRowTitle>{item.nome}</ListRowTitle>
                       <ListRowSubTitle>
-                        {`${item.unidade_medida} R$ ${item.preco}`}
+                      {`${item.unidade_medida} • R$ ${item.preco}`}
                       </ListRowSubTitle>
                       {item.status_produto ? (
                         <ListRowSubTitle>
