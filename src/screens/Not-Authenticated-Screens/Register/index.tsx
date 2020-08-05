@@ -256,13 +256,13 @@ const Login: React.FC = () => {
           );
           return;
         }
-        // if (!video) {
-        //   Alert.alert(
-        //     'Atenção',
-        //     'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
-        //   );
-        //   return
-        // }
+        if (!video) {
+          Alert.alert(
+            'Atenção',
+            'Você deve nos enviar um do processo produtivo de seu estabelecimento ',
+          );
+          return;
+        }
 
         setLoading(true);
 
@@ -329,8 +329,8 @@ const Login: React.FC = () => {
   );
 
   return (
-    <S.Container>
-      <KeyboardView>
+    <KeyboardView>
+      <S.Container>
         <S.Header>
           <S.Title>Crie sua conta</S.Title>
           <S.Subtitle>{subtitle}</S.Subtitle>
@@ -369,42 +369,42 @@ const Login: React.FC = () => {
             )}
           </S.Form>
         </FormProvider>
-      </KeyboardView>
 
-      {!keyboardIsOpen && (
-        <S.Footer>
-          <S.DotsContainer>
-            <S.Dots
-              onPress={() => nextStep(1)}
-              isFilled
-              color={colors.primary}
-            />
-            <S.Dots
-              onPress={() => nextStep(2)}
-              isFilled={step >= 2}
-              color={darken(0.05, colors.primary)}
-            />
-            <S.Dots
-              onPress={() => nextStep(3)}
-              isFilled={step >= 3}
-              color={darken(0.1, colors.primary)}
-            />
-            <S.Dots
-              onPress={() => nextStep(4)}
-              isFilled={step >= 4}
-              color={darken(0.15, colors.primary)}
-            />
-          </S.DotsContainer>
+        {!keyboardIsOpen && (
+          <S.Footer>
+            <S.DotsContainer>
+              <S.Dots
+                onPress={() => nextStep(1)}
+                isFilled
+                color={colors.primary}
+              />
+              <S.Dots
+                onPress={() => nextStep(2)}
+                isFilled={step >= 2}
+                color={darken(0.05, colors.primary)}
+              />
+              <S.Dots
+                onPress={() => nextStep(3)}
+                isFilled={step >= 3}
+                color={darken(0.1, colors.primary)}
+              />
+              <S.Dots
+                onPress={() => nextStep(4)}
+                isFilled={step >= 4}
+                color={darken(0.15, colors.primary)}
+              />
+            </S.DotsContainer>
 
-          <S.ButtonSignIn
-            onPress={() => formRef.current?.submitForm()}
-            loading={loading}
-          >
-            Avancar
-          </S.ButtonSignIn>
-        </S.Footer>
-      )}
-    </S.Container>
+            <S.ButtonSignIn
+              onPress={() => formRef.current?.submitForm()}
+              loading={loading}
+            >
+              Avancar
+            </S.ButtonSignIn>
+          </S.Footer>
+        )}
+      </S.Container>
+    </KeyboardView>
   );
 };
 

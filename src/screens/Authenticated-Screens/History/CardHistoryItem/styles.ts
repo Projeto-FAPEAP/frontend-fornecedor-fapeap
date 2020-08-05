@@ -47,5 +47,5 @@ export const Sale = styled.Text`
 export const Status = styled.Text<IStatusProps>`
   font-size: 14px;
   color: ${({ color }) => color};
-  font-family: ${({ theme }) => theme.fonts.Ubuntu.semiBold};
+  font-family: ${({ theme }) => theme.fonts.Ubuntu.normal};
 `;

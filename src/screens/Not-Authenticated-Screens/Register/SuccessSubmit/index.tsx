@@ -19,11 +19,8 @@ const SuccessSubmit: React.FC = () => {
       <S.Content>
         <S.Title>Cadastro finalizado</S.Title>
         <S.Subtitle>
-          Agora será necessário aguardar até 7 dias, para confirmarmos seus
-          dados cadastrados.
-        </S.Subtitle>
-        <S.Subtitle>
-          Não se preocupe, entraremos em contato em breve, por email.
+          Aguarde a confirmação do seu cadastro pelo GEA. Enviaremos um e-mail
+          informando sobre a homologação do seus dados cadastrais.
         </S.Subtitle>
 
         <S.Button onPress={navigateToWelcomeAuth}>
