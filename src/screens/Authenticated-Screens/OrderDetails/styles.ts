@@ -215,7 +215,22 @@ export const SubTotalText = styled.Text`
   font-weight: bold;
 `;
 
+export const Amount = styled.Text`
+  font-size: ${hp('2%')}px;
+  color: #9a9a9a;
+`;
+
 export const ListWrapper = styled.View`
+  width: ${wp('75%')}px;
+  padding-top: ${hp('1%')}px;
+  text-align: center;
+  align-content: center;
+
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+export const ListWrapperInner = styled.View`
   width: ${wp('75%')}px;
   padding-top: ${hp('1%')}px;
   text-align: center;
@@ -229,10 +244,8 @@ export const ListWrapperItem = styled.View`
   border-bottom-width: 1px;
   border-color: #d4cbcb;
   width: ${wp('75%')}px;
-
-  text-align: center;
-  align-content: center;
-  height: ${hp('5%')}px;
-  flex-direction: row;
-  justify-content: space-between;
+  align-content: flex-start;
+  height: ${hp('9%')}px;
+  flex-direction: column;
+  justify-content:flex-start;
 `;

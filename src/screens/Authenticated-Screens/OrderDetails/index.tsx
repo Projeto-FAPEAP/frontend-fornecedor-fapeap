@@ -29,14 +29,31 @@ import {
   SubTotalText,
   SubTotalSpanInner,
   ListWrapper,
-  ListWrapperItem,
+  ListWrapperItem,ListWrapperInner,Amount
 } from './styles';
+
+interface Items{
+  id:number;
+  preco_venda:string;
+  quantidade:string;
+  produto:{
+    nome:string;
+    preco:string;
+  }
+}
 
 const OrderDetails: React.FC = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [itemsList,setItemList] = useState<Items[] | undefined>([]);
   const { itemId } = route.params;
+  const {extraData} = route.params;
+
+  useEffect(()=>{
+    getAllItems();
+  },[])
+
   async function confirmOrder():Promise<void>{
     try{
       const response = await api.put(`${api.defaults.baseURL}/validarpedidos/${itemId}`)
@@ -46,6 +63,87 @@ const OrderDetails: React.FC = () => {
       setLoading(false);
       
       Alert.alert('Aviso', 'Pedido Confirmado!',[{
+        text: 'Ok',
+        onPress: () => navigation.navigate('Index'),
+        style: 'default',
+      },]);
+    }catch(error){
+      setLoading(false);
+      console.log(JSON.stringify(error, null, 2));
+      console.log(error, 'jonathan');
+      console.log(Object(error.response), 'salve');
+      Alert.alert(error.response.data.error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
+  }
+
+  async function getAllItems(): Promise<void> {
+    setLoading(true);
+    console.log(itemId)
+    try {
+      const response = await api.get(
+        `${api.defaults.baseURL}/fornecedor/pedidos/itens/${itemId}`,
+      );
+      
+        
+      setItemList(response.data)
+
+
+      setLoading(false);
+      console.log(JSON.stringify(response.data,null,2));
+    } catch (error) {
+      setLoading(false);
+      if (error.message === 'Network Error') {
+        Alert.alert('Verifique sua conexão de internet e tente novamente!!');
+      } else {
+        console.log(JSON.stringify(error, null, 2));
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+      }
+    }
+  }
+
+  async function cancelOrder():Promise<void>{
+    try{
+      const response = await api.put(`${api.defaults.baseURL}/cancelarpedidos/${itemId}`)
+      console.log(JSON.stringify(response.data, null, 2));
+  
+    
+      setLoading(false);
+      
+      Alert.alert('Aviso', 'Pedido Cancelado!',[{
         text: 'Ok',
         onPress: () => navigation.navigate('Index'),
         style: 'default',
@@ -89,21 +187,24 @@ const OrderDetails: React.FC = () => {
           </ClientInformationImageWrapper>
           <Span>
             <ClientInformationTextWrapper>
-              <Title numberOfLines={1}>Consmidor Nome</Title>
-              <SubTitle>Status: Pendente</SubTitle>
-              <SubTitle>Tipo de Pedido: Delivery</SubTitle>
-              <SubTitle>Endereço: Rua Dr.Braulino,1235</SubTitle>
+              <Title numberOfLines={1}>{extraData.name}</Title>
+              <SubTitle>{`Status: ${extraData.status}`}</SubTitle>
+              <SubTitle>{`Tipo de Pedido: ${extraData.delivery?'Delivery':'Reserva'}`}</SubTitle>
+              <SubTitle>{`Endereço: ${extraData.address}`}</SubTitle>
             </ClientInformationTextWrapper>
             <ClientInformationButtonWrapper>
-              <ButtonShareLocalization>
-                <ButtonShareLocalizationIcon>
-                  <Icon name="whatsapp" size={32} color="#fff" />
-                </ButtonShareLocalizationIcon>
+            {extraData.status !== 'Pendente'?(
+             <ButtonShareLocalization>
+             <ButtonShareLocalizationIcon>
+               <Icon name="whatsapp" size={32} color="#fff" />
+             </ButtonShareLocalizationIcon>
 
-                <ButtonShareLocalizationText>
-                  Compartilhar Endereço
-                </ButtonShareLocalizationText>
-              </ButtonShareLocalization>
+             <ButtonShareLocalizationText>
+               Compartilhar Endereço
+             </ButtonShareLocalizationText>
+           </ButtonShareLocalization>
+            ):null}
+              
             </ClientInformationButtonWrapper>
           </Span>
         </ClientInformation>
@@ -112,55 +213,21 @@ const OrderDetails: React.FC = () => {
             <ListWrapper>
               <FlatList
                 scrollEnabled={false}
-                horizontal
-           
-                ListFooterComponent={() => (
-                  <View>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                    <ListWrapperItem>
-                      <TotalText>Total</TotalText>
-                      <TotalText>R$ 30.00</TotalText>
-                    </ListWrapperItem>
-                  </View>
-                )}
+               
+           data={itemsList}
+                
                 renderItem={({ item, index }) => (
                   <ListWrapperItem>
-                    <TotalText>Total</TotalText>
-                    <TotalText>R$ 30.00</TotalText>
+                    <ListWrapperInner>
+                      <TotalText>{item.produto.nome}</TotalText>
+                      <TotalText> {`R$ ${item.preco_venda}`}</TotalText>
+                    </ListWrapperInner>
+                    <Amount>
+                      {`Quantidade: ${item.quantidade}`}
+                    </Amount>
                   </ListWrapperItem>
                 )}
-                keyExtractor={(index) => String(index.uri)}
+                keyExtractor={(item, index) => String(index)}
               />
             </ListWrapper>
             <SubTotalSpan>
@@ -175,14 +242,17 @@ const OrderDetails: React.FC = () => {
             </SubTotalSpan>
             <TotalSpan>
               <TotalText>Total</TotalText>
-              <TotalText>R$ 30.00</TotalText>
+              <TotalText>{`R$ ${extraData.total}`}</TotalText>
             </TotalSpan>
           </OrderRecipe>
           <ButtonWrapper>
-            <Button onPress={()=>confirmOrder()}>
+            {extraData.status === 'Pendente'?(
+              <Button onPress={()=>confirmOrder()}>
               <ButtonText>Confirmar Pedido</ButtonText>
             </Button>
-            <ButtonCancel>
+            ):null}
+            
+            <ButtonCancel onPress={()=>cancelOrder()}>
               <ButtonText>Cancelar Pedido</ButtonText>
             </ButtonCancel>
           </ButtonWrapper>

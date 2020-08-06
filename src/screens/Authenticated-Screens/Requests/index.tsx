@@ -38,6 +38,8 @@ interface Orders {
   total: number;
   consumidor: {
     nome: string;
+    logradouro:string;
+    numero_local:string;
   };
   created_at:string;
 }
@@ -194,6 +196,13 @@ const Requests: React.FC = () => {
                     <ListRow
                       onPress={() => navigation.navigate('OrderDetails', {
                         itemId: item.id,
+                        extraData:{
+                          name:item.consumidor.nome,
+                          status:item.status_pedido,
+                          delivery: item.tipo_da_compra,
+                          address:item.consumidor.logradouro+", "+item.consumidor.numero_local,
+                          total: item.total
+                        }
                       })}>
                         <ListRowInnerLeft>
                         <ListRowTitle numberOfLines={1} >{item.consumidor.nome}</ListRowTitle>

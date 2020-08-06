@@ -53,7 +53,7 @@ export const ListRow = styled.TouchableOpacity`
   flex-direction:row;
 `;
 
-export const ListRowInnerLeft = styled.TouchableOpacity`
+export const ListRowInnerLeft = styled.View`
   justify-content: center;
   width: ${wp('45%')}px;
   margin-bottom: ${hp('0.2%')}px;
