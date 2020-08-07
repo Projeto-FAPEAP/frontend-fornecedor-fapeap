@@ -18,7 +18,6 @@ export const CardItem = styled.TouchableOpacity.attrs({
   padding: 15px;
   justify-content: center;
   align-items: center;
-
   border-radius: 5px;
   border-bottom-width: 0.8px;
   border-bottom-color: ${({ theme }) => theme.colors.border};
