@@ -1,5 +1,6 @@
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 
+import logo from '@assets/logo.png';
 import Button from '@components/Button';
 import styled from 'styled-components/native';
 
@@ -7,7 +8,14 @@ export const Container = styled.View`
   flex: 1;
 `;
 
-export const IconSpace = styled.View``;
+export const IconSpace = styled.Image.attrs({
+  source: logo,
+  resizeMode: 'contain',
+})`
+  width: 200px;
+  height: 200px;
+  margin: auto;
+`;
 
 export const Footer = styled.View`
   margin-top: auto;

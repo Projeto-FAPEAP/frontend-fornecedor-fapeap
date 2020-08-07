@@ -5,9 +5,9 @@ const { width, height } = Dimensions.get('window');
 export default {
   title: 'light',
   colors: {
-    primary: '#84378F',
-    secundary: '#fff',
-    success: '#1AE255',
+    primary: '#730949',
+    secundary: '#9b6774',
+    success: '#8ebf22',
     danger: '#FF4646',
     warning: '#FFD500',
 

@@ -20,15 +20,15 @@
 		2DCD954D1E0B4F2C00145EB5 /* QueroAcaiFornecedorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* QueroAcaiFornecedorTests.m */; };
 		33CBDC535B1C4C5D9D43F185 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4426B0CF54704B049A9993F8 /* OpenSans-Bold.ttf */; };
 		44D7BDD20C52C53ACFDC4517 /* libPods-QueroAcaiFornecedor-QueroAcaiFornecedorTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 44697785D093624DC7AEE2FA /* libPods-QueroAcaiFornecedor-QueroAcaiFornecedorTests.a */; };
+		6BEB2E23BE8642EF9B133C69 /* Ubuntu-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D7EDBA461234FCE9272D175 /* Ubuntu-Bold.ttf */; };
 		8FA0D242D15A4793875643A9 /* OpenSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8ABDBE893D984D11B319B287 /* OpenSans-SemiBoldItalic.ttf */; };
 		9CA59C768DC8404E905957EE /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3372A21D97A34924BF328EB1 /* OpenSans-Regular.ttf */; };
+		A02AD374EBA04B92B3AA4718 /* Ubuntu-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F6CB446B23DB423BBA803CCD /* Ubuntu-Medium.ttf */; };
 		A538A53F9D4F9EC446CC16A5 /* libPods-QueroAcaiFornecedor-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A2FF796919EC7C78D92264A /* libPods-QueroAcaiFornecedor-tvOS.a */; };
+		C693173FAB684EAC8D498379 /* Ubuntu-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3F57E03F57974740BAC67D14 /* Ubuntu-Regular.ttf */; };
 		C7C2BAD6004D4D94958E9B52 /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 32339C8CA4DA4E4F88B9B740 /* OpenSans-Italic.ttf */; };
 		EFFCB04AC993B86017B3BA96 /* libPods-QueroAcaiFornecedor-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27431C5FF0ADC31A4334BE60 /* libPods-QueroAcaiFornecedor-tvOSTests.a */; };
-		6BEB2E23BE8642EF9B133C69 /* Ubuntu-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D7EDBA461234FCE9272D175 /* Ubuntu-Bold.ttf */; };
 		FFB428417E094A39AB014DD3 /* Ubuntu-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 946ED82DCF8246E6AF9F1F02 /* Ubuntu-Light.ttf */; };
-		A02AD374EBA04B92B3AA4718 /* Ubuntu-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F6CB446B23DB423BBA803CCD /* Ubuntu-Medium.ttf */; };
-		C693173FAB684EAC8D498379 /* Ubuntu-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3F57E03F57974740BAC67D14 /* Ubuntu-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,7 +55,7 @@
 		00E356F21AD99517003FC87E /* QueroAcaiFornecedorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QueroAcaiFornecedorTests.m; sourceTree = "<group>"; };
 		03DA6209AD827C769ABBAE92 /* Pods-QueroAcaiFornecedor-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QueroAcaiFornecedor-tvOS.release.xcconfig"; path = "Target Support Files/Pods-QueroAcaiFornecedor-tvOS/Pods-QueroAcaiFornecedor-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		0F677ECDD4574DD69B8963A3 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* QueroAcaiFornecedor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QueroAcaiFornecedor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Quero Açaí para fornecedores.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quero Açaí para fornecedores.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = QueroAcaiFornecedor/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = QueroAcaiFornecedor/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -72,9 +72,11 @@
 		3372A21D97A34924BF328EB1 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../src/assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		33975102F4794DF083006CFD /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		3BCD18EA80954A3594526C7C /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		3F57E03F57974740BAC67D14 /* Ubuntu-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Ubuntu-Regular.ttf"; path = "../src/assets/fonts/Ubuntu-Regular.ttf"; sourceTree = "<group>"; };
 		4426B0CF54704B049A9993F8 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Bold.ttf"; path = "../src/assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		44697785D093624DC7AEE2FA /* libPods-QueroAcaiFornecedor-QueroAcaiFornecedorTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-QueroAcaiFornecedor-QueroAcaiFornecedorTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4907640924D742E7AAFAAC02 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		4D7EDBA461234FCE9272D175 /* Ubuntu-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Ubuntu-Bold.ttf"; path = "../src/assets/fonts/Ubuntu-Bold.ttf"; sourceTree = "<group>"; };
 		4ED5535B3F24416BB35ECEC5 /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiBold.ttf"; path = "../src/assets/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		50D11871D9C049FCB7C2EADE /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		5C09AEE724D25547008A265B /* QueroAcaiFornecedor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = QueroAcaiFornecedor.entitlements; path = QueroAcaiFornecedor/QueroAcaiFornecedor.entitlements; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 		7894ADD1C7F343EB919926E4 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		7B48C10C60BCC52191DBFF12 /* Pods-QueroAcaiFornecedor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QueroAcaiFornecedor.debug.xcconfig"; path = "Target Support Files/Pods-QueroAcaiFornecedor/Pods-QueroAcaiFornecedor.debug.xcconfig"; sourceTree = "<group>"; };
 		8ABDBE893D984D11B319B287 /* OpenSans-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiBoldItalic.ttf"; path = "../src/assets/fonts/OpenSans-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		946ED82DCF8246E6AF9F1F02 /* Ubuntu-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Ubuntu-Light.ttf"; path = "../src/assets/fonts/Ubuntu-Light.ttf"; sourceTree = "<group>"; };
 		95B3A32CF4A04DC79FEB7919 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		9DCC1F05D1842F1161ADBC20 /* Pods-QueroAcaiFornecedor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QueroAcaiFornecedor.release.xcconfig"; path = "Target Support Files/Pods-QueroAcaiFornecedor/Pods-QueroAcaiFornecedor.release.xcconfig"; sourceTree = "<group>"; };
 		AC24031EB8DD431494A30C25 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -97,11 +100,8 @@
 		E0917AEA9FFE49D5B5598E5B /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		F6CB446B23DB423BBA803CCD /* Ubuntu-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Ubuntu-Medium.ttf"; path = "../src/assets/fonts/Ubuntu-Medium.ttf"; sourceTree = "<group>"; };
 		FCE31C4429524E6DA73D75B5 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
-		4D7EDBA461234FCE9272D175 /* Ubuntu-Bold.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Bold.ttf"; path = "../src/assets/fonts/Ubuntu-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		946ED82DCF8246E6AF9F1F02 /* Ubuntu-Light.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Light.ttf"; path = "../src/assets/fonts/Ubuntu-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		F6CB446B23DB423BBA803CCD /* Ubuntu-Medium.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Medium.ttf"; path = "../src/assets/fonts/Ubuntu-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		3F57E03F57974740BAC67D14 /* Ubuntu-Regular.ttf */ = {isa = PBXFileReference; name = "Ubuntu-Regular.ttf"; path = "../src/assets/fonts/Ubuntu-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,7 +226,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* QueroAcaiFornecedor.app */,
+				13B07F961A680F5B00A75B9A /* Quero Açaí para fornecedores.app */,
 				00E356EE1AD99517003FC87E /* QueroAcaiFornecedorTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* QueroAcaiFornecedor-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* QueroAcaiFornecedor-tvOSTests.xctest */,
@@ -307,7 +307,7 @@
 			);
 			name = QueroAcaiFornecedor;
 			productName = QueroAcaiFornecedor;
-			productReference = 13B07F961A680F5B00A75B9A /* QueroAcaiFornecedor.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Quero Açaí para fornecedores.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* QueroAcaiFornecedor-tvOS */ = {
@@ -818,8 +818,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = QueroAcaiFornecedor;
+				PRODUCT_BUNDLE_IDENTIFIER = br.com.fapeap.queroacaifornecedor;
+				PRODUCT_NAME = "Quero Açaí para fornecedores";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -841,8 +841,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = QueroAcaiFornecedor;
+				PRODUCT_BUNDLE_IDENTIFIER = br.com.fapeap.queroacaifornecedor;
+				PRODUCT_NAME = "Quero Açaí para fornecedores";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
