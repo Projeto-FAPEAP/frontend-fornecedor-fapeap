@@ -263,7 +263,7 @@ const OrderDetails: React.FC = () => {
               <ListRowPending>{extraData.status}</ListRowPending>):(
               <ListRowConfirmed>{extraData.status}</ListRowConfirmed>)}
             {extraData.status !== 'Pendente' && extraData.delivery?(
-             <ButtonShareLocalization onPress={()=>{!Linking.canOpenURL(`whatsapp://send?text=${extraData.address}`)?Linking.openURL(`whatsapp://send?text=${extraData.address}`):Alert.alert('Aviso','Instale o whatsapp para utilizar esta função!!')}}>
+             <ButtonShareLocalization onPress={()=>{Linking.canOpenURL(`whatsapp://send?text=${extraData.address}`).then((response)=>response?Linking.openURL(`whatsapp://send?text=${extraData.address}`):Alert.alert('Aviso','Instale o whatsapp para utilizar esta função!!'))}}>
              <ButtonShareLocalizationIcon>
                <Icon name="whatsapp" size={18} color="#fff" />
              </ButtonShareLocalizationIcon>
