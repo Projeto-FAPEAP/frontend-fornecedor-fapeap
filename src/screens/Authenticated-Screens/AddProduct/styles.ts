@@ -18,7 +18,7 @@ import {
     width: 85%;
     height: ${hp('6.5%')}px;
     elevation: 5;
-    border-radius: 22px;
+    border-radius: 12px;
     margin-top: 26px;
     padding-horizontal: ${hp('1.8%')}px;
     padding-vertical: ${hp('1.8%')}px;
@@ -30,7 +30,7 @@ import {
     width: 85%;
     height: ${hp('6.5%')}px;
     elevation: 5;
-    border-radius: 22px;
+    border-radius: 12px;
     margin-top: 26px;
     padding-horizontal: ${hp('1.8%')}px;
     overflow: hidden;
@@ -75,7 +75,7 @@ import {
   
   export const AddProductButton = styled.TouchableOpacity`
     width: ${wp('40%')}px;
-    border-radius: 22px;
+    border-radius: 12px;
     height: ${hp('6%')}px;
     justify-content: center;
     background: ${(props) => props.theme.colors.primary};

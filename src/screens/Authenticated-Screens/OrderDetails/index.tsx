@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { View, Text, SafeAreaView, FlatList, Alert, Image,ScrollView } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Alert, Image,ScrollView,Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import api from '../../../services/api';
 import { useNavigation,useRoute, NavigationContainer } from '@react-navigation/native';
 import Loader from '../../utils/index';
+import { 
+  format,
+} from 'date-fns';
+import pt from 'date-fns/locale/pt-BR';
 import {
   Container,
   ClientInformation,
@@ -29,7 +33,7 @@ import {
   SubTotalText,
   SubTotalSpanInner,
   ListWrapper,
-  ListWrapperItem,ListWrapperInner,Amount
+  ListWrapperItem,ListWrapperInner,Amount,ListRowConfirmed,ListRowPending
 } from './styles';
 
 interface Items{
@@ -100,7 +104,61 @@ const OrderDetails: React.FC = () => {
         `${api.defaults.baseURL}/fornecedor/pedidos/itens/${itemId}`,
       );
       
+     /*  const a = [
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
         
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+        
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+        
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+        
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+        
+      ]; */
       setItemList(response.data)
 
 
@@ -175,28 +233,39 @@ const OrderDetails: React.FC = () => {
 
   return (
     <Container>
-      <ScrollView>
+      
+{/* <ScrollView> */}
+
+
+      
         <Loader loading={loading} />
       
         <ClientInformation>
-          <ClientInformationImageWrapper>
+          {/* <ClientInformationImageWrapper>
             <ClientInformationImage
               source={require('../../../assets/Order.png')}
               resizeMode="contain"
             />
-          </ClientInformationImageWrapper>
+          </ClientInformationImageWrapper> */}
           <Span>
             <ClientInformationTextWrapper>
               <Title numberOfLines={1}>{extraData.name}</Title>
-              <SubTitle>{`Status: ${extraData.status}`}</SubTitle>
-              <SubTitle>{`Tipo de Pedido: ${extraData.delivery?'Delivery':'Reserva'}`}</SubTitle>
-              <SubTitle>{`Endereço: ${extraData.address}`}</SubTitle>
+              
+              
+              <SubTitle>{extraData.address}</SubTitle>
+              <SubTitle>{format(
+                         Date.parse(extraData.date), 
+                          "'Dia' dd 'de' MMMM', às ' HH:mm'h'",{ locale: pt }
+                        )}</SubTitle>
             </ClientInformationTextWrapper>
             <ClientInformationButtonWrapper>
-            {extraData.status !== 'Pendente'?(
-             <ButtonShareLocalization>
+            {extraData.status === 'Pendente'?(
+              <ListRowPending>{extraData.status}</ListRowPending>):(
+              <ListRowConfirmed>{extraData.status}</ListRowConfirmed>)}
+            {extraData.status !== 'Pendente' && extraData.delivery?(
+             <ButtonShareLocalization onPress={()=>{!Linking.canOpenURL(`whatsapp://send?text=${extraData.address}`)?Linking.openURL(`whatsapp://send?text=${extraData.address}`):Alert.alert('Aviso','Instale o whatsapp para utilizar esta função!!')}}>
              <ButtonShareLocalizationIcon>
-               <Icon name="whatsapp" size={32} color="#fff" />
+               <Icon name="whatsapp" size={18} color="#fff" />
              </ButtonShareLocalizationIcon>
 
              <ButtonShareLocalizationText>
@@ -212,9 +281,9 @@ const OrderDetails: React.FC = () => {
           <OrderRecipe>
             <ListWrapper>
               <FlatList
-                scrollEnabled={false}
-               
-           data={itemsList}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                data={itemsList}
                 
                 renderItem={({ item, index }) => (
                   <ListWrapperItem>
@@ -233,11 +302,11 @@ const OrderDetails: React.FC = () => {
             <SubTotalSpan>
               <SubTotalSpanInner>
                 <SubTotalText>Taxa de Entrega</SubTotalText>
-                <SubTotalText>R$ 8.50</SubTotalText>
+                <SubTotalText>{extraData.delivery? extraData.tax:'0.00' }</SubTotalText>
               </SubTotalSpanInner>
               <SubTotalSpanInner>
                 <SubTotalText>SubTotal</SubTotalText>
-                <SubTotalText>R$ 8.50</SubTotalText>
+                <SubTotalText>{extraData.subtotal}</SubTotalText>
               </SubTotalSpanInner>
             </SubTotalSpan>
             <TotalSpan>
@@ -245,7 +314,9 @@ const OrderDetails: React.FC = () => {
               <TotalText>{`R$ ${extraData.total}`}</TotalText>
             </TotalSpan>
           </OrderRecipe>
-          <ButtonWrapper>
+          
+        </OrderInformation>
+        <ButtonWrapper>
             {extraData.status === 'Pendente'?(
               <Button onPress={()=>confirmOrder()}>
               <ButtonText>Confirmar Pedido</ButtonText>
@@ -256,8 +327,7 @@ const OrderDetails: React.FC = () => {
               <ButtonText>Cancelar Pedido</ButtonText>
             </ButtonCancel>
           </ButtonWrapper>
-        </OrderInformation>
-        </ScrollView>
+       {/*  </ScrollView> */}
     </Container>
   );
 };

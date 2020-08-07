@@ -34,8 +34,10 @@ import {
 interface Orders {
   id: string;
   status_pedido: string;
-  tipo_da_compra: boolean;
+  delivery: boolean;
   total: number;
+  subtotal:number;
+  taxa_entrega:number|undefined;
   consumidor: {
     nome: string;
     logradouro:string;
@@ -95,50 +97,8 @@ const Requests: React.FC = () => {
       const response = await api.get(
         `${api.defaults.baseURL}/fornecedor/pedidos`,
       );
-      /*  console.log(JSON.stringify(response.data, null, 2)); */
-      /* const a = [
-        {
-          total: '35.63',
-          status_pedido: 'Pendente',
-          tipo_da_compra: false,
-          consumidor: {
-            nome: 'teste',
-          },
-        },
-        {
-          total: '35.63',
-          status_pedido: 'Confirmado',
-          tipo_da_compra: false,
-          consumidor: {
-            nome: 'teste',
-          },
-        },
-        {
-          total: '35.63',
-          status_pedido: 'Confirmado',
-          tipo_da_compra: false,
-          consumidor: {
-            nome: 'teste',
-          },
-        },
-        {
-          total: '35.63',
-          status_pedido: 'Pendente',
-          tipo_da_compra: false,
-          consumidor: {
-            nome: 'teste',
-          },
-        },
-        {
-          total: '35.63',
-          status_pedido: 'Pendente',
-          tipo_da_compra: false,
-          consumidor: {
-            nome: 'teste',
-          },
-        },
-      ]; */
-      /* setOrdersData(a); */
+        console.log(JSON.stringify(response.data, null, 2)); 
+      
       handleOrderList(response.data);
 
       setLoading(false);
@@ -199,9 +159,12 @@ const Requests: React.FC = () => {
                         extraData:{
                           name:item.consumidor.nome,
                           status:item.status_pedido,
-                          delivery: item.tipo_da_compra,
+                          delivery: item.delivery,
                           address:item.consumidor.logradouro+", "+item.consumidor.numero_local,
-                          total: item.total
+                          total: item.total,
+                          date:item.created_at,
+                          subtotal:item.subtotal,
+                          tax:item.taxa_entrega
                         }
                       })}>
                         <ListRowInnerLeft>
@@ -209,7 +172,7 @@ const Requests: React.FC = () => {
                       
                       <ListRowSubTitle>
                         {`Tipo de Pedido: ${
-                          item.tipo_da_compra ? 'Delivery' : ' Reserva'
+                          item.delivery ? 'Delivery' : ' Reserva'
                         }`}
                       </ListRowSubTitle>
                       <ListRowTotal numberOfLines={1}>{`Total: R$ ${item.total}`}</ListRowTotal>
