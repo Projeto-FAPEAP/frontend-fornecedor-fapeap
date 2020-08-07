@@ -7,44 +7,64 @@ import api from '@services/api';
 import CardHistoryItem from './CardHistoryItem';
 
 interface IResponse {
-  id: string;
-  total: string;
-  tipo_da_compra: boolean;
-  status_pedido: 'Finalizado' | 'Cancelado';
-  consumidor: {
-    nome: string;
-  };
+  data: {
+    id: string;
+    total: string;
+    delivery?: boolean;
+    status_pedido: 'Finalizado' | 'Cancelado';
+    consumidor: {
+      nome: string;
+    };
+  }[];
+  page: number;
+  perPage: number;
+  pages: number;
+  total: number;
 }
 
 export interface IRequest {
   id: string;
   total: string;
-  delivery: boolean;
+  delivery?: boolean;
   client: string;
   status_pedido: 'Finalizado' | 'Cancelado';
 }
 
 const History: React.FC = () => {
   const [requests, setRequest] = React.useState<IRequest[]>([]);
+  const [page, setPage] = React.useState(1);
+
+  const findRequestPerPage = React.useCallback(async (nextPage: number) => {
+    const response = await api.get<IResponse>(`/fornecedor/pedidos/historico`, {
+      params: {
+        page: nextPage,
+        limit: 30,
+      },
+    });
+
+    const { data } = response.data;
+
+    setRequest(
+      data.map((item) => {
+        const { id, total, delivery, status_pedido } = item;
+        const { nome } = item.consumidor;
+
+        return {
+          id,
+          total,
+          delivery: !!delivery,
+          client: nome,
+          status_pedido,
+        };
+      }),
+    );
+
+    setPage(response.data.page);
+  }, []);
 
   React.useEffect(() => {
-    api.get<IResponse[]>(`/fornecedor/pedidos/historico`).then((response) => {
-      setRequest(
-        response.data.map((item) => {
-          const { id, total, tipo_da_compra, status_pedido } = item;
-          const { nome } = item.consumidor;
-
-          return {
-            id,
-            total,
-            delivery: tipo_da_compra,
-            client: nome,
-            status_pedido,
-          };
-        }),
-      );
-    });
-  }, []);
+    findRequestPerPage(1);
+  }, [findRequestPerPage]);
 
   const hasRequest = React.useMemo(() => {
     return requests.length > 0;
