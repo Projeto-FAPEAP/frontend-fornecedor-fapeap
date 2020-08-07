@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 
+import IsEmpty from '@components/IsEmpty';
 import api from '@services/api';
 
 import CardHistoryItem from './CardHistoryItem';
@@ -44,6 +45,18 @@ const History: React.FC = () => {
       );
     });
   }, []);
+
+  const hasRequest = React.useMemo(() => {
+    return requests.length > 0;
+  }, [requests]);
+
+  if (!hasRequest) {
+    return (
+      <IsEmpty icon="exclamationcircleo">
+        Parece que você não possui pedidos no histórico
+      </IsEmpty>
+    );
+  }
 
   return (
     <FlatList
