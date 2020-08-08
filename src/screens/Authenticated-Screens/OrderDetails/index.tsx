@@ -242,6 +242,49 @@ const OrderDetails: React.FC = () => {
     }
   }
 
+   async function sendingOrder():Promise<void>{
+    setLoading(true)
+    try{
+      const response = await api.put(`${api.defaults.baseURL}/validarpedidos/${itemId}`)
+      console.log(JSON.stringify(response.data, null, 2));
+  
+    
+      setLoading(false);
+      
+      getAllOrders().then(
+        (response)=>{
+          Alert.alert('Aviso','O cliente foi informado que o entregador está a caminho!!',[{
+            text: 'Ok',
+            onPress: () => navigation.navigate('Index'),
+            style: 'default',
+          },]);
+        }
+      )
+    }catch(error){
+      setLoading(false);
+      console.log(JSON.stringify(error, null, 2));
+      console.log(error, 'jonathan');
+      console.log(Object(error.response), 'salve');
+      Alert.alert(error.response.data.error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
+  }
+
   return (
     <Container>
       
@@ -327,17 +370,29 @@ const OrderDetails: React.FC = () => {
           </OrderRecipe>
           
         </OrderInformation>
-        <ButtonWrapper>
+        
             {extraData.status === 'Pendente'?(
-              <Button onPress={()=>confirmOrder()}>
-              <ButtonText>Confirmar Pedido</ButtonText>
-            </Button>
+             <ButtonWrapper>
+                <Button onPress={()=>confirmOrder()}>
+                    <ButtonText>Confirmar Pedido</ButtonText>
+                </Button>
+                <ButtonCancel onPress={()=>cancelOrder()}>
+                  <ButtonText>Cancelar Pedido</ButtonText>
+                </ButtonCancel>
+                </ButtonWrapper>
+
+              
             ):null}
+            {extraData.status === 'Pedido em rota de entrega' || extraData.status === 'Pendente' && extraData.delivery === true?(
+              null
+            ):(
+              <ButtonWrapper>
+<Button onPress={()=>sendingOrder()}>
+              <ButtonText>Entregador a caminho</ButtonText>
+            </Button>
+            </ButtonWrapper>
+            )}
             
-            <ButtonCancel onPress={()=>cancelOrder()}>
-              <ButtonText>Cancelar Pedido</ButtonText>
-            </ButtonCancel>
-          </ButtonWrapper>
        {/*  </ScrollView> */}
     </Container>
   );

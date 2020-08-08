@@ -239,7 +239,7 @@ export const ListWrapperItem = styled.View`
 
 export const ListRowPending = styled.Text`
   width:60px;
-  font-size: ${hp('2%')}px;
+  font-size: 12px;
   color: white;
   background:#ffd500;
   text-align:center;
@@ -248,8 +248,8 @@ export const ListRowPending = styled.Text`
 `;
 
 export const ListRowConfirmed = styled.Text`
-  width:80px;
-  font-size: ${hp('2%')}px;
+  width:90px;
+  font-size: 12px;
   color: white;
   background:#59A656;
   text-align:center;
