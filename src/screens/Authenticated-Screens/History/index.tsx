@@ -6,15 +6,21 @@ import Loading from '@components/Loading';
 import api from '@services/api';
 
 import CardHistoryItem from './CardHistoryItem';
+import { ItemDocument } from '@screens/Not-Authenticated-Screens/Register/FormStep4/styles';
 
 interface IResponse {
   historico: {
     id: string;
     total: string;
     delivery?: boolean;
+    subtotal:number;
+    taxa_entrega:number;
+    created_at:string;
     status_pedido: 'Finalizado' | 'Cancelado';
     consumidor: {
       nome: string;
+      logradouro:string;
+      numero_local:string;
     };
   }[];
   page: number;
@@ -29,6 +35,11 @@ export interface IRequest {
   delivery?: boolean;
   client: string;
   status_pedido: 'Finalizado' | 'Cancelado';
+  subtotal:number;
+  taxa_entrega:number;
+  created_at:string;
+  logradouro:string;
+  numero_local:string
 }
 
 const History: React.FC = () => {
@@ -48,8 +59,8 @@ const History: React.FC = () => {
 
     setRequest(
       data.map((item) => {
-        const { id, total, delivery, status_pedido } = item;
-        const { nome } = item.consumidor;
+        const { id, total, delivery, status_pedido,subtotal, taxa_entrega,created_at} = item;
+        const { nome,logradouro,numero_local } = item.consumidor;
 
         return {
           id,
@@ -57,6 +68,11 @@ const History: React.FC = () => {
           delivery: !!delivery,
           client: nome,
           status_pedido,
+          logradouro,
+          numero_local,
+          subtotal,
+          taxa_entrega,
+          created_at
         };
       }),
     );
@@ -90,7 +106,7 @@ const History: React.FC = () => {
       showsVerticalScrollIndicator={false}
       data={requests}
       keyExtractor={(item) => String(item.id)}
-      renderItem={({ item: request }) => <CardHistoryItem request={request} />}
+      renderItem={({ item: request }) => <CardHistoryItem request={request} page={'HistoryDetails'}  />}
     />
   );
 };

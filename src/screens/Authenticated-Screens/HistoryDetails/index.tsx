@@ -12,6 +12,8 @@ import pt from 'date-fns/locale/pt-BR';
 import {
   Container,
   ClientInformation,
+  ClientInformationImageWrapper,
+  ClientInformationImage,
   Span,
   ClientInformationTextWrapper,
   ClientInformationButtonWrapper,
@@ -46,11 +48,10 @@ interface Items{
   }
 }
 
-const OrderDetails: React.FC = () => {
+const HistoryDetails: React.FC = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [initializing,setInitializing] = useState(true);
   const [itemsList,setItemList] = useState<Items[] | undefined>([]);
   const { itemId } = route.params;
   const {extraData} = route.params;
@@ -110,7 +111,7 @@ const OrderDetails: React.FC = () => {
         `${api.defaults.baseURL}/fornecedor/pedidos/itens/${itemId}`,
       );
       
-      const a = [
+      /* const a = [
         {
           total: '35.63',
           status_pedido: 'Pendente',
@@ -194,10 +195,10 @@ const OrderDetails: React.FC = () => {
           },
         },
         
-      ];
-      setItemList(a)
+      ]; */
+      setItemList(response.data)
 
-      setInitializing(false);
+
       setLoading(false);
       console.log(JSON.stringify(response.data,null,2));
     } catch (error) {
@@ -316,121 +317,84 @@ const OrderDetails: React.FC = () => {
   }
 
   return (
-    <ScrollView >
-       <Loader loading={loading} />
-      {!loading?(
- <Container>
-   
- <ClientInformation>
-   {/* <ClientInformationImageWrapper>
-     <ClientInformationImage
-       source={require('../../../assets/Order.png')}
-       resizeMode="contain"
-     />
-   </ClientInformationImageWrapper> */}
-   <Span>
-     <ClientInformationTextWrapper>
-       <Title numberOfLines={1}>{extraData.name}</Title>
-       
-       
-       <SubTitle>{extraData.address}</SubTitle>
-       <SubTitle>{format(
-                  Date.parse(extraData.date), 
-                   "'Dia' dd 'de' MMMM', às ' HH:mm'h'",{ locale: pt }
-                 )}</SubTitle>
-     </ClientInformationTextWrapper>
-     <ClientInformationButtonWrapper>
-     {extraData.status === 'Pendente'?(
-       <ListRowPending>{extraData.status}</ListRowPending>):(
-       <ListRowConfirmed>{extraData.status}</ListRowConfirmed>)}
-     {extraData.status !== 'Pendente' && extraData.delivery?(
-      <ButtonShareLocalization onPress={()=>{Linking.canOpenURL(`whatsapp://send?text=${extraData.address}`).then((response)=>response?Linking.openURL(`whatsapp://send?text=${extraData.address}`):Alert.alert('Aviso','Instale o whatsapp para utilizar esta função!!'))}}>
-      <ButtonShareLocalizationIcon>
-        <Icon name="whatsapp" size={18} color="#fff" />
-      </ButtonShareLocalizationIcon>
+    <ScrollView style={{backgroundColor:'#f9f9f9'}}>
+    <Container>
+      
 
-      <ButtonShareLocalizationText>
-        Compartilhar Endereço
-      </ButtonShareLocalizationText>
-    </ButtonShareLocalization>
-     ):null}
-       
-     </ClientInformationButtonWrapper>
-   </Span>
- </ClientInformation>
- <OrderInformation>
-   <OrderRecipe>
-     <ListWrapper>
-       <FlatList
-         showsHorizontalScrollIndicator={false}
-         showsVerticalScrollIndicator={false}
-         data={itemsList}
-         scrollEnabled={false}
-         renderItem={({ item, index }) => (
-           <ListWrapperItem>
-             <ListWrapperInner>
-               <TotalText>{item.produto.nome}</TotalText>
-               <TotalText> {formatPrice(item.preco_venda)}</TotalText>
-             </ListWrapperInner>
-             <Amount>
-               {`Quantidade: ${item.quantidade}`}
-             </Amount>
-           </ListWrapperItem>
-         )}
-         keyExtractor={(item, index) => String(index)}
-       />
-     </ListWrapper>
-     <SubTotalSpan>
-       <SubTotalSpanInner>
-         <SubTotalText>Taxa de Entrega</SubTotalText>
-         <SubTotalText>{extraData.delivery? formatPrice(extraData.tax):'0.00' }</SubTotalText>
-       </SubTotalSpanInner>
-       <SubTotalSpanInner>
-         <SubTotalText>SubTotal</SubTotalText>
-         <SubTotalText>{formatPrice(extraData.subtotal)}</SubTotalText>
-       </SubTotalSpanInner>
-     </SubTotalSpan>
-     <TotalSpan>
-       <TotalText>Total</TotalText>
-       <TotalText>{formatPrice(extraData.total)}</TotalText>
-     </TotalSpan>
-   </OrderRecipe>
-   
- </OrderInformation>
- 
-     {extraData.status === 'Pendente'?(
-      <ButtonWrapper>
-         <Button onPress={()=>confirmOrder()}>
-             <ButtonText>Confirmar Pedido</ButtonText>
-         </Button>
-         <ButtonCancel onPress={()=>cancelOrder()}>
-           <ButtonText>Cancelar Pedido</ButtonText>
-         </ButtonCancel>
-         </ButtonWrapper>
 
-       
-     ):null}
-     {extraData.status === 'Pedido em rota de entrega' || extraData.status === 'Pendente' && extraData.delivery === true?(
-       null
-     ):(
-       <ButtonWrapper>
-<Button onPress={()=>sendingOrder()}>
-       <ButtonText>Entregador a caminho</ButtonText>
-     </Button>
-     </ButtonWrapper>
-     )}
-     
- 
-</Container>
-      ):(
-<Container>
 
-</Container>
-      )
-      }
-   
+      
+        <Loader loading={loading} />
+      
+        <ClientInformation>
+          {/* <ClientInformationImageWrapper>
+            <ClientInformationImage
+              source={require('../../../assets/Order.png')}
+              resizeMode="contain"
+            />
+          </ClientInformationImageWrapper> */}
+          <Span>
+            <ClientInformationTextWrapper>
+              <Title numberOfLines={1}>{extraData.name}</Title>
+              
+              
+              <SubTitle>{extraData.address}</SubTitle>
+              <SubTitle>{format(
+                         Date.parse(extraData.date), 
+                          "'Dia' dd 'de' MMMM', às ' HH:mm'h'",{ locale: pt }
+                        )}</SubTitle>
+            </ClientInformationTextWrapper>
+            <ClientInformationButtonWrapper>
+            {extraData.status === 'Cancelado'?(
+              <ListRowPending>{extraData.status}</ListRowPending>):(
+              <ListRowConfirmed>{extraData.status}</ListRowConfirmed>)}
+            
+              
+            </ClientInformationButtonWrapper>
+          </Span>
+        </ClientInformation>
+        <OrderInformation>
+          <OrderRecipe>
+            <ListWrapper>
+              <FlatList
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                data={itemsList}
+                scrollEnabled={false}
+                renderItem={({ item, index }) => (
+                  <ListWrapperItem>
+                    <ListWrapperInner>
+                      <TotalText>{item.produto.nome}</TotalText>
+                      <TotalText> {formatPrice(item.preco_venda)}</TotalText>
+                    </ListWrapperInner>
+                    <Amount>
+                      {`Quantidade: ${item.quantidade}`}
+                    </Amount>
+                  </ListWrapperItem>
+                )}
+                keyExtractor={(item, index) => String(index)}
+              />
+            </ListWrapper>
+            <SubTotalSpan>
+              <SubTotalSpanInner>
+                <SubTotalText>Taxa de Entrega</SubTotalText>
+                <SubTotalText>{extraData.delivery? formatPrice(extraData.tax):'0.00' }</SubTotalText>
+              </SubTotalSpanInner>
+              <SubTotalSpanInner>
+                <SubTotalText>SubTotal</SubTotalText>
+                <SubTotalText>{formatPrice(extraData.subtotal)}</SubTotalText>
+              </SubTotalSpanInner>
+            </SubTotalSpan>
+            <TotalSpan>
+              <TotalText>Total</TotalText>
+              <TotalText>{formatPrice(extraData.total)}</TotalText>
+            </TotalSpan>
+          </OrderRecipe>
+          
+        </OrderInformation>
+    </Container>
     </ScrollView>
   );
 };
 
-export default OrderDetails;
+export default HistoryDetails;

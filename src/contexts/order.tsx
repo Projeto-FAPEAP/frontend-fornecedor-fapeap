@@ -50,7 +50,7 @@ export const OrdersProvider: React.FC = ({ children }) => {
   }, []);
 
   function handleOrderList(array: IOrders[]): void {
-    setLoading(true)
+    /* setLoading(true) */
     const ordersdata: IOrders[] = array;
     const pending = [];
     const confirmed = [];
@@ -75,7 +75,7 @@ export const OrdersProvider: React.FC = ({ children }) => {
         total[i] = confirmed[i - pending.length];
       }
     }
-    setLoading(false)
+    /* setLoading(false) */
     setPendingLength(pending.length);
     setOrdersData(total);
   }

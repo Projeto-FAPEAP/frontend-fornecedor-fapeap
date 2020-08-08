@@ -1,9 +1,8 @@
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  background: ${(props) => props.theme.colors.background};
   flex-direction: column;
-  background: ${(props) => props.theme.colors.secundary};
+  background:  #f2f1f7;
 `;
 
 export const Section = styled.View`

@@ -36,6 +36,7 @@
     "axios": "^0.19.2",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "date-fns": "^2.15.0",
+    "date-fns-tz": "^1.0.10",
     "polished": "^3.6.5",
     "react": "16.11.0",
     "react-native": "0.62.2",

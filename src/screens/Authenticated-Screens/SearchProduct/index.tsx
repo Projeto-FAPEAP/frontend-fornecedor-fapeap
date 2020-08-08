@@ -119,6 +119,7 @@ const Products: React.FC = () => {
     if (search !== '') {
       handleSearch()
     }else{
+      setFound(false)
       setProductsListResult(productsList)
     }
   }, [search]);
@@ -139,7 +140,7 @@ const Products: React.FC = () => {
                 :null}
                 <ListWrapperSearchProduct>
                   <FlatList
-                    scrollEnabled={false}
+                  showsVerticalScrollIndicator={false}
                     data={productsListResult}
                     refreshing={false}
                     onRefresh={() => getAllProducts()}

@@ -6,6 +6,7 @@ import api from '../../../services/api';
 import Loader from '../../utils/index';
 import AuthContext from '../../../contexts/auth';
 import ProductContext from '../../../contexts/product';
+import formatPrice from '../../../utils/formatPrice';
 import {
   Container,
   ListWrapper,
@@ -128,7 +129,7 @@ const Products: React.FC = () => {
                     <ListProductsTextWrapper>
                       <ListRowTitle>{item.nome}</ListRowTitle>
                       <ListRowSubTitle>
-                      {`${item.unidade_medida} • R$ ${item.preco}`}
+                      {`${item.unidade_medida} • ${formatPrice(parseFloat(item.preco))}`}
                       </ListRowSubTitle>
                       {item.status_produto ? (
                         <ListRowSubTitle>

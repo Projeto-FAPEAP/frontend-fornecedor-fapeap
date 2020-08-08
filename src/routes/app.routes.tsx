@@ -9,6 +9,7 @@ import AddProduct from '../screens/Authenticated-Screens/AddProduct';
 import EditProduct from '../screens/Authenticated-Screens/EditProduct';
 import OrderDetails from '../screens/Authenticated-Screens/OrderDetails';
 import SearchProduct from '../screens/Authenticated-Screens/SearchProduct';
+import HistoryDetails from '../screens/Authenticated-Screens/HistoryDetails';
 import Settings from '../screens/Authenticated-Screens/Settings';
 import BottomTabRoutes from './bottomTab.routes';
 
@@ -86,6 +87,13 @@ const AppRoutes: React.FC = () => {
             headerTitle: 'Buscar Produto',
           }}
           component={SearchProduct}
+        />
+         <Stack.Screen
+          name="HistoryDetails"
+          options={{
+            headerTitle: 'Detalhes Histórico',
+          }}
+          component={HistoryDetails}
         />
       </Stack.Navigator>
     </>

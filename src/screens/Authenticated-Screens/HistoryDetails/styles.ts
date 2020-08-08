@@ -9,8 +9,7 @@ import styled from 'styled-components/native';
 export const Container = styled.View`
   
   flex-direction: column;
-  border-width:1px;
-  background: #f9f9f9;
+  background: #f9f9f9
 `;
 
 export const ClientInformation = styled.View`
@@ -18,7 +17,7 @@ export const ClientInformation = styled.View`
   align-items: center;
   flex-direction: column;
 /*   height:12%; */
-  background: #f9f9f9;
+  background: #f9f9f9
   border-bottom-width:1px;
   border-color:#dedede;
 `;

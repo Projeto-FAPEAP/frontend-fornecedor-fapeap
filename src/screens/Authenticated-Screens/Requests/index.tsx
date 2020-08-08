@@ -9,9 +9,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation,useRoute } from '@react-navigation/native';
 import { 
-  format,
+  format
 } from 'date-fns';
-import formatPrice from '../../../utils/formatPrice'
+/* import { zonedTimeToUtc,format } from 'date-fns-tz'; */
+import formatPrice from '../../../utils/formatPrice';
 import pt from 'date-fns/locale/pt-BR';
 import AuthContext from '../../../contexts/auth';
 import OrderContext from '../../../contexts/order';
@@ -177,17 +178,21 @@ const Requests: React.FC = () => {
                           item.delivery ? 'Delivery' : ' Reserva'
                         }`}
                       </ListRowSubTitle>
-                      <ListRowTotal numberOfLines={1}>{`Total: R$ ${item.total}`}</ListRowTotal>
+                      <ListRowTotal numberOfLines={1}>{`Total: ${formatPrice(item.total)}`}</ListRowTotal>
                         </ListRowInnerLeft>
                         <ListRowInnerRight>
                           {item.status_pedido === 'Pendente'?(
                           <ListRowPending>{item.status_pedido}</ListRowPending>):(
                           <ListRowConfirmed>{item.status_pedido}</ListRowConfirmed>)}
                         <ListRowSubTitle>
-                        {format(
-                         Date.parse(item.created_at), 
+                        {format(Date.parse(item.created_at), 
                           "'Dia' dd 'de' MMMM', às ' HH:mm'h'",{ locale: pt }
-                        )}
+                        )
+                       /* format( zonedTimeToUtc(Date.parse(item.created_at), 'America/Sao_Paulo') */
+              /*  format(Date.parse(item.created_at),  "'Dia' dd 'de' MMMM', às ' HH:mm'h'", {
+                          timeZone: 'America/Brasilia',
+                        }) */
+                         }
                       </ListRowSubTitle>
                         </ListRowInnerRight>
                       
