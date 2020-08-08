@@ -38,10 +38,13 @@ export const OrdersProvider: React.FC = ({ children }) => {
   const [ordersData, setOrdersData] = useState<IOrders[] | null>([]);
   const [loading, setLoading] = useState(true);
   const [pendingLength, setPendingLength] = useState(0);
-  const {user} = useContext(AuthContext)
+  const {user,signed} = useContext(AuthContext)
   useEffect(() => {
     setTimeout(function () {
-      getAllOrders();
+      if(signed){
+        getAllOrders();
+      }
+      
     
     }, 1000);
   }, []);

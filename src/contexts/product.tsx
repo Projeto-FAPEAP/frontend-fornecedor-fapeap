@@ -30,9 +30,12 @@ const ProductContext = createContext<IProductsContextData>({} as IProductsContex
 export const ProductProvider: React.FC = ({ children }) => {
   const [productList, setProductList] = useState<IProducts[] | null>([]);
   const [loading, setLoading] = useState(true);
-  const {user} = useContext(AuthContext)
+  const {user,signed} = useContext(AuthContext)
   useEffect(() => {
+    if(signed){
       getAllProducts();
+    }
+      
   }, []);
 
   function handleMeasurement(data: Array<IProducts>): void {
