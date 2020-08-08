@@ -2,6 +2,7 @@ import React from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 
 import IsEmpty from '@components/IsEmpty';
+import Loading from '@components/Loading';
 import api from '@services/api';
 
 import CardHistoryItem from './CardHistoryItem';
@@ -33,6 +34,7 @@ export interface IRequest {
 const History: React.FC = () => {
   const [requests, setRequest] = React.useState<IRequest[]>([]);
   const [page, setPage] = React.useState(1);
+  const [loading, setLoading] = React.useState(true);
 
   const findRequestPerPage = React.useCallback(async (nextPage: number) => {
     const response = await api.get<IResponse>(`/fornecedor/pedidos/historico`, {
@@ -60,6 +62,7 @@ const History: React.FC = () => {
     );
 
     setPage(response.data.page);
+    setLoading(false);
   }, []);
 
   React.useEffect(() => {
@@ -69,6 +72,10 @@ const History: React.FC = () => {
   const hasRequest = React.useMemo(() => {
     return requests.length > 0;
   }, [requests]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   if (!hasRequest) {
     return (

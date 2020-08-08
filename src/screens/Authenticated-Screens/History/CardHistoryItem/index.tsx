@@ -20,14 +20,20 @@ const CardHistoryItem: React.FC<CardHistoryItemProps> = (props) => {
     return colors.warning;
   }, [colors.success, colors.warning, request.status_pedido]);
 
+  const statusIcon = React.useMemo(() => {
+    if (request.status_pedido === 'Finalizado') return 'checkcircleo';
+
+    return 'closecircleo';
+  }, [request.status_pedido]);
+
   const formattedPrice = React.useMemo(() => {
     return formatPrice(Number(request.total));
   }, [request.total]);
 
   return (
     <S.CardItem>
-      <S.IConStatus color={statusColor} name="checkcircleo" size={25} />
-      <S.NameClient>Manoel Gomes Borges</S.NameClient>
+      <S.IConStatus color={statusColor} name={statusIcon} size={25} />
+      <S.NameClient>{request.client}</S.NameClient>
       <S.Sale>
         {formattedPrice} • {request.delivery ? 'Delivery' : 'Retirado no local'}
       </S.Sale>
