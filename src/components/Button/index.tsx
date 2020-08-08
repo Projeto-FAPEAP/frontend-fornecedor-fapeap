@@ -28,7 +28,7 @@ const Button: React.FC<IButtonProps> = (props) => {
   return (
     <S.Container {...buttonProps} enabled={enabled}>
       {loading ? (
-        <ActivityIndicator size="small" color={colors.white} />
+        <ActivityIndicator size="small" color={colorText || colors.white} />
       ) : (
         <S.ButtonText color={colorText}>{children}</S.ButtonText>
       )}

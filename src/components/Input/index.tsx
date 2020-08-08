@@ -38,6 +38,8 @@ const Input: React.FC<IInputProps> = (props) => {
 
   useEffect(() => {
     inputRef.current.value = defaultValue;
+
+    setIsFilled(!!defaultValue);
   }, [defaultValue]);
 
   useEffect(() => {
@@ -51,6 +53,7 @@ const Input: React.FC<IInputProps> = (props) => {
       setValue(ref, value) {
         ref.setNativeProps({ text: value });
         inputRef.current.value = value;
+        setIsFilled(!!value);
       },
       getValue(ref) {
         return ref.value || '';
@@ -94,6 +97,7 @@ const Input: React.FC<IInputProps> = (props) => {
           }}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
+          numberOfLines={1}
           {...rest}
         />
       </S.ContentInput>

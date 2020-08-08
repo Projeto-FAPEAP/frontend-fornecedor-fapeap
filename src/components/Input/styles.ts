@@ -8,11 +8,13 @@ interface IPropsContentInput {
   isErrored: boolean;
 }
 
-export const Container = styled.View``;
+export const Container = styled.View`
+  width: 400px;
+`;
 
 export const ContentInput = styled.View<IPropsContentInput>`
-  width: 100%;
   align-items: center;
+  width: 100%;
   padding: 0 10px;
   border-width: 2px;
   flex-direction: row;
@@ -45,9 +47,9 @@ export const ContentInput = styled.View<IPropsContentInput>`
 `;
 
 export const TextInput = styled.TextInput`
+  flex: 1;
   padding-right: 10px;
   font-size: 16px;
-  flex: 1;
   font-family: ${({ theme }) => theme.fonts.Ubuntu.normal};
   color: ${({ theme, editable }) =>
     editable ? theme.colors.title : theme.colors.regular};

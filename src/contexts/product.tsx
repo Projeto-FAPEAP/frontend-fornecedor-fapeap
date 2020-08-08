@@ -8,8 +8,9 @@ import React, {
 import { Alert } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
-import AuthContext from './auth'
+
 import api from '../services/api';
+import AuthContext from './auth';
 
 interface IProducts {
   id: string;
@@ -21,21 +22,22 @@ interface IProducts {
 }
 
 interface IProductsContextData {
-  productList: IProducts[]|null;
-  getAllProducts():Promise<void>;
-  loading:boolean;
+  productList: IProducts[] | null;
+  getAllProducts(): Promise<void>;
+  loading: boolean;
 }
 
-const ProductContext = createContext<IProductsContextData>({} as IProductsContextData);
+const ProductContext = createContext<IProductsContextData>(
+  {} as IProductsContextData,
+);
 export const ProductProvider: React.FC = ({ children }) => {
   const [productList, setProductList] = useState<IProducts[] | null>([]);
   const [loading, setLoading] = useState(true);
-  const {user,signed} = useContext(AuthContext)
+  const { user, signed } = useContext(AuthContext);
   useEffect(() => {
-    if(signed){
+    if (signed) {
       getAllProducts();
     }
-      
   }, []);
 
   function handleMeasurement(data: Array<IProducts>): void {
@@ -54,13 +56,13 @@ export const ProductProvider: React.FC = ({ children }) => {
   }
 
   async function getAllProducts(): Promise<void> {
-    const userLoaded = await AsyncStorage.getItem(
-      '@QueroAçaí-Fornecedor:user',
-    );
+    const userLoaded = await AsyncStorage.getItem('@QueroAçaí-Fornecedor:user');
     setLoading(true);
-  
+
     try {
-      const response = await api.get(`${api.defaults.baseURL}/produto/${JSON.parse(userLoaded).id}`);
+      const response = await api.get(
+        `${api.defaults.baseURL}/produto/${JSON.parse(userLoaded).id}`,
+      );
       handleMeasurement(response.data);
       setLoading(false);
     } catch (error) {
@@ -92,17 +94,14 @@ export const ProductProvider: React.FC = ({ children }) => {
     }
   }
 
- 
   return (
-    <ProductContext.Provider
-      value={{ getAllProducts, loading,productList }}
-    >
+    <ProductContext.Provider value={{ getAllProducts, loading, productList }}>
       {children}
     </ProductContext.Provider>
   );
 };
 
-export function useAuth(): IProductsContextData {
+export function useProducts(): IProductsContextData {
   const context = useContext(ProductContext);
 
   return context;
