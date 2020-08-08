@@ -7,7 +7,7 @@ import api from '@services/api';
 import CardHistoryItem from './CardHistoryItem';
 
 interface IResponse {
-  data: {
+  historico: {
     id: string;
     total: string;
     delivery?: boolean;
@@ -42,7 +42,7 @@ const History: React.FC = () => {
       },
     });
 
-    const { data } = response.data;
+    const { historico: data } = response.data;
 
     setRequest(
       data.map((item) => {
