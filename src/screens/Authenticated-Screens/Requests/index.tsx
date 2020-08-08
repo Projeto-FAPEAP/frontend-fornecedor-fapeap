@@ -7,13 +7,14 @@ import RNPickerSelect from 'react-native-picker-select';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useRoute } from '@react-navigation/native';
 import { 
   format,
 } from 'date-fns';
 import formatPrice from '../../../utils/formatPrice'
 import pt from 'date-fns/locale/pt-BR';
 import AuthContext from '../../../contexts/auth';
+import OrderContext from '../../../contexts/order';
 import api from '../../../services/api';
 import Loader from '../../utils/index';
 import {
@@ -49,10 +50,11 @@ interface Orders {
 
 const Requests: React.FC = () => {
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
-  const [ordersData, setOrdersData] = useState<Orders[] | undefined>([]);
-  const [pendingLength, setPendingLength] = useState(0);
-  
+  const route = useRoute();
+  const {loading,pendingLength,getAllOrders,ordersData} = useContext(OrderContext);
+  /* const [loading, setLoading] = useState(false); */
+/*   const [ordersData, setOrdersData] = useState<Orders[] | undefined>([]); */
+/*   const [pendingLength, setPendingLength] = useState(0); */
   useEffect(() => {
     setTimeout(function () {
       getAllOrders();
@@ -60,7 +62,7 @@ const Requests: React.FC = () => {
     }, 1000);
   }, []);
 
-  function handleOrderList(array: Orders[]): void {
+ /*  function handleOrderList(array: Orders[]): void {
     const ordersdata: Orders[] = array;
     const pending = [];
     const confirmed = [];
@@ -130,7 +132,7 @@ const Requests: React.FC = () => {
         console.log(error.config);
       }
     }
-  }
+  } */
 
 
   return (

@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import api from '../../../services/api';
 import Loader from '../../utils/index';
 import AuthContext from '../../../contexts/auth';
+import ProductContext from '../../../contexts/product';
 import {
   Container,
   ListWrapper,
@@ -32,17 +33,17 @@ interface Products {
 }
 const Products: React.FC = () => {
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
+ /*  const [loading, setLoading] = useState(false); */
   const [productsList, setProductsList] = useState<Products[] | undefined>([]);
   const {user } = useContext(AuthContext);
+  const {productList,getAllProducts,loading} = useContext(ProductContext)
   useEffect(() => {
     setTimeout(function () {
-
       getAllProducts();
     }, 1000);
   }, []);
 
-  function handleMeasurement(data: Array<Products>): void {
+/*   function handleMeasurement(data: Array<Products>): void {
     for (let i = 0; i < data.length; i += 1) {
       if (data[i].unidade_medida === '1') {
         data[i].unidade_medida = '1 kg';
@@ -92,7 +93,7 @@ const Products: React.FC = () => {
         console.log(error.config);
       }
     }
-  }
+  } */
   return (
     <>
       <Container>
@@ -112,7 +113,7 @@ const Products: React.FC = () => {
             <ListWrapper>
               <FlatList
                 scrollEnabled
-                data={productsList}
+                data={productList}
                 refreshing={false}
                 onRefresh={() => getAllProducts()}
                 

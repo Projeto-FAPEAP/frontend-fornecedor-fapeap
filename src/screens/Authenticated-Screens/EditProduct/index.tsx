@@ -9,6 +9,7 @@ import * as Animatable from 'react-native-animatable';
 import ImagePicker, { ImagePickerResponse } from 'react-native-image-picker';
 import RNPickerSelect from 'react-native-picker-select';
 import AuthContext from '../../../contexts/auth';
+import ProductContext from  '../../../contexts/product';
 import {
     Container,
     Input,
@@ -55,6 +56,7 @@ const AddProducts: React.FC = () => {
     >([]);
     const [selectedProduct, setSelectedProduct] = useState('');
     const [learning, setLearning] = useState(false);
+    const {getAllProducts} = useContext(ProductContext);
     useEffect(()=>{
       getProduct(itemId)
     },[])
@@ -245,11 +247,15 @@ const AddProducts: React.FC = () => {
     
           setLoading(false);
 
-          Alert.alert('Aviso','Atualizado com sucesso!!',[{
-            text: 'Ok',
-            onPress: () => navigation.navigate('Index'),
-            style: 'default',
-          },]);
+          getAllProducts().then(
+            (response)=>{
+              Alert.alert('Aviso','Atualizado com sucesso!!',[{
+                text: 'Ok',
+                onPress: () => navigation.navigate('Index'),
+                style: 'default',
+              },]);
+            }
+          )
         } catch (error) {
           setLoading(false);
           console.log(JSON.stringify(error, null, 2));

@@ -5,6 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from 'styled-components';
 
 import { AuthProvider } from './contexts/auth';
+import {ProductProvider} from './contexts/product';
+import {OrdersProvider} from './contexts/order';
 import Routes from './routes';
 import themeLigth from './styles/themes/light';
 
@@ -13,7 +15,11 @@ const App: React.FC = () => {
     <NavigationContainer>
       <AuthProvider>
         <ThemeProvider theme={themeLigth}>
-          <Routes />
+          <ProductProvider>
+            <OrdersProvider>
+              <Routes />
+            </OrdersProvider>
+          </ProductProvider>
         </ThemeProvider>
       </AuthProvider>
     </NavigationContainer>

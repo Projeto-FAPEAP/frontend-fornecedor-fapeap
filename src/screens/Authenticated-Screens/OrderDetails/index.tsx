@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect,useContext } from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image,ScrollView,Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import api from '../../../services/api';
@@ -35,6 +35,7 @@ import {
   ListWrapper,
   ListWrapperItem,ListWrapperInner,Amount,ListRowConfirmed,ListRowPending
 } from './styles';
+import OrderContext from '../../../contexts/order';
 
 interface Items{
   id:number;
@@ -53,12 +54,13 @@ const OrderDetails: React.FC = () => {
   const [itemsList,setItemList] = useState<Items[] | undefined>([]);
   const { itemId } = route.params;
   const {extraData} = route.params;
-
+  const {getAllOrders} = useContext(OrderContext);
   useEffect(()=>{
     getAllItems();
   },[])
 
   async function confirmOrder():Promise<void>{
+    setLoading(true)
     try{
       const response = await api.put(`${api.defaults.baseURL}/validarpedidos/${itemId}`)
       console.log(JSON.stringify(response.data, null, 2));
@@ -66,11 +68,15 @@ const OrderDetails: React.FC = () => {
     
       setLoading(false);
       
-      Alert.alert('Aviso', 'Pedido Confirmado!',[{
-        text: 'Ok',
-        onPress: () => navigation.navigate('Index'),
-        style: 'default',
-      },]);
+      getAllOrders().then(
+        (response)=>{
+          Alert.alert('Aviso','Pedido Confirmado!!',[{
+            text: 'Ok',
+            onPress: () => navigation.navigate('Index'),
+            style: 'default',
+          },]);
+        }
+      )
     }catch(error){
       setLoading(false);
       console.log(JSON.stringify(error, null, 2));
@@ -194,6 +200,7 @@ const OrderDetails: React.FC = () => {
   }
 
   async function cancelOrder():Promise<void>{
+    setLoading(true)
     try{
       const response = await api.put(`${api.defaults.baseURL}/cancelarpedidos/${itemId}`)
       console.log(JSON.stringify(response.data, null, 2));
@@ -201,11 +208,15 @@ const OrderDetails: React.FC = () => {
     
       setLoading(false);
       
-      Alert.alert('Aviso', 'Pedido Cancelado!',[{
-        text: 'Ok',
-        onPress: () => navigation.navigate('Index'),
-        style: 'default',
-      },]);
+      getAllOrders().then(
+        (response)=>{
+          Alert.alert('Aviso','Pedido Cancelado!!',[{
+            text: 'Ok',
+            onPress: () => navigation.navigate('Index'),
+            style: 'default',
+          },]);
+        }
+      )
     }catch(error){
       setLoading(false);
       console.log(JSON.stringify(error, null, 2));

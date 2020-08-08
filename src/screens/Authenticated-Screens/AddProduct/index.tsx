@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { View, FlatList, Alert, Image, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useRoute, NavigationContainer } from '@react-navigation/native';
 import api from '../../../services/api';
 import Loader from '../../utils/index';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
 import ImagePicker, { ImagePickerResponse } from 'react-native-image-picker';
 import RNPickerSelect from 'react-native-picker-select';
+import AuthContext from '../../../contexts/auth';
+import ProductContext from  '../../../contexts/product';
 import {
     Container,
     Input,
@@ -23,6 +25,7 @@ import {
     MediaWrapper,
     RemoveMedia,
     RemoveMediaButtonWrapper,
+    RemoveProductButton,
     WrapperButtons,
 
 } from './styles';
@@ -36,21 +39,13 @@ interface Products {
   estoque_produto: number;
   unidade_medida: string | number;
 }
-const AddProduct: React.FC = () => {
-    const navigation = useNavigation()
-    const [delivery, setDelivery] = useState(false);
+const AddProducts: React.FC = () => {
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { itemId } = route.params;
+    const {user } = useContext(AuthContext);
     const [extraPhoto, setExtraPhoto] = useState(false);
-    // const [pictures, setPictures] = useState([5]);
-    const [showExtraInput, setShowExtraInput] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [photoList, setPhotoList] = useState<ImagePickerResponse[]>([]);
-    const [video, setVideo] = useState({});
-    const [videoSelected, setVideoSelected] = useState(false);
-    const [showProducts, setShowProducts] = useState(false);
-    const [showOrders, setShowOrders] = useState(true);
-    const [addProductModal, setAddProductModal] = useState(false);
-    const [editProductModal, setEditProductModal] = useState(false);
-    // Variaveis referentes ao cadastro do Produto
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [itemsNumber, setItemsNumber] = useState('');
@@ -59,26 +54,12 @@ const AddProduct: React.FC = () => {
     const [productphotoList, setProductphotoList] = useState<
       ImagePickerResponse[]
     >([]);
-    /// ////////////////////////////////////////////
-    // variáveis referentes a listagem de produtos
-    const [productsList, setProductsList] = useState<Products[] | undefined>([]);
-    /// /////////////////////////////////////////////
-  
-    // Variaveis referentes a busca de Produtos
-    const [openSearchModal, setOpenSearchModal] = useState(false);
-    const [search, setSearch] = useState('');
-    const [orderDataAux, setOrderDataAux] = useState<Orders[] | undefined>([]);
-    // ////////////////////////////////////////////
-    // Variaveis referentes ao delete de produtos
     const [selectedProduct, setSelectedProduct] = useState('');
-    /// /////////////////////////////////////////
-  
-    // Variáveis referentes a listagem de pedidos
-    const [ordersData, setOrdersData] = useState<Orders[] | undefined>([]);
-    const [pendingLength, setPendingLength] = useState(0);
-    // //////////////////////////////////////////
     const [learning, setLearning] = useState(false);
- 
+    const {getAllProducts} = useContext(ProductContext);
+    useEffect(()=>{
+      getProduct(itemId)
+    },[])
 
     function removePhoto(index: number): void {
         // Alert.alert('Jonathan');
@@ -111,132 +92,223 @@ const AddProduct: React.FC = () => {
           ],
           { cancelable: false },
         );
-      }
+    }
     
-      function learn(): void {
-        setTimeout(function () {
-          setLearning(false);
-        }, 5000);
-      }
-      function handleChoosePhoto(): void {
-        // Alert.alert('Jonathan');
-        if (productphotoList.length < 2) {
-          const photos = productphotoList;
-          let Repeat = false;
-          const options = {};
-          ImagePicker.launchImageLibrary(options, (Response) => {
-            if (Response.uri) {
-              for (let i = 0; i < productphotoList.length; i += 1) {
-                if (String(photos[i].uri) === Response.uri) {
-                  Repeat = true;
-                }
-              }
-    
-              if (Repeat) {
-                Alert.alert(
-                  'Aviso',
-                  'Você já adicionou essa imagem, evite adicionar imagens repetidas!',
-                );
-              } else {
-                photos.push(Object(Response));
-    
-                setProductphotoList(photos);
-                setExtraPhoto(true);
-                setLearning(true);
-                learn();
-                Alert.alert('Adicionado com Sucesso!');
-                setExtraPhoto(false);
+    function learn(): void {
+      setTimeout(function () {
+        setLearning(false);
+      }, 5000);
+    }
+    function handleChoosePhoto(): void {
+      // Alert.alert('Jonathan');
+      if (productphotoList.length < 2) {
+        const photos = productphotoList;
+        let Repeat = false;
+        const options = {};
+        ImagePicker.launchImageLibrary(options, (Response) => {
+          if (Response.uri) {
+            for (let i = 0; i < productphotoList.length; i += 1) {
+              if (String(photos[i].uri) === Response.uri) {
+                Repeat = true;
               }
             }
-          });
-        } else {
-          Alert.alert(
-            'Aviso',
-            'Você chegou ao limite de fotos inseridas, caso queira adicionar novas, exclua alguma!',
-          );
-        }
+  
+            if (Repeat) {
+              Alert.alert(
+                'Aviso',
+                'Você já adicionou essa imagem, evite adicionar imagens repetidas!',
+              );
+            } else {
+              photos.push(Object(Response));
+  
+              setProductphotoList(photos);
+              setExtraPhoto(true);
+              setLearning(true);
+              learn();
+              Alert.alert('Adicionado com Sucesso!');
+              setExtraPhoto(false);
+            }
+          }
+        });
+      } else {
+        Alert.alert(
+          'Aviso',
+          'Você chegou ao limite de fotos inseridas, caso queira adicionar novas, exclua alguma!',
+        );
       }
-
-  async function addProduct(): Promise<void> {
-    if (
-      productName === '' ||
-      productPrice === '' ||
-      itemsNumber === '' ||
-      availability === 1 ||
-      measurement === 1 ||
-      productphotoList.length === 0
-    ) {
-      Alert.alert('Aviso', 'Preencha todos os campos!!');
-    } else {
-      console.log(measurement);
-      setLoading(true);
-      const formData = new FormData();
-
-      const photoListArray = productphotoList;
- 
-      const image = {};
-
-      formData.append('nome', productName);
-      formData.append('preco', parseFloat(productPrice));
-      formData.append('estoque_produto', itemsNumber);
-      formData.append('status_produto', availability === 2);
-
-      formData.append('unidade_medida', measurement);
-
-      for (let i = 0; i < productphotoList.length; i += 1) {
-        formData.append('file', photoListArray[i]);
-      }
-      console.log(productPrice);
-
-      /* fetch('https://fapeap.colares.net.br/fornecedor', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-        .then(
-          (response) => response.json(), // if the response is a JSON object
-        )
-        .then(
-          (success) => console.log(success), // Handle the success response object
-        )
-        .catch(
-          (error) => console.log(JSON.stringify(error, null, 2)), // Handle the error response object
-        ); */
-
-      try {
-        const response = await api.post(
-          `${api.defaults.baseURL}/produto`,
-          formData,
+    }
+    async function deleteProduct(): Promise<void> {
+      Alert.alert(
+        'Remover Produto',
+        'Quer mesmo remover?',
+        [
           {
-            headers: {
-              'Content-Type': 'multipart/form-data',
+            text: 'Não',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {
+            text: 'Sim',
+            onPress: async () => {
+              setLoading(true);
+              console.log(selectedProduct, 'getr');
+              try {
+                const response = await api.delete(
+                  `${api.defaults.baseURL}/produto/${selectedProduct}`,
+                );
+                
+                
+                setLoading(false);
+                Alert.alert('Aviso','Removido com sucesso!!',[{
+                  text: 'Ok',
+                  onPress: () => navigation.navigate('Index'),
+                  style: 'default',
+                },]);
+
+                // setProductphotoList(response[0].data.imagens)
+              } catch (error) {
+                setLoading(false);
+                console.log(JSON.stringify(error, null, 2));
+                console.log(error, 'jonathan');
+                console.log(Object(error.response), 'salve');
+                Alert.alert(error.response.data.error);
+                if (error.response) {
+                  // The request was made and the server responded with a status code
+                  // that falls out of the range of 2xx
+                  console.log(error.response.data);
+                  console.log(error.response.status);
+                  console.log(error.response.headers);
+                } else if (error.request) {
+                  // The request was made but no response was received
+                  // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                  // http.ClientRequest in node.js
+                  console.log(error.request);
+                } else {
+                  // Something happened in setting up the request that triggered an Error
+                  console.log('Error', error.message);
+                }
+                console.log(error.config);
+              }
             },
           },
+        ],
+        { cancelable: false },
+      );
+    }
+
+    async function editProduct(): Promise<void> {
+      console.log(measurement, availability, 'coemço');
+      if (
+        productName === '' ||
+        productPrice === '' ||
+        itemsNumber === '' ||
+        availability === 1 ||
+        measurement === 1 ||
+        productphotoList.length === 0
+      ) {
+        Alert.alert('Aviso', 'Preencha todos os campos!!');
+      } else {
+        setLoading(true);
+        console.log(measurement, availability);
+        const formData = new FormData();
+  
+        const photoListArray = productphotoList;
+        /* const token = await AsyncStorage.getItem('@QueroAçaí-Fornecedor:token'); */
+        /* console.log(token, 'Jonathan'); */
+        const image = {};
+        formData.append('nome', productName);
+        formData.append('preco', productPrice);
+        formData.append('estoque_produto', itemsNumber);
+        formData.append('status_produto', availability);
+  
+        formData.append('unidade_medida', measurement);
+        /*  for (let i = 0; i < productphotoList.length; i += 1) {
+          image = {
+            uri: photoListArray[i].uri,
+            type: photoListArray[i].type,
+            name: photoListArray[i].fileName,
+          };
+          formData.append('imagem', image);
+        } */
+        console.log(formData);
+        try {
+          const response = await api.put(
+            `${api.defaults.baseURL}/produto/${selectedProduct}`,
+            {
+              nome: productName,
+              preco: parseFloat(productPrice),
+              status_produto: availability === 2,
+              estoque_produto: itemsNumber,
+              unidade_medida: measurement - 1,
+            },
+          );
+          console.log(JSON.stringify(response.data, null, 2));
+  
+    
+          setLoading(false);
+          getAllProducts().then(
+            (response)=>{
+              Alert.alert('Aviso','Adicionado com sucesso!!',[{
+                text: 'Ok',
+                onPress: () => navigation.navigate('Index'),
+                style: 'default',
+              },]);
+            }
+          )
+          
+        } catch (error) {
+          setLoading(false);
+          console.log(JSON.stringify(error, null, 2));
+          console.log(error, 'jonathan');
+          console.log(Object(error.response), 'salve');
+          Alert.alert(error.response.data.error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        }
+      }
+    }
+
+    async function getProduct(idProduct: string): Promise<void> {
+      setLoading(true);
+
+      console.log(idProduct, 'getr');
+      try {
+        const response = await api.get(
+          `${api.defaults.baseURL}/produto/${user.id}/${idProduct}`,
         );
-        console.log(response.data);
-        setProductName('');
-        setItemsNumber('');
-        setAvailability(0);
-        setMeasurement(0);
-        setProductPrice('');
-        setProductphotoList([]);
-        setAddProductModal(false);
-      
+        console.log(JSON.stringify(response.data,null,2))
+        console.log(response.data.status_produto,'tedst')
+        const available = response.data.status_produto ? 2 : 3;
+        const Measurement = parseInt(response.data.unidade_medida) + 1;
+        console.log(Measurement, 'hhhhhhhhhhhhhhhh');
+        setProductName(response.data.nome);
+        setProductPrice(response.data.preco);
+        setAvailability(available);
+        setMeasurement(parseInt(Measurement));
+        setItemsNumber(response.data.estoque_produto.toString());
+        setSelectedProduct(response.data.id);
         setLoading(false);
-        Alert.alert('Aviso','Adicionado com sucesso!!',[{
-          text: 'Ok',
-          onPress: () => navigation.navigate('Index'),
-          style: 'default',
-        },]);
+     
+        console.log(JSON.stringify(response.data, null, 2));
+        // setProductphotoList(response[0].data.imagens)
       } catch (error) {
         setLoading(false);
-        console.log(JSON.stringify(error, null, 2));
         console.log(error, 'jonathan');
         console.log(Object(error.response), 'salve');
-
         Alert.alert(error.response.data.error);
         if (error.response) {
           // The request was made and the server responded with a status code
@@ -256,69 +328,55 @@ const AddProduct: React.FC = () => {
         console.log(error.config);
       }
     }
-  }
 
-  
-
- 
   return (
     <>
       <Container>
         <Loader loading={loading}/>
-        
-            <KeyboardAwareScrollView>
+        <KeyboardAwareScrollView>
               <ModalBackground>
                 <FormAddProduct>
-                  
-
                   <Input
-                    value={productName}
                     placeholder="Nome do Produto"
+                    value={productName}
                     onChangeText={(text) => setProductName(text)}
                   />
                   <Input
-                    value={productPrice}
                     placeholder="Preço do Produto"
-                    onChangeText={(text) => setProductPrice(text)}
+                    value={productPrice}
                     keyboardType="number-pad"
+                    onChangeText={(text) => setProductPrice(text)}
                   />
                   <Input
-                    value={itemsNumber}
                     placeholder="Número de items do produto"
+                    value={itemsNumber}
                     keyboardType="number-pad"
                     onChangeText={(text) => setItemsNumber(text)}
                   />
                   <DropdownWrappeer>
                     <RNPickerSelect
                       value={availability}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setAvailability(itemValue)
+                      onValueChange={(value, itemIndex) =>
+                        setAvailability(value)
                       }
                       style={{
                         placeholder: {
                           color: '#2e2e2e',
                         },
                       }}
-                      placeholder={{
-                        label: 'Selecione a disponibilidade',
+                      placeholder={
+                        {
+                            label: 'Selecione a disponibilidade',
                         value: 1,
                         color: '#9EA0A4',
-                      }}
+                        }
+                      }
                       items={[
+                        /* { label: 'Selecione a disponibilidade', value: 1 }, */
                         { label: 'Disponível', value: 2 },
                         { label: 'Indisponível', value: 3 },
                       ]}
                     />
-                    {/* <Dropdown
-                      selectedValue={availability}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setAvailability(itemValue)
-                      }
-                    >
-                      <Dropdown.Item label="Disponibilidade?" value={0} />
-                      <Dropdown.Item label="Disponível" value={1} />
-                      <Dropdown.Item label="Indisponível" value={2} />
-                    </Dropdown> */}
                   </DropdownWrappeer>
                   <DropdownWrappeer>
                     <RNPickerSelect
@@ -331,12 +389,19 @@ const AddProduct: React.FC = () => {
                           color: '#2e2e2e',
                         },
                       }}
-                      placeholder={{
-                        label: 'Selecione a unidade de medida',
+                      placeholder={
+                        {
+                           label: 'Selecione a unidade de medida',
                         value: 1,
-                        color: '#9EA0A4',
-                      }}
+                        color: '#999999',
+                        }
+                      }
                       items={[
+                        /* {
+                          label: 'Selecione a unidade de medida',
+                          value: 1,
+                          color: '#9EA0A4',
+                        }, */
                         {
                           label: '1 Quilograma (kg)',
                           value: 2,
@@ -346,18 +411,6 @@ const AddProduct: React.FC = () => {
                         { label: '500 Mililitros (ml)', value: 5 },
                       ]}
                     />
-                    {/* <Dropdown
-                      selectedValue={measurement}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setMeasurement(itemValue)
-                      }
-                    >
-                      <Dropdown.Item label="Unidade de Medida?" value={0} />
-                      <Dropdown.Item label="1 Quilograma (kg)" value={1} />
-                      <Dropdown.Item label="1 Litro (l)" value={2} />
-                      <Dropdown.Item label="500 Gramas (g)" value={3} />
-                      <Dropdown.Item label="500 Mililitros (ml)" value={4} />
-                    </Dropdown> */}
                   </DropdownWrappeer>
                   <P>Fotos (até 2 fotos)</P>
 
@@ -401,13 +454,19 @@ const AddProduct: React.FC = () => {
                       keyExtractor={(index) => String(index.uri)}
                     />
                   </WrapperListAddProduct>
-
                   <WrapperButtons>
-                    <AddProductButton onPress={() => addProduct()}>
-                      <AddProductButtonText>
-                        Adicionar Produto
-                      </AddProductButtonText>
+                    <AddProductButton onPress={() => editProduct()}>
+                      <AddProductButtonText>Atualizar</AddProductButtonText>
                     </AddProductButton>
+                    <RemoveProductButton>
+                      <AddProductButtonText
+                        onPress={() => {
+                          deleteProduct();
+                        }}
+                      >
+                        Excluir
+                      </AddProductButtonText>
+                    </RemoveProductButton>
                   </WrapperButtons>
                 </FormAddProduct>
               </ModalBackground>
@@ -419,4 +478,4 @@ const AddProduct: React.FC = () => {
   );
 };
 
-export default AddProduct;
+export default AddProducts;
