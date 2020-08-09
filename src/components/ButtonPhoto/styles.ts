@@ -63,7 +63,7 @@ export const ButtonTrash = styled.TouchableOpacity.attrs({
 `;
 
 export const IconTrash = styled(FaIcon).attrs({
-  name: 'trash',
+  name: 'trash-2',
 })`
   font-size: 24px;
   color: ${({ theme }) => theme.colors.danger};

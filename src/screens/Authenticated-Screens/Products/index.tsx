@@ -1,12 +1,14 @@
-import React, { useState, useEffect,useContext } from 'react';
-import {FlatList, Alert} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { FlatList, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
 import { useNavigation } from '@react-navigation/native';
-import api from '../../../services/api';
-import Loader from '../../utils/index';
+
 import AuthContext from '../../../contexts/auth';
 import ProductContext from '../../../contexts/product';
+import api from '../../../services/api';
 import formatPrice from '../../../utils/formatPrice';
+import Loader from '../../utils/index';
 import {
   Container,
   ListWrapper,
@@ -20,7 +22,6 @@ import {
   ListProductsTextWrapper,
   SearchTextInner,
   SearchInputButton,
-
 } from './styles';
 
 // import * as S from './styles';
@@ -34,17 +35,17 @@ interface Products {
 }
 const Products: React.FC = () => {
   const navigation = useNavigation();
- /*  const [loading, setLoading] = useState(false); */
+  /*  const [loading, setLoading] = useState(false); */
   const [productsList, setProductsList] = useState<Products[] | undefined>([]);
-  const {user } = useContext(AuthContext);
-  const {productList,getAllProducts,loading} = useContext(ProductContext)
+  const { user } = useContext(AuthContext);
+  const { productList, getAllProducts, loading } = useContext(ProductContext);
   useEffect(() => {
     setTimeout(function () {
       getAllProducts();
     }, 1000);
   }, []);
 
-/*   function handleMeasurement(data: Array<Products>): void {
+  /*   function handleMeasurement(data: Array<Products>): void {
     for (let i = 0; i < data.length; i += 1) {
       if (data[i].unidade_medida === '1') {
         data[i].unidade_medida = '1 kg';
@@ -96,61 +97,62 @@ const Products: React.FC = () => {
     }
   } */
   return (
-    <>
-      <Container>
-        <Loader loading={loading}/>
-            <SearchWrapper>
-              <SearchInputButton onPress={() => navigation.navigate('SearchProduct')}>
-                <SearchTextInner>Buscar Produto</SearchTextInner>
-              </SearchInputButton>
-              <AddButton
-                onPress={() => {
-                  navigation.navigate('AddProduct')
-                }}
-              >
-                <AddButtonText>Adicionar</AddButtonText>
-              </AddButton>
-            </SearchWrapper>
-            <ListWrapper>
-              <FlatList
-                scrollEnabled
-                data={productList}
-                refreshing={false}
-                onRefresh={() => getAllProducts()}
-                
-                renderItem={({ item, index }) => (
-                  <ListProducts onPress={() =>  navigation.navigate('EditProduct', {
-                    itemId: item.id,
-                  })}>
-                    <ListProductsImageWrapper
-                      source={require('../../../assets/acai_1.jpg')}
-                      resizeMode="contain"
-                    />
-                    <ListProductsTextWrapper>
-                      <ListRowTitle>{item.nome}</ListRowTitle>
-                      <ListRowSubTitle>
-                      {`${item.unidade_medida} • ${formatPrice(parseFloat(item.preco))}`}
-                      </ListRowSubTitle>
-                      {item.status_produto ? (
-                        <ListRowSubTitle>
-                          <Icon name="check-circle" color="green" size={20} />
-                          {' ' + 'Disponivel'}
-                        </ListRowSubTitle>
-                      ) : (
-                        <ListRowSubTitle>
-                          <Icon name="ban" color="red" size={20} />
-                          {' ' + 'Indisponivel'}
-                        </ListRowSubTitle>
-                      )}
-                    </ListProductsTextWrapper>
-                  </ListProducts>
-                )}
-                keyExtractor={(item, index) => String(index)}
-              />
-            </ListWrapper>
-        
-        </Container>
-    </>
+    <Container>
+      <Loader loading={loading} />
+      <SearchWrapper>
+        <SearchInputButton onPress={() => navigation.navigate('SearchProduct')}>
+          <SearchTextInner>Buscar Produto</SearchTextInner>
+        </SearchInputButton>
+        <AddButton
+          onPress={() => {
+            navigation.navigate('AddProduct');
+          }}
+        >
+          <AddButtonText>Adicionar</AddButtonText>
+        </AddButton>
+      </SearchWrapper>
+
+      <ListWrapper
+        scrollEnabled
+        data={productList}
+        refreshing={false}
+        onRefresh={() => getAllProducts()}
+        renderItem={({ item, index }) => (
+          <ListProducts
+            onPress={() =>
+              navigation.navigate('EditProduct', {
+                itemId: item.id,
+              })
+            }
+          >
+            <ListProductsImageWrapper
+              source={require('../../../assets/acai_1.jpg')}
+              resizeMode="contain"
+            />
+            <ListProductsTextWrapper>
+              <ListRowTitle>{item.nome}</ListRowTitle>
+              <ListRowSubTitle>
+                {`${item.unidade_medida} • ${formatPrice(
+                  parseFloat(item.preco),
+                )}`}
+              </ListRowSubTitle>
+              {item.status_produto ? (
+                <ListRowSubTitle>
+                  <Icon name="check-circle" color="green" size={20} />
+                  {' ' + 'Disponivel'}
+                </ListRowSubTitle>
+              ) : (
+                <ListRowSubTitle>
+                  <Icon name="ban" color="red" size={20} />
+                  {' ' + 'Indisponivel'}
+                </ListRowSubTitle>
+              )}
+            </ListProductsTextWrapper>
+          </ListProducts>
+        )}
+        keyExtractor={(item, index) => String(index)}
+      />
+    </Container>
   );
 };
 

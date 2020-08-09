@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex-direction: column;
-  background:  #f2f1f7;
+  background: #f2f1f7;
 `;
 
 export const Section = styled.View`
@@ -16,7 +16,7 @@ export const SectionTitle = styled.Text`
   color: #747479;
   font-size: 15px;
   padding-left: 17px;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const ListWrapperOrders = styled.View`
@@ -33,62 +33,62 @@ export const ListRow = styled.TouchableOpacity`
   border-color: #e4e4e6;
   margin-bottom: 2px;
   background: white;
-  flex-direction:row;
+  flex-direction: row;
 `;
 
 export const ListRowInnerLeft = styled.View`
   justify-content: center;
-  width:47%;
+  width: 47%;
   margin-bottom: 2px;
   background: white;
 `;
 
 export const ListRowInnerRight = styled.View`
   justify-content: center;
-  width:47%;
+  width: 47%;
   margin-bottom: 4px;
   background: white;
-  align-items:flex-end;
+  align-items: flex-end;
 `;
 
 export const ListRowTitle = styled.Text`
   font-size: 16px;
-  color:#333;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.bold }
+  color: #333;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;
 
 export const ListRowSubTitle = styled.Text`
   padding-top: 3px;
   font-size: 12px;
   color: #666666;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const ListRowPending = styled.Text`
-  width:60px;
-  font-size:12px;
+  width: 60px;
+  font-size: 12px;
   color: white;
-  background:#ffd500;
-  text-align:center;
-  border-radius:2px;
- 
-  margin-bottom:18px;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  background: #ffd500;
+  text-align: center;
+  border-radius: 2px;
+  margin-bottom: 18px;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const ListRowConfirmed = styled.Text`
-  width:80px;
+  padding: 4px 5px;
+  border-radius: 2px;
+  max-width: 160px;
   font-size: 12px;
   color: white;
-  background:#59A656;
-  text-align:center;
-  border-radius:2px;
-  margin-bottom:18px;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  background: #59a656;
+  text-align: center;
+  margin-bottom: 18px;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const ListRowTotal = styled.Text`
   font-size: 12px;
   color: #666666;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.bold }
+  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;

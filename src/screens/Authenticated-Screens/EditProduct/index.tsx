@@ -10,7 +10,7 @@ import KeyboardView from '@components/KeyboardView';
 import { useAuth } from '@contexts/auth';
 import { useProducts } from '@contexts/product';
 import SelectPhoto from '@libs/SelectPhoto';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import api from '@services/api';
 import { FormHandles } from '@unform/core';
 import { Form as FormProvider } from '@unform/mobile';
@@ -36,6 +36,7 @@ interface IResponseProduct {
   status_produto: boolean;
   nome: string;
   preco: string;
+  estoque_produto: string;
   arquivos: {
     id: string;
     url: string;
@@ -47,6 +48,7 @@ interface ISubmit {
   preco: string;
   status_produto: string;
   unidade_medida: string;
+  estoque_produto: string;
 }
 
 interface IFile {
@@ -61,6 +63,7 @@ const EditProduct: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const { colors } = useTheme();
   const { user } = useAuth();
+  const { goBack } = useNavigation();
   const { getAllProducts } = useProducts();
   const [files, setFiles] = React.useState<IFile[]>([]);
 
@@ -72,13 +75,20 @@ const EditProduct: React.FC = () => {
     api
       .get<IResponseProduct>(`/produto/${user.id}/${routeParams.itemId}`)
       .then((response) => {
-        const { nome, preco, status_produto, arquivos } = response.data;
+        const {
+          nome,
+          preco,
+          status_produto,
+          arquivos,
+          estoque_produto,
+        } = response.data;
 
         formRef.current?.setData({
           nome,
           preco: `R$ ${preco}`,
           status_produto: status_produto ? 'Disponivel' : 'Indisponivel',
           unidade_medida: 'Litro',
+          estoque_produto: String(estoque_produto),
         });
 
         const responseFiles = Array.from({ length: 2 }, (_v, k) => {
@@ -107,6 +117,12 @@ const EditProduct: React.FC = () => {
       });
   }, [routeParams.itemId, user]);
 
+  React.useEffect(() => {
+    return () => {
+      getAllProducts();
+    };
+  }, [getAllProducts]);
+
   const handleSubmit = React.useCallback(
     async (values: ISubmit) => {
       setLoading(true);
@@ -114,6 +130,7 @@ const EditProduct: React.FC = () => {
       try {
         const schema = Yup.object().shape({
           nome: Yup.string().required('Nome é obrigatório'),
+          estoque_produto: Yup.string().required('Estoque é obrigatório'),
           preco: Yup.string()
             .test(
               'price',
@@ -141,6 +158,7 @@ const EditProduct: React.FC = () => {
         await schema.validate(values, { abortEarly: false });
 
         const { nome, preco, status_produto, unidade_medida } = values;
+        const { estoque_produto } = values;
 
         const formattedPrice = preco.split('R$ ')[1];
 
@@ -149,9 +167,9 @@ const EditProduct: React.FC = () => {
           preco: formattedPrice,
           status_produto: status_produto === 'Disponivel',
           unidade_medida,
+          estoque_produto,
         });
 
-        getAllProducts();
         Alert.alert(
           'Tudo certo',
           'As informações do produto foram atualizadas',
@@ -161,12 +179,23 @@ const EditProduct: React.FC = () => {
           const errors = getValidationErrors(err);
           formRef.current?.setErrors(errors);
         }
-        console.log(JSON.stringify(err, null, 2));
       }
       setLoading(false);
     },
-    [routeParams.itemId, getAllProducts],
+    [routeParams.itemId],
   );
+
+  const handleDelete = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      await api.delete(`/produto/${routeParams.itemId}`);
+      Alert.alert('Tudo certo', 'Produto excluído com sucesso');
+      goBack();
+    } catch {
+      //
+    }
+    setLoading(false);
+  }, [routeParams.itemId, goBack]);
 
   const handleChangeAvailability = React.useCallback((value) => {
     const option = value as IAvailability;
@@ -274,6 +303,21 @@ const EditProduct: React.FC = () => {
     [handleDeleteImage],
   );
 
+  const handleConfirmDeleteProduct = React.useCallback(() => {
+    Alert.alert(
+      'Confirme para continuar',
+      'Deseja confimar a exlusão deste produto?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        { text: 'Sim, delete!', onPress: handleDelete },
+      ],
+      { cancelable: false },
+    );
+  }, [handleDelete]);
+
   return (
     <KeyboardView>
       <S.Container>
@@ -315,6 +359,20 @@ const EditProduct: React.FC = () => {
                 });
 
                 formRef.current?.setFieldValue('preco', formatted);
+              }}
+            />
+            <Input
+              icon="package"
+              label="Quantidade em estoque"
+              name="estoque_produto"
+              placeholder="Quantidade em estoque"
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              autoCorrect={false}
+              returnKeyType="next"
+              containerStyle={{
+                maxWidth: 400,
+                marginTop: 15,
               }}
             />
             <RNPickerSelect
@@ -391,7 +449,11 @@ const EditProduct: React.FC = () => {
           </S.ContentPhotos>
 
           <S.Actions>
-            <S.ButtonDelete loading={loading} colorText={colors.danger}>
+            <S.ButtonDelete
+              loading={loading}
+              colorText={colors.danger}
+              onPress={handleConfirmDeleteProduct}
+            >
               Excluir
             </S.ButtonDelete>
             <S.ButtonSubmit

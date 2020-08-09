@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import formatPrice from '@utils/formatPrice';
 import { useTheme } from 'styled-components';
 
@@ -9,11 +9,10 @@ import * as S from './styles';
 
 interface CardHistoryItemProps {
   request: IRequest;
-  page: string;
 }
 
 const CardHistoryItem: React.FC<CardHistoryItemProps> = (props) => {
-  const { request, page } = props;
+  const { request } = props;
 
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -34,13 +33,13 @@ const CardHistoryItem: React.FC<CardHistoryItemProps> = (props) => {
   }, [request.total]);
 
   const handlePress = React.useCallback(() => {
-    navigation.navigate(page, {
+    navigation.navigate('HistoryDetails', {
       itemId: request.id,
       extraData: {
         name: request.client,
         status: request.status_pedido,
         delivery: request.delivery,
-        address: `${request.logradouro}${request.numero_local}`,
+        address: `${request.logradouro}, ${request.numero_local}`,
         total: request.total,
         date: request.created_at,
         subtotal: request.subtotal,
@@ -49,7 +48,6 @@ const CardHistoryItem: React.FC<CardHistoryItemProps> = (props) => {
     });
   }, [
     navigation,
-    page,
     request.client,
     request.created_at,
     request.delivery,

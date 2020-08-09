@@ -1,159 +1,34 @@
-import {
-    widthPercentageToDP as wp,
-    heightPercentageToDP as hp,
-  } from 'react-native-responsive-screen';
-  
-  import styled from 'styled-components/native';
-  
-  export const Container = styled.View`
-    background: ${(props) => props.theme.colors.background};
-    flex-direction: column;
-  
-    background: ${(props) => props.theme.colors.secundary};
-  `;
-  
-  export const Input = styled.TextInput`
-    align-self: center;
-    background: #fff;
-    width: 85%;
-    height: ${hp('6.5%')}px;
-    elevation: 5;
-    border-radius: 12px;
-    margin-top: 26px;
-    padding-horizontal: ${hp('1.8%')}px;
-    padding-vertical: ${hp('1.8%')}px;
-    font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
-  `;
-  
-  export const DropdownWrappeer = styled.View`
-    background: #fff;
-    width: 85%;
-    height: ${hp('6.5%')}px;
-    elevation: 5;
-    border-radius: 12px;
-    margin-top: 26px;
-    padding-horizontal: ${hp('1.8%')}px;
-    overflow: hidden;
-    align-self: center;
-    justify-content: center;
-  `;
-  
-  export const P = styled.Text`
-    font-size: ${hp('2.4%')}px;
-    color: #000000;
-    padding-vertical: ${hp('1.8%')}px;
-    text-align: center;
-    font-family:${(props)=> props.theme.fonts.Ubuntu.normal }    
-  `;
+import Button from '@components/Button';
+import styled from 'styled-components/native';
 
-  export const AddButton = styled.TouchableOpacity`
-    justify-content: center;
-    align-items: center;
-    width: ${wp('25%')}px;
-    background: ${(props) => props.theme.colors.primary};
-    border-radius: 22px;
-    height: ${hp('7%')}px;
-  `;
-  
-  export const ModalBackground = styled.View`
-    flex: 1;
-    align-items: center;
-    flex-direction: column;
-    background-color: #00000040;
-    justify-content: center;
-  `;
-  
-  export const FormAddProduct = styled.View`
-    align-items: center;
-    flex-direction: column;
-    background-color: #ffffff;
-    min-height: ${hp('95%')}px;
-    width: ${wp('100%')}px;
-    align-items: center;
-    justify-content: space-around;
-  `;
-  
-  export const AddProductButton = styled.TouchableOpacity`
-    width: ${wp('40%')}px;
-    border-radius: 12px;
-    height: ${hp('6%')}px;
-    justify-content: center;
-    background: ${(props) => props.theme.colors.primary};
-    margin-bottom: ${hp('1.8%')}px;
-  `;
-  
-  export const WrapperButtons = styled.View`
-    flex-direction:row;
-    width:100%;
-    align-items:center;
-    justify-content:space-around
-    height:${hp('12%')}px;
-  `;
-  
-  export const AddProductButtonText = styled.Text`
-    text-align: center;
-    align-content: center;
-    font-size: ${hp('2.4%')}px;
-    color: ${(props) => props.theme.colors.secundary};
-    font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
-  `;
-  
-  export const WrapperListAddProduct = styled.View`
-    height: ${hp('25%')}px;
-    justify-content:center;
-    align-items:center;
-    width: ${wp('75%')}px;
-    align-self:center;
-  `;
-  
-  export const MediaSpotButtonAddProduct = styled.TouchableOpacity`
-    height: ${hp('25%')}px;
-    align-self: center;
-    width: ${wp('75%')}px;
-    border-width: 1px;
-    border-color: #b8b6b6;
-  `;
-  
-  export const AddMediaButtonWrapperAddProduct = styled.View`
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-  `;
-  
-  export const RemoveMediaButtonWrapperAddProduct = styled.ImageBackground`
-      justify-content: center;
-      align-items: center;
-    background-color:#0E1717
-      height: 100%;
-    `;
-  
-  export const RemoveMediaButtonWrapper = styled.ImageBackground`
-    justify-content: flex-start;
-    align-items: flex-end;
-    background-color:#0E1717
-    height: 100%;
-    width: ${wp('75%')}px;
-    `;
-  
-  export const MediaWrapper = styled.View`
-    flex-direction: column;
-    justify-content: flex-start;
-    height: ${hp('25%')}px;
-    border-width: 1px;
-    width: ${wp('75%')}px;
-    border-color: #b8b6b6;
-    align-items: flex-end;
-    background: #000;
-  `;
-  
-  export const RemoveMedia = styled.TouchableOpacity`
-    height: ${hp('8%')}px;
-    width: ${wp('10%')}px;
-    justify-content: center;
-    align-items: center;
-  `;
-  
-  
-  
-  
+export const Container = styled.View`
+  margin: 20px 10px;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const Title = styled.Text`
+  font-size: 18px;
+  margin: 15px auto 30px;
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }) => theme.fonts.Ubuntu.semiBold};
+`;
+
+export const Form = styled.View``;
+
+export const ContentPhotos = styled.View`
+  flex-direction: row;
+  justify-content: center;
+`;
+
+export const Actions = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 20px 0;
+`;
+
+export const ButtonSubmit = styled(Button)`
+  margin: 0 auto;
+  width: 40%;
+  background-color: ${({ theme }) => theme.colors.success};
+`;

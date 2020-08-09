@@ -1,404 +1,335 @@
-import React, { useState, useEffect ,useContext} from 'react';
-import { View, FlatList, Alert, Image, Modal } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
-import api from '../../../services/api';
-import Loader from '../../utils/index';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import * as Animatable from 'react-native-animatable';
-import ImagePicker, { ImagePickerResponse } from 'react-native-image-picker';
+import React from 'react';
+import { Alert } from 'react-native';
+import { MaskService } from 'react-native-masked-text';
 import RNPickerSelect from 'react-native-picker-select';
-import ProductContext from  '../../../contexts/product';
-import {
-    Container,
-    Input,
-    P,
-    DropdownWrappeer,
-    ModalBackground,
-    FormAddProduct,
-    AddProductButton,
-    AddProductButtonText,
-    WrapperListAddProduct,
-    MediaSpotButtonAddProduct,
-    AddMediaButtonWrapperAddProduct,
-    MediaWrapper,
-    RemoveMedia,
-    RemoveMediaButtonWrapper,
-    WrapperButtons,
 
-} from './styles';
+import ButtonPhoto from '@components/ButtonPhoto';
+import Input from '@components/Input';
+import KeyboardView from '@components/KeyboardView';
+import { useProducts } from '@contexts/product';
+import SelectPhoto from '@libs/SelectPhoto';
+import { useNavigation } from '@react-navigation/native';
+import api from '@services/api';
+import { FormHandles } from '@unform/core';
+import { Form as FormProvider } from '@unform/mobile';
+import getValidationErrors from '@utils/getValidationErrors';
+import * as Yup from 'yup';
 
-// import * as S from './styles';
-interface Products {
-  id: string;
+import * as S from './styles';
+
+type IAvailability = 'Disponível' | 'Indisponivel';
+
+interface ISubmit {
   nome: string;
   preco: string;
-  status_produto: number;
-  estoque_produto: number;
-  unidade_medida: string | number;
+  status_produto: string;
+  unidade_medida: string;
+  estoque_produto: string;
 }
+
+interface IFile {
+  id: string;
+  url: string;
+  isFilled: boolean;
+  data?: {
+    type?: string;
+    size: number;
+    name: string;
+    uri: string;
+    fileCopyUri: string;
+  };
+}
+
 const AddProduct: React.FC = () => {
-    const navigation = useNavigation()
-    const [extraPhoto, setExtraPhoto] = useState(false);;
-    const [loading, setLoading] = useState(false);
-    
-    // Variaveis referentes ao cadastro do Produto
-    const [productName, setProductName] = useState('');
-    const [productPrice, setProductPrice] = useState('');
-    const [itemsNumber, setItemsNumber] = useState('');
-    const [availability, setAvailability] = useState(0);
-    const [measurement, setMeasurement] = useState(0);
-    const [productphotoList, setProductphotoList] = useState<
-      ImagePickerResponse[]
-    >([]);
-    const {getAllProducts} = useContext(ProductContext);
-    const [learning, setLearning] = useState(false);
- 
+  const formRef = React.useRef<FormHandles>(null);
+  const [loading, setLoading] = React.useState(false);
+  const { goBack } = useNavigation();
+  const { getAllProducts } = useProducts();
+  const [files, setFiles] = React.useState<IFile[]>([{}, {}]);
 
-    function removePhoto(index: number): void {
-        // Alert.alert('Jonathan');
-        Alert.alert(
-          'Remover foto',
-          'Quer mesmo remover?',
-          [
-            {
-              text: 'Não',
-              onPress: () => console.log('Cancel Pressed'),
-              style: 'cancel',
-            },
-            {
-              text: 'Sim',
-              onPress: () => {
-                const oldPhotosList = productphotoList;
-                const newPhotoList = [];
-                let j = 0;
-                for (let i = 0; i < productphotoList.length; i += 1) {
-                  if (i !== index) {
-                    newPhotoList[j] = oldPhotosList[i];
-                    j += 1;
-                  }
-                }
-    
-                setProductphotoList(newPhotoList);
-                Alert.alert('Removido com Sucesso!');
-              },
-            },
-          ],
-          { cancelable: false },
-        );
-      }
-    
-      function learn(): void {
-        setTimeout(function () {
-          setLearning(false);
-        }, 5000);
-      }
-      function handleChoosePhoto(): void {
-        // Alert.alert('Jonathan');
-        if (productphotoList.length < 2) {
-          const photos = productphotoList;
-          let Repeat = false;
-          const options = {};
-          ImagePicker.launchImageLibrary(options, (Response) => {
-            if (Response.uri) {
-              for (let i = 0; i < productphotoList.length; i += 1) {
-                if (String(photos[i].uri) === Response.uri) {
-                  Repeat = true;
-                }
-              }
-    
-              if (Repeat) {
-                Alert.alert(
-                  'Aviso',
-                  'Você já adicionou essa imagem, evite adicionar imagens repetidas!',
-                );
-              } else {
-                photos.push(Object(Response));
-    
-                setProductphotoList(photos);
-                setExtraPhoto(true);
-                setLearning(true);
-                learn();
-                Alert.alert('Adicionado com Sucesso!');
-                setExtraPhoto(false);
-              }
-            }
-          });
-        } else {
-          Alert.alert(
-            'Aviso',
-            'Você chegou ao limite de fotos inseridas, caso queira adicionar novas, exclua alguma!',
-          );
-        }
-      }
+  React.useEffect(() => {
+    return () => {
+      getAllProducts();
+    };
+  }, [getAllProducts]);
 
-  async function addProduct(): Promise<void> {
-    console.log(measurement)
-    if (
-      productName === '' ||
-      productPrice === '' ||
-      itemsNumber === '' ||
-      availability === 1 ||
-      availability === 0 ||
-      measurement === 1 ||
-      measurement === 0 ||
-      productphotoList.length === 0
-    ) {
-      Alert.alert('Aviso', 'Preencha todos os campos!!');
-    } else {
-      console.log(measurement);
+  const handleSubmit = React.useCallback(
+    async (values: ISubmit) => {
       setLoading(true);
-      const formData = new FormData();
-
-      const photoListArray = productphotoList;
- 
-      const image = {};
-
-      formData.append('nome', productName);
-      formData.append('preco', parseFloat(productPrice));
-      formData.append('estoque_produto', itemsNumber);
-      formData.append('status_produto', availability === 2);
-
-      formData.append('unidade_medida', measurement);
-
-      for (let i = 0; i < productphotoList.length; i += 1) {
-        formData.append('file', photoListArray[i]);
-      }
-      console.log(productPrice);
-
-      /* fetch('https://fapeap.colares.net.br/fornecedor', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-        .then(
-          (response) => response.json(), // if the response is a JSON object
-        )
-        .then(
-          (success) => console.log(success), // Handle the success response object
-        )
-        .catch(
-          (error) => console.log(JSON.stringify(error, null, 2)), // Handle the error response object
-        ); */
-
+      formRef.current?.setErrors({});
       try {
-        const response = await api.post(
-          `${api.defaults.baseURL}/produto`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
-        console.log(response.data);
-        setProductName('');
-        setItemsNumber('');
-        setAvailability(0);
-        setMeasurement(0);
-        setProductPrice('');
-        setProductphotoList([]);
-      
-        setLoading(false);
-        getAllProducts().then(
-          (response)=>{
-            Alert.alert('Aviso','Adicionado com sucesso!!',[{
-              text: 'Ok',
-              onPress: () => navigation.navigate('Index'),
-              style: 'default',
-            },]);
-          }
-        )
-      } catch (error) {
-        setLoading(false);
-        console.log(JSON.stringify(error, null, 2));
-        console.log(error, 'jonathan');
-        console.log(Object(error.response), 'salve');
+        const schema = Yup.object().shape({
+          nome: Yup.string().required('Nome é obrigatório'),
+          estoque_produto: Yup.string().required('Estoque é obrigatório'),
+          preco: Yup.string()
+            .test(
+              'price',
+              'Você precisa declarar um valor para o produto',
+              (value: string) => {
+                try {
+                  const price = value.split('R$ ')[1];
+                  if (Number(price) > 0) return true;
 
-        Alert.alert(error.response.data.error);
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
+                  return false;
+                } catch {
+                  return false;
+                }
+              },
+            )
+            .required('Valor é obrigatório'),
+          status_produto: Yup.string().required(
+            'Estatus do produto é obrigatório',
+          ),
+          unidade_medida: Yup.string().required(
+            'Unidade de medida do produto é obrigatória',
+          ),
+        });
+
+        await schema.validate(values, { abortEarly: false });
+
+        const { nome, preco, status_produto, unidade_medida } = values;
+        const { estoque_produto } = values;
+
+        const formattedPrice = preco.split('R$ ')[1];
+
+        const filterImages = files.filter((file) => file.isFilled);
+
+        if (filterImages.length === 0) {
+          Alert.alert(
+            'Atenção',
+            'Você precisa selecionar pelo menos uma imagem',
+          );
+          setLoading(false);
+          return;
         }
-        console.log(error.config);
+
+        const formData = new FormData();
+
+        filterImages.forEach((file) => {
+          formData.append('file', file.data);
+        });
+
+        formData.append('nome', nome);
+        formData.append('preco', formattedPrice);
+        formData.append('estoque_produto', estoque_produto);
+        formData.append('status_produto', status_produto === 'Disponivel');
+        formData.append('unidade_medida', unidade_medida);
+
+        await api.post(`/produto`, formData);
+
+        Alert.alert('Tudo certo', 'Produto cadastrado com sucesso');
+        goBack();
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
       }
-    }
-  }
-useEffect(()=>{
-  console.log(measurement)
-})
-  
+      setLoading(false);
+    },
+    [files, goBack],
+  );
 
- 
+  const handleChangeAvailability = React.useCallback((value) => {
+    const option = value as IAvailability;
+    formRef.current?.setFieldValue('status_produto', option);
+  }, []);
+
+  const handleChangeMeasure = React.useCallback((value: string) => {
+    formRef.current?.setFieldValue('unidade_medida', value);
+  }, []);
+
+  const handleSaveImage = React.useCallback(async (idx: number) => {
+    const photo = await SelectPhoto();
+
+    if (!photo) return;
+
+    const { type, fileSize, fileName, uri } = photo;
+
+    const formattedFile = {
+      type,
+      size: fileSize,
+      name: fileName || `${Date.now()}.png`,
+      uri,
+      fileCopyUri: uri,
+    };
+
+    setFiles((state) =>
+      state.map((findFile, index) =>
+        index === idx
+          ? { isFilled: true, id: uri, url: uri, data: formattedFile }
+          : findFile,
+      ),
+    );
+  }, []);
+
+  const handleDeleteImage = React.useCallback(async (idx: number) => {
+    setFiles((state) =>
+      state.map((findFile, index) =>
+        index === idx ? { isFilled: false, id: '', url: '' } : findFile,
+      ),
+    );
+  }, []);
+
+  const handleConfirmDelete = React.useCallback(
+    (idx: number) => {
+      Alert.alert(
+        'Confirme para continuar',
+        'Deseja confimar a exlusão desta imagem?',
+        [
+          {
+            text: 'Cancelar',
+            style: 'cancel',
+          },
+          { text: 'Sim, delete!', onPress: () => handleDeleteImage(idx) },
+        ],
+        { cancelable: false },
+      );
+    },
+    [handleDeleteImage],
+  );
+
   return (
-    <>
-      <Container>
-        <Loader loading={loading}/>
-        
-            <KeyboardAwareScrollView>
-              <ModalBackground>
-                <FormAddProduct>
-                  
+    <KeyboardView>
+      <S.Container>
+        <S.Title>Você só precisa alterar o necessário</S.Title>
+        <FormProvider onSubmit={handleSubmit} ref={formRef}>
+          <S.Form>
+            <Input
+              icon="edit"
+              label="Nome do produto"
+              name="nome"
+              placeholder="Nome do produto"
+              autoCapitalize="none"
+              returnKeyType="next"
+              containerStyle={{
+                maxWidth: 400,
+              }}
+            />
 
-                  <Input
-                    value={productName}
-                    placeholder="Nome do Produto"
-                    onChangeText={(text) => setProductName(text)}
-                  />
-                  <Input
-                    value={productPrice}
-                    placeholder="Preço do Produto"
-                    onChangeText={(text) => setProductPrice(text)}
-                    keyboardType="number-pad"
-                  />
-                  <Input
-                    value={itemsNumber}
-                    placeholder="Número de items do produto"
-                    keyboardType="number-pad"
-                    onChangeText={(text) => setItemsNumber(text)}
-                  />
-                  <DropdownWrappeer>
-                    <RNPickerSelect
-                      value={availability}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setAvailability(itemValue)
-                      }
-                      style={{
-                        placeholder: {
-                          color: '#2e2e2e',
-                        },
-                      }}
-                      placeholder={{
-                        label: 'Selecione a disponibilidade',
-                        value: 1,
-                        color: '#9EA0A4',
-                      }}
-                      items={[
-                        { label: 'Disponível', value: 2 },
-                        { label: 'Indisponível', value: 3 },
-                      ]}
-                    />
-                    {/* <Dropdown
-                      selectedValue={availability}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setAvailability(itemValue)
-                      }
-                    >
-                      <Dropdown.Item label="Disponibilidade?" value={0} />
-                      <Dropdown.Item label="Disponível" value={1} />
-                      <Dropdown.Item label="Indisponível" value={2} />
-                    </Dropdown> */}
-                  </DropdownWrappeer>
-                  <DropdownWrappeer>
-                    <RNPickerSelect
-                      value={measurement}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setMeasurement(itemValue)
-                      }
-                      style={{
-                        placeholder: {
-                          color: '#2e2e2e',
-                        },
-                      }}
-                      placeholder={{
-                        label: 'Selecione a unidade de medida',
-                        value: 1,
-                        color: '#9EA0A4',
-                      }}
-                      items={[
-                        {
-                          label: '1 Quilograma (kg)',
-                          value: 2,
-                        },
-                        { label: '1 Litro (l)', value: 3 },
-                        { label: '500 Gramas (g)', value: 4 },
-                        { label: '500 Mililitros (ml)', value: 5 },
-                      ]}
-                    />
-                    {/* <Dropdown
-                      selectedValue={measurement}
-                      onValueChange={(itemValue, itemIndex) =>
-                        setMeasurement(itemValue)
-                      }
-                    >
-                      <Dropdown.Item label="Unidade de Medida?" value={0} />
-                      <Dropdown.Item label="1 Quilograma (kg)" value={1} />
-                      <Dropdown.Item label="1 Litro (l)" value={2} />
-                      <Dropdown.Item label="500 Gramas (g)" value={3} />
-                      <Dropdown.Item label="500 Mililitros (ml)" value={4} />
-                    </Dropdown> */}
-                  </DropdownWrappeer>
-                  <P>Fotos (até 2 fotos)</P>
+            <Input
+              icon="dollar-sign"
+              label="Preço do produto"
+              name="preco"
+              placeholder="Preço do produto"
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              autoCorrect={false}
+              returnKeyType="next"
+              containerStyle={{
+                marginTop: 15,
+                maxWidth: 400,
+              }}
+              onChangeText={(text) => {
+                const formatted = MaskService.toMask('money', text, {
+                  precision: 2,
+                  separator: '.',
+                  delimiter: ',',
+                  unit: 'R$ ',
+                  suffixUnit: '',
+                });
 
-                  <WrapperListAddProduct>
-                    <FlatList
-                      horizontal
-                      data={productphotoList}
-                      extraData={extraPhoto}
-                      ListFooterComponent={() => (
-                        <MediaSpotButtonAddProduct
-                          onPress={() => handleChoosePhoto()}
-                        >
-                          <AddMediaButtonWrapperAddProduct>
-                            <Icon color="#84378F" size={35} name="plus" />
-                          </AddMediaButtonWrapperAddProduct>
-                        </MediaSpotButtonAddProduct>
-                      )}
-                      /* ListEmptyComponent={() => <View />} */
-                      renderItem={({ item, index }) => (
-                        <MediaWrapper>
-                          <RemoveMediaButtonWrapper
-                            source={item}
-                            resizeMode="contain"
-                          >
-                            {learning ? (
-                              <Animatable.View
-                                animation="slideInRight"
-                                iterationCount={5}
-                              >
-                                <Image
-                                  source={require('../../../assets/learn.png')}
-                                />
-                              </Animatable.View>
-                            ) : null}
-                            <RemoveMedia onPress={() => removePhoto(index)}>
-                              <Icon color="#EA3232" size={35} name="trash-o" />
-                            </RemoveMedia>
-                          </RemoveMediaButtonWrapper>
-                        </MediaWrapper>
-                      )}
-                      keyExtractor={(index) => String(index.uri)}
-                    />
-                  </WrapperListAddProduct>
+                formRef.current?.setFieldValue('preco', formatted);
+              }}
+            />
+            <Input
+              icon="package"
+              label="Quantidade em estoque"
+              name="estoque_produto"
+              placeholder="Quantidade em estoque"
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              autoCorrect={false}
+              returnKeyType="next"
+              containerStyle={{
+                maxWidth: 400,
+                marginTop: 15,
+              }}
+            />
+            <RNPickerSelect
+              onValueChange={handleChangeAvailability}
+              placeholder={{
+                label: 'Selecione a disponibilidade do produto',
+                displayValue: false,
+              }}
+              items={[
+                { label: 'Disponível', value: 'Disponível' },
+                { label: 'Indisponível', value: 'Indisponível' },
+              ]}
+            >
+              <Input
+                icon="alert-circle"
+                label="Disponibilidade"
+                name="status_produto"
+                placeholder="Selecione a disponibilidade do produto"
+                autoCapitalize="none"
+                keyboardType="number-pad"
+                autoCorrect={false}
+                returnKeyType="next"
+                containerStyle={{
+                  marginTop: 15,
+                  maxWidth: 400,
+                }}
+              />
+            </RNPickerSelect>
 
-                  <WrapperButtons>
-                    <AddProductButton onPress={() => addProduct()}>
-                      <AddProductButtonText>
-                        Adicionar Produto
-                      </AddProductButtonText>
-                    </AddProductButton>
-                  </WrapperButtons>
-                </FormAddProduct>
-              </ModalBackground>
-            </KeyboardAwareScrollView>
-   
-        
-        </Container>
-    </>
+            <RNPickerSelect
+              onValueChange={handleChangeMeasure}
+              placeholder={{
+                label: 'Selecione a unidade de medida',
+                displayValue: false,
+              }}
+              items={[
+                {
+                  label: '1 Quilograma (kg)',
+                  value: 'Quilograma',
+                },
+                { label: '1 Litro (l)', value: 'Litro' },
+                { label: '500 Gramas (g)', value: 'Gramas' },
+                { label: '500 Mililitros (ml)', value: 'Mililitros' },
+              ]}
+            >
+              <Input
+                placeholder="Selecione a unidade de medida"
+                icon="box"
+                label="Unidade de medida"
+                name="unidade_medida"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                containerStyle={{
+                  marginTop: 15,
+                  maxWidth: 400,
+                }}
+              />
+            </RNPickerSelect>
+          </S.Form>
+
+          <S.Title>Fotos do produto (até 2 fotos)</S.Title>
+
+          <S.ContentPhotos>
+            {files.map((file, idx) => (
+              <ButtonPhoto
+                key={`${file.id}-${idx}`}
+                url={file.url}
+                style={idx > 0 ? { marginLeft: 10 } : {}}
+                onPress={() => handleSaveImage(idx)}
+                onRemove={() => handleConfirmDelete(idx)}
+              />
+            ))}
+          </S.ContentPhotos>
+
+          <S.Actions>
+            <S.ButtonSubmit
+              loading={loading}
+              onPress={() => formRef.current?.submitForm()}
+            >
+              Cadastrar
+            </S.ButtonSubmit>
+          </S.Actions>
+        </FormProvider>
+      </S.Container>
+    </KeyboardView>
   );
 };
 
