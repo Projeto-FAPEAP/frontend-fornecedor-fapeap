@@ -2,11 +2,14 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { MaskService } from 'react-native-masked-text';
 import RNPickerSelect from 'react-native-picker-select';
+import Toast from 'react-native-simple-toast';
 
+import ButtonPhoto from '@components/ButtonPhoto';
 import Input from '@components/Input';
 import KeyboardView from '@components/KeyboardView';
 import { useAuth } from '@contexts/auth';
 import { useProducts } from '@contexts/product';
+import SelectPhoto from '@libs/SelectPhoto';
 import { useRoute } from '@react-navigation/native';
 import api from '@services/api';
 import { FormHandles } from '@unform/core';
@@ -23,11 +26,20 @@ interface IParams {
   itemId: string;
 }
 
+interface IReponseFile {
+  id: string;
+  url: string;
+}
+
 interface IResponseProduct {
   id: string;
   status_produto: boolean;
   nome: string;
   preco: string;
+  arquivos: {
+    id: string;
+    url: string;
+  }[];
 }
 
 interface ISubmit {
@@ -37,6 +49,12 @@ interface ISubmit {
   unidade_medida: string;
 }
 
+interface IFile {
+  id: string;
+  url: string;
+  isFilled: boolean;
+}
+
 const EditProduct: React.FC = () => {
   const formRef = React.useRef<FormHandles>(null);
   const { params } = useRoute();
@@ -44,6 +62,7 @@ const EditProduct: React.FC = () => {
   const { colors } = useTheme();
   const { user } = useAuth();
   const { getAllProducts } = useProducts();
+  const [files, setFiles] = React.useState<IFile[]>([]);
 
   const routeParams = params as IParams;
 
@@ -53,7 +72,7 @@ const EditProduct: React.FC = () => {
     api
       .get<IResponseProduct>(`/produto/${user.id}/${routeParams.itemId}`)
       .then((response) => {
-        const { nome, preco, status_produto } = response.data;
+        const { nome, preco, status_produto, arquivos } = response.data;
 
         formRef.current?.setData({
           nome,
@@ -61,6 +80,25 @@ const EditProduct: React.FC = () => {
           status_produto: status_produto ? 'Disponivel' : 'Indisponivel',
           unidade_medida: 'Litro',
         });
+
+        const responseFiles = Array.from({ length: 2 }, (_v, k) => {
+          try {
+            return {
+              id: arquivos[k].id,
+              url: arquivos[k].url,
+              isFilled: true,
+            };
+          } catch (error) {
+            return {
+              id: '',
+              url: '',
+              isFilled: false,
+            };
+          }
+        });
+
+        setFiles(responseFiles);
+        console.log(responseFiles);
 
         setLoading(false);
       })
@@ -112,6 +150,7 @@ const EditProduct: React.FC = () => {
           status_produto: status_produto === 'Disponivel',
           unidade_medida,
         });
+
         getAllProducts();
         Alert.alert(
           'Tudo certo',
@@ -137,6 +176,103 @@ const EditProduct: React.FC = () => {
   const handleChangeMeasure = React.useCallback((value: string) => {
     formRef.current?.setFieldValue('unidade_medida', value);
   }, []);
+
+  const handleSaveImage = React.useCallback(
+    async (file: IFile, idx: number) => {
+      const photo = await SelectPhoto();
+
+      if (!photo) return;
+
+      Toast.show('Efetuando o upload...', Toast.SHORT, ['UIAlertController']);
+
+      const { type, fileSize, fileName, uri } = photo;
+
+      const isUpdate = file.isFilled;
+      const formattedFile = {
+        type,
+        size: fileSize,
+        name: fileName || `${Date.now()}.png`,
+        uri,
+        fileCopyUri: uri,
+      };
+
+      const formData = new FormData();
+
+      formData.append('file', formattedFile);
+
+      try {
+        if (isUpdate) {
+          const { data } = await api.put<IReponseFile>(
+            `/arquivoproduto/${file.id}`,
+            formData,
+          );
+          setFiles((state) =>
+            state.map((findFile) =>
+              findFile.id === file.id
+                ? { isFilled: true, id: data.id, url: data.url }
+                : findFile,
+            ),
+          );
+        } else {
+          const { data } = await api.post<IReponseFile[]>(
+            `/arquivoproduto/${routeParams.itemId}`,
+            formData,
+          );
+
+          setFiles((state) =>
+            state.map((findFile, index) =>
+              index === idx
+                ? { isFilled: true, id: data[0].id, url: data[0].url }
+                : findFile,
+            ),
+          );
+        }
+        Toast.show('Foto atualizada', Toast.SHORT, ['UIAlertController']);
+      } catch (err) {
+        Toast.show('Ocorreu um erro ao atualizar', Toast.SHORT, [
+          'UIAlertController',
+        ]);
+      }
+    },
+    [routeParams.itemId],
+  );
+
+  const handleDeleteImage = React.useCallback(async (file: IFile) => {
+    try {
+      await api.delete(`/arquivoproduto/${file.id}`);
+
+      setFiles((state) =>
+        state.map((findFile) =>
+          findFile.id === file.id
+            ? { isFilled: false, url: '', id: '' }
+            : findFile,
+        ),
+      );
+      Toast.show('Foto excluída', Toast.SHORT, ['UIAlertController']);
+    } catch {
+      Toast.show('Ocorreu um erro ao deletar', Toast.SHORT, [
+        'UIAlertController',
+      ]);
+    }
+  }, []);
+
+  const handleConfirmDelete = React.useCallback(
+    (file: IFile) => {
+      Alert.alert(
+        'Confirme para continuar',
+        'Deseja confimar a exlusão desta imagem?',
+        [
+          {
+            text: 'Cancelar',
+            style: 'cancel',
+          },
+          { text: 'Sim, delete!', onPress: () => handleDeleteImage(file) },
+        ],
+        { cancelable: false },
+      );
+    },
+    [handleDeleteImage],
+  );
 
   return (
     <KeyboardView>
@@ -239,6 +375,21 @@ const EditProduct: React.FC = () => {
               />
             </RNPickerSelect>
           </S.Form>
+
+          <S.Title>Fotos do produto (até 2 fotos)</S.Title>
+
+          <S.ContentPhotos>
+            {files.map((file, idx) => (
+              <ButtonPhoto
+                key={`${file.id}-${idx}`}
+                url={file.url}
+                style={idx > 0 ? { marginLeft: 10 } : {}}
+                onPress={() => handleSaveImage(file, idx)}
+                onRemove={() => handleConfirmDelete(file)}
+              />
+            ))}
+          </S.ContentPhotos>
+
           <S.Actions>
             <S.ButtonDelete loading={loading} colorText={colors.danger}>
               Excluir

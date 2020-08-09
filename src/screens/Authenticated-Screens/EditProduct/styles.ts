@@ -16,6 +16,11 @@ export const Title = styled.Text`
 
 export const Form = styled.View``;
 
+export const ContentPhotos = styled.View`
+  flex-direction: row;
+  justify-content: center;
+`;
+
 export const Actions = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -31,4 +36,5 @@ export const ButtonDelete = styled(Button)`
   width: 40%;
   background-color: ${({ theme }) => theme.colors.transparent};
   border-color: ${({ theme }) => theme.colors.danger};
+  border-width: 1px;
 `;
