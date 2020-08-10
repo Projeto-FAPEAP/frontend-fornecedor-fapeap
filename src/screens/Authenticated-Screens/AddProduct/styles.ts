@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 export const Container = styled.View`
   margin: 20px 10px;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
 `;
 
 export const Title = styled.Text`
@@ -14,7 +14,9 @@ export const Title = styled.Text`
   font-family: ${({ theme }) => theme.fonts.Ubuntu.semiBold};
 `;
 
-export const Form = styled.View``;
+export const Form = styled.View`
+  align-self: stretch;
+`;
 
 export const ContentPhotos = styled.View`
   flex-direction: row;

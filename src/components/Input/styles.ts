@@ -9,7 +9,9 @@ interface IPropsContentInput {
 }
 
 export const Container = styled.View`
-  width: 400px;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
 `;
 
 export const ContentInput = styled.View<IPropsContentInput>`

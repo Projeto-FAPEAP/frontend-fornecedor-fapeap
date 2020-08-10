@@ -202,9 +202,6 @@ const AddProduct: React.FC = () => {
               placeholder="Nome do produto"
               autoCapitalize="none"
               returnKeyType="next"
-              containerStyle={{
-                maxWidth: 400,
-              }}
             />
 
             <Input
@@ -218,7 +215,6 @@ const AddProduct: React.FC = () => {
               returnKeyType="next"
               containerStyle={{
                 marginTop: 15,
-                maxWidth: 400,
               }}
               onChangeText={(text) => {
                 const formatted = MaskService.toMask('money', text, {
@@ -242,7 +238,6 @@ const AddProduct: React.FC = () => {
               autoCorrect={false}
               returnKeyType="next"
               containerStyle={{
-                maxWidth: 400,
                 marginTop: 15,
               }}
             />
@@ -268,7 +263,6 @@ const AddProduct: React.FC = () => {
                 returnKeyType="next"
                 containerStyle={{
                   marginTop: 15,
-                  maxWidth: 400,
                 }}
               />
             </RNPickerSelect>
@@ -299,7 +293,6 @@ const AddProduct: React.FC = () => {
                 returnKeyType="next"
                 containerStyle={{
                   marginTop: 15,
-                  maxWidth: 400,
                 }}
               />
             </RNPickerSelect>
