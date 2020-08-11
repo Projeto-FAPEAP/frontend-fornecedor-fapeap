@@ -90,6 +90,7 @@ const OrderDetails: React.FC = () => {
   const { params } = useRoute();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [loadingCancel, setLoadingCancel] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [itemsList, setItemList] = useState<Items[] | undefined>([]);
   const routeParams = params as IParams;
@@ -107,9 +108,8 @@ const OrderDetails: React.FC = () => {
       );
       console.log(JSON.stringify(response.data, null, 2));
 
-      setLoading(false);
-
       getAllOrders().then((response) => {
+        setLoading(false);
         Alert.alert('Aviso', 'Pedido Confirmado!!', [
           {
             text: 'Ok',
@@ -149,7 +149,7 @@ const OrderDetails: React.FC = () => {
       const response = await api.get(
         `${api.defaults.baseURL}/fornecedor/pedidos/itens/${routeParams.itemId}`,
       );
-
+      console.log(routeParams.itemId, 'jogogogo');
       const a = [
         {
           total: '35.63',
@@ -266,16 +266,15 @@ const OrderDetails: React.FC = () => {
   }
 
   async function cancelOrder(): Promise<void> {
-    setLoading(true);
+    setLoadingCancel(true);
     try {
       const response = await api.put(
         `${api.defaults.baseURL}/cancelarpedidos/${routeParams.itemId}`,
       );
       console.log(JSON.stringify(response.data, null, 2));
 
-      setLoading(false);
-
       getAllOrders().then((response) => {
+        setLoadingCancel(false);
         Alert.alert('Aviso', 'Pedido Cancelado!!', [
           {
             text: 'Ok',
@@ -317,9 +316,9 @@ const OrderDetails: React.FC = () => {
       );
       console.log(JSON.stringify(response.data, null, 2));
 
-      setLoading(false);
-
       getAllOrders().then((response) => {
+        setLoading(false);
+
         Alert.alert(
           'Aviso',
           'O cliente foi informado que o entregador está a caminho!!',
@@ -471,22 +470,26 @@ const OrderDetails: React.FC = () => {
 
           {extraData.extraData.status === 'Pendente' ? (
             <ButtonWrapper>
-              <Button onPress={() => confirmOrder()}>
+              <Button loading={loading} onPress={() => confirmOrder()}>
                 <ButtonText>Confirmar Pedido</ButtonText>
               </Button>
-              <ButtonCancel onPress={() => cancelOrder()}>
+              <ButtonCancel
+                loading={loadingCancel}
+                onPress={() => cancelOrder()}
+              >
                 <ButtonText>Cancelar Pedido</ButtonText>
               </ButtonCancel>
             </ButtonWrapper>
           ) : null}
-          {extraData.extraData.status === 'Pedido em rota de entrega' ||
+          {extraData.extraData.delivery === false ||
+          extraData.extraData.status === 'Pedido em rota de entrega' ||
           (extraData.extraData.status === 'Pendente' &&
             extraData.extraData.delivery === true) ? null : (
             <ButtonWrapper>
-                <Button onPress={() => sendingOrder()}>
+              <Button loading={loading} onPress={() => sendingOrder()}>
                 <ButtonText>Entregador a caminho</ButtonText>
               </Button>
-              </ButtonWrapper>
+            </ButtonWrapper>
           )}
         </ScrollView>
       ) : (

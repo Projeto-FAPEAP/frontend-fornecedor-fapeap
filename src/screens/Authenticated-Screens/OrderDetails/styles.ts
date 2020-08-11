@@ -4,6 +4,7 @@ import {
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import Buttonn from '@components/Button';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
@@ -113,8 +114,8 @@ export const ButtonWrapper = styled.View`
   justify-content: space-around;
 `;
 
-export const Button = styled.TouchableOpacity`
-  width: 45%;
+export const Button = styled(Buttonn)`
+  max-width: 50%;
   border-radius: 12px;
   height: 38px;
   margin-top: 25px;
@@ -124,7 +125,7 @@ export const Button = styled.TouchableOpacity`
   margin-bottom: 10px;
 `;
 
-export const ButtonCancel = styled.TouchableOpacity`
+export const ButtonCancel = styled(Buttonn)`
   width: 45%;
   border-radius: 12px;
   height: 38px;
