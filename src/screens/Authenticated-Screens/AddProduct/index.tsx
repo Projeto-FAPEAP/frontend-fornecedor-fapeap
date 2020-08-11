@@ -112,7 +112,7 @@ const AddProduct: React.FC = () => {
         formData.append('nome', nome);
         formData.append('preco', formattedPrice);
         formData.append('estoque_produto', estoque_produto);
-        formData.append('status_produto', status_produto === 'Disponivel');
+        formData.append('status_produto', status_produto === 'Disponível');
         formData.append('unidade_medida', unidade_medida);
 
         await api.post(`/produto`, formData);

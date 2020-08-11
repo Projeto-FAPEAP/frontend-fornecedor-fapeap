@@ -165,7 +165,7 @@ const EditProduct: React.FC = () => {
         await api.put(`/produto/${routeParams.itemId}`, {
           nome,
           preco: formattedPrice,
-          status_produto: status_produto === 'Disponivel',
+          status_produto: status_produto === 'Disponível',
           unidade_medida,
           estoque_produto,
         });
