@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { FlatList, Alert } from 'react-native';
+import { FlatList, Alert, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { useNavigation } from '@react-navigation/native';
@@ -25,7 +25,7 @@ import {
 } from './styles';
 
 // import * as S from './styles';
-interface Products {
+interface IProducts {
   id: string;
   nome: string;
   preco: string;
@@ -36,7 +36,7 @@ interface Products {
 const Products: React.FC = () => {
   const navigation = useNavigation();
   /*  const [loading, setLoading] = useState(false); */
-  const [productsList, setProductsList] = useState<Products[] | undefined>([]);
+  const [productsList, setProductsList] = useState<IProducts[] | undefined>([]);
   const { user } = useContext(AuthContext);
   const { productList, getAllProducts, loading } = useContext(ProductContext);
   useEffect(() => {
@@ -98,60 +98,67 @@ const Products: React.FC = () => {
   } */
   return (
     <Container>
-      <Loader loading={loading} />
-      <SearchWrapper>
-        <SearchInputButton onPress={() => navigation.navigate('SearchProduct')}>
-          <SearchTextInner>Buscar Produto</SearchTextInner>
-        </SearchInputButton>
-        <AddButton
-          onPress={() => {
-            navigation.navigate('AddProduct');
-          }}
-        >
-          <AddButtonText>Adicionar</AddButtonText>
-        </AddButton>
-      </SearchWrapper>
+      {!loading ? (
+        <View>
+          <SearchWrapper>
+            <SearchInputButton
+              onPress={() => navigation.navigate('SearchProduct')}
+            >
+              <SearchTextInner>Buscar Produto</SearchTextInner>
+            </SearchInputButton>
+            <AddButton
+              onPress={() => {
+                navigation.navigate('AddProduct');
+              }}
+            >
+              <AddButtonText>Adicionar</AddButtonText>
+            </AddButton>
+          </SearchWrapper>
 
-      <ListWrapper
-        scrollEnabled
-        data={productList}
-        refreshing={false}
-        onRefresh={() => getAllProducts()}
-        renderItem={({ item, index }) => (
-          <ListProducts
-            onPress={() =>
-              navigation.navigate('EditProduct', {
-                itemId: item.id,
-              })
-            }
-          >
-            <ListProductsImageWrapper
-              source={require('../../../assets/acai_1.jpg')}
-              resizeMode="contain"
-            />
-            <ListProductsTextWrapper>
-              <ListRowTitle>{item.nome}</ListRowTitle>
-              <ListRowSubTitle>
-                {`${item.unidade_medida} • ${formatPrice(
-                  parseFloat(item.preco),
-                )}`}
-              </ListRowSubTitle>
-              {item.status_produto ? (
-                <ListRowSubTitle>
-                  <Icon name="check-circle" color="green" size={20} />
-                  {' ' + 'Disponivel'}
-                </ListRowSubTitle>
-              ) : (
-                <ListRowSubTitle>
-                  <Icon name="ban" color="red" size={20} />
-                  {' ' + 'Indisponivel'}
-                </ListRowSubTitle>
-              )}
-            </ListProductsTextWrapper>
-          </ListProducts>
-        )}
-        keyExtractor={(item, index) => String(index)}
-      />
+          <ListWrapper
+            scrollEnabled
+            data={productList}
+            refreshing={false}
+            onRefresh={() => getAllProducts()}
+            renderItem={({ item, index }) => (
+              <ListProducts
+                onPress={() =>
+                  navigation.navigate('EditProduct', {
+                    itemId: (item as IProducts).id,
+                  })
+                }
+              >
+                <ListProductsImageWrapper
+                  source={require('../../../assets/acai_1.jpg')}
+                  resizeMode="contain"
+                />
+                <ListProductsTextWrapper>
+                  <ListRowTitle>{(item as IProducts).nome}</ListRowTitle>
+                  <ListRowSubTitle>
+                    {`${(item as IProducts).unidade_medida} • ${formatPrice(
+                      parseFloat((item as IProducts).preco),
+                    )}`}
+                  </ListRowSubTitle>
+                  {(item as IProducts).status_produto ? (
+                    <ListRowSubTitle>
+                      <Icon name="check-circle" color="green" size={20} />
+                      {' ' + 'Disponivel'}
+                    </ListRowSubTitle>
+                  ) : (
+                    <ListRowSubTitle>
+                      <Icon name="ban" color="red" size={20} />
+                      {' ' + 'Indisponivel'}
+                    </ListRowSubTitle>
+                  )}
+                </ListProductsTextWrapper>
+              </ListProducts>
+            )}
+            keyExtractor={(item, index) => String(index)}
+          />
+        </View>
+      ) : (
+        <Loader loading={loading} />
+      )}
     </Container>
   );
 };

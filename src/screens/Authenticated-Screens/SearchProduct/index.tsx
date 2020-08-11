@@ -1,21 +1,23 @@
-import React, { useState, useEffect,useContext } from 'react';
-import {FlatList, Alert,Text} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { FlatList, Alert, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
 import { useNavigation } from '@react-navigation/native';
+
+import AuthContext from '../../../contexts/auth';
 import api from '../../../services/api';
 import Loader from '../../utils/index';
-import AuthContext from '../../../contexts/auth';
 import {
-    Container,
-    ListRowTitle,
-    ListRowSubTitle,
-    SearchInput,
-    ListProducts,
-    ListProductsImageWrapper,
-    ListProductsTextWrapper,
-    HeaderSearchProduct,
-    ListWrapperSearchProduct,
-    NothingFound,
+  Container,
+  ListRowTitle,
+  ListRowSubTitle,
+  SearchInput,
+  ListProducts,
+  ListProductsImageWrapper,
+  ListProductsTextWrapper,
+  HeaderSearchProduct,
+  ListWrapperSearchProduct,
+  NothingFound,
 } from './styles';
 
 // import * as S from './styles';
@@ -31,10 +33,12 @@ const Products: React.FC = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [productsList, setProductsList] = useState<Products[] | undefined>([]);
-  const [productsListResult, setProductsListResult] = useState<Products[] | undefined>([]);
+  const [productsListResult, setProductsListResult] = useState<
+    Products[] | undefined
+  >([]);
   const [search, setSearch] = useState('');
-  const [found,setFound] = useState(false);
-  const {user } = useContext(AuthContext);
+  const [found, setFound] = useState(false);
+  const { user } = useContext(AuthContext);
   useEffect(() => {
     getAllProducts();
   }, []);
@@ -52,14 +56,16 @@ const Products: React.FC = () => {
       }
     }
     setProductsList(data);
-    setProductsListResult(data)
+    setProductsListResult(data);
   }
 
   async function getAllProducts(): Promise<void> {
     setLoading(true);
-    console.log(user.id,'teste')
+    console.log(user!.id, 'teste');
     try {
-      const response = await api.get(`${api.defaults.baseURL}/produto/${user.id}`);
+      const response = await api.get(
+        `${api.defaults.baseURL}/produto/${user!.id}`,
+      );
       handleMeasurement(response.data);
       setLoading(false);
       console.log(loading);
@@ -93,92 +99,93 @@ const Products: React.FC = () => {
   }
 
   function handleSearch(): void {
-    let aux: Products[] = [];
+    const aux: Products[] = [];
     let k = 0;
-    for(let i = 0; i< productsList!.length;i+=1){
-      if(productsList![i].nome.match(`^${search}`)){
-        console.log(i,productsList![i].nome)
+    for (let i = 0; i < productsList!.length; i += 1) {
+      if (productsList![i].nome.match(`^${search}`)) {
+        console.log(i, productsList![i].nome);
 
         aux[k] = productsList![i];
-        k+=1;
-        console.log(JSON.stringify(aux[i],null,2))
+        k += 1;
+        console.log(JSON.stringify(aux[i], null, 2));
       }
     }
-    if(aux.length ===0){
-      setFound(true)
-      setProductsListResult(aux)
-    }else{
-      setFound(false)
-      setProductsListResult(aux)
+    if (aux.length === 0) {
+      setFound(true);
+      setProductsListResult(aux);
+    } else {
+      setFound(false);
+      setProductsListResult(aux);
     }
-    console.log(aux.length)
-    
+    console.log(aux.length);
   }
 
   useEffect(() => {
     if (search !== '') {
-      handleSearch()
-    }else{
-      setFound(false)
-      setProductsListResult(productsList)
+      handleSearch();
+    } else {
+      setFound(false);
+      setProductsListResult(productsList);
     }
   }, [search]);
   return (
     <>
       <Container>
-        <Loader loading={loading}/>
-                <HeaderSearchProduct>
-               
-                    <SearchInput
-                      autoFocus
-                      onChangeText={(text) => setSearch(text)}
-                      placeholder="Buscar Produto"
-                    />
-              
-                </HeaderSearchProduct>
-                {found?(<NothingFound>Nada encontrado!</NothingFound>)
-                :null}
-                <ListWrapperSearchProduct>
-                  <FlatList
-                  showsVerticalScrollIndicator={false}
-                    data={productsListResult}
-                    refreshing={false}
-                    onRefresh={() => getAllProducts()}
-                    renderItem={({ item, index }) => (
-                      <ListProducts onPress={() =>  navigation.navigate('EditProduct', {
+        {!loading ? (
+          <View>
+            <HeaderSearchProduct>
+              <SearchInput
+                autoFocus
+                onChangeText={(text) => setSearch(text)}
+                placeholder="Buscar Produto"
+              />
+            </HeaderSearchProduct>
+            {found ? <NothingFound>Nada encontrado!</NothingFound> : null}
+            <ListWrapperSearchProduct>
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={productsListResult}
+                refreshing={false}
+                onRefresh={() => getAllProducts()}
+                renderItem={({ item, index }) => (
+                  <ListProducts
+                    onPress={() =>
+                      navigation.navigate('EditProduct', {
                         itemId: item.id,
-                      })}>
-                        <ListProductsImageWrapper
-                          source={require('../../../assets/acai_1.jpg')}
-                          resizeMode="contain"
-                        />
-                        <ListProductsTextWrapper>
-                          <ListRowTitle>{item.nome}</ListRowTitle>
-                          <ListRowSubTitle>
-                            {`${item.unidade_medida} R$ ${item.preco}`}
-                          </ListRowSubTitle>
-                          {item.status_produto ? (
-                            <ListRowSubTitle>
-                              <Icon
-                                name="check-circle"
-                                color="green"
-                                size={20}
-                              />
-                              {' ' + 'Disponivel'}
-                            </ListRowSubTitle>
-                          ) : (
-                            <ListRowSubTitle>
-                              <Icon name="ban" color="red" size={20} />
-                              {' ' + 'Indisponivel'}
-                            </ListRowSubTitle>
-                          )}
-                        </ListProductsTextWrapper>
-                      </ListProducts>
-                    )}
-                    keyExtractor={(item, index) => String(index)}
-                  />
-                </ListWrapperSearchProduct>
-        </Container>
+                      })
+                    }
+                  >
+                    <ListProductsImageWrapper
+                      source={require('../../../assets/acai_1.jpg')}
+                      resizeMode="contain"
+                    />
+                    <ListProductsTextWrapper>
+                      <ListRowTitle>{item.nome}</ListRowTitle>
+                      <ListRowSubTitle>
+                        {`${item.unidade_medida} R$ ${item.preco}`}
+                      </ListRowSubTitle>
+                      {item.status_produto ? (
+                        <ListRowSubTitle>
+                          <Icon name="check-circle" color="green" size={20} />
+                          {' ' + 'Disponivel'}
+                        </ListRowSubTitle>
+                      ) : (
+                        <ListRowSubTitle>
+                          <Icon name="ban" color="red" size={20} />
+                          {' ' + 'Indisponivel'}
+                        </ListRowSubTitle>
+                      )}
+                    </ListProductsTextWrapper>
+                  </ListProducts>
+                )}
+                keyExtractor={(item, index) => String(index)}
+              />
+            </ListWrapperSearchProduct>
+          </View>
+        ) : (
+          <Loader loading={loading} />
+        )}
+      </Container>
     </>
   );
 };

@@ -7,20 +7,19 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  
   flex-direction: column;
-  border-width:1px;
   background: #f9f9f9;
+  flex: 1;
 `;
 
 export const ClientInformation = styled.View`
   justify-content: space-around;
   align-items: center;
   flex-direction: column;
-/*   height:12%; */
+  /*   height:12%; */
   background: #f9f9f9;
-  border-bottom-width:1px;
-  border-color:#dedede;
+  border-bottom-width: 1px;
+  border-color: #dedede;
 `;
 
 export const ClientInformationImageWrapper = styled.View`
@@ -32,15 +31,15 @@ export const ClientInformationImageWrapper = styled.View`
 
 export const Title = styled.Text`
   font-size: 17px;
-  color:#333;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.bold }
+  color: #333;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;
 
 export const SubTitle = styled.Text`
   padding-top: 3px;
   font-size: 12px;
   color: #666666;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const Span = styled.View`
@@ -48,24 +47,24 @@ export const Span = styled.View`
   align-items: center;
   flex-direction: row;
   height: 90px;
-  width:100%;
-  background:#fff;
-  border-radius:2px;
-  border-top-width:1px;
-  border-color:#dedede;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  border-top-width: 1px;
+  border-color: #dedede;
 `;
 
 export const ClientInformationTextWrapper = styled.View`
   justify-content: space-around;
-  align-self:center;
-  width:45%;
+  align-self: center;
+  width: 45%;
 `;
 
 export const ClientInformationButtonWrapper = styled.View`
   justify-content: space-around;
   align-items: center;
-  height:100%;
-  width:38%;
+  height: 100%;
+  width: 38%;
 `;
 
 export const ButtonShareLocalization = styled.TouchableOpacity`
@@ -80,22 +79,21 @@ export const ButtonShareLocalization = styled.TouchableOpacity`
 `;
 
 export const ButtonShareLocalizationIcon = styled.View`
-  width:15%;
+  width: 15%;
 `;
 export const ButtonShareLocalizationText = styled.Text`
   font-size: 14px;
   width: 75%;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  font-family:${(props) => props.theme.fonts.Ubuntu.normal}
   color: #fff;
 `;
 
 export const OrderInformation = styled.View`
   background: #f9f9f9;
-  min-height:400px;
+  min-height: 400px;
   align-items: center;
   justify-content: center;
   padding: 6px;
-  
 `;
 
 export const OrderRecipe = styled.View`
@@ -103,11 +101,10 @@ export const OrderRecipe = styled.View`
   background: #fff;
   border-width: 1px;
   border-color: #e6dada;
-  min-height:250px;
+  min-height: 250px;
   border-radius: 15px;
   align-items: center;
   justify-content: center;
-  
 `;
 
 export const ButtonWrapper = styled.View`
@@ -141,9 +138,9 @@ export const ButtonCancel = styled.TouchableOpacity`
 export const ButtonText = styled.Text`
   text-align: center;
   align-content: center;
-  font-size:15px;
-  color: ${(props) => props.theme.colors.secundary};
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  font-size: 15px;
+  color: #fff;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const TotalSpan = styled.View`
@@ -154,7 +151,7 @@ export const TotalSpan = styled.View`
   height: 32px;
   flex-direction: row;
   justify-content: space-between;
-  width:85%;
+  width: 85%;
 `;
 
 export const TotalText = styled.Text`
@@ -163,11 +160,11 @@ export const TotalText = styled.Text`
   align-content: center;
   font-size: 15px;
   color: #333;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.bold }
+  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;
 
 export const SubTotalSpan = styled.View`
- /*  border-top-width: 1px;
+  /*  border-top-width: 1px;
   border-color: #d4cbcb; */
   text-align: center;
   align-content: center;
@@ -190,9 +187,9 @@ export const SubTotalSpanInner = styled.View`
 export const SubTotalText = styled.Text`
   text-align: center;
   align-content: center;
-  font-size:12px;
+  font-size: 12px;
   color: #9a9a9a;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.bold }
+  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;
 
 export const Amount = styled.Text`
@@ -205,16 +202,14 @@ export const ListWrapper = styled.View`
   padding-top: 5px;
   text-align: center;
   align-content: center;
-/*   min-height:60%; */
+  /*   min-height:60%; */
   flex-direction: row;
   justify-content: space-between;
-  
-  
 `;
 
 export const ListWrapperInner = styled.View`
   width: 100%;
-  padding-top:7px;
+  padding-top: 7px;
   text-align: center;
   align-content: center;
 
@@ -229,25 +224,25 @@ export const ListWrapperItem = styled.View`
   align-content: flex-start;
   height: 60px;
   flex-direction: column;
-  justify-content:flex-start;
+  justify-content: flex-start;
 `;
 
 export const ListRowPending = styled.Text`
-  width:60px;
+  width: 60px;
   font-size: 12px;
   color: white;
-  background:#ffd500;
-  text-align:center;
-  border-radius:2px;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  background: #ffd500;
+  text-align: center;
+  border-radius: 2px;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
 export const ListRowConfirmed = styled.Text`
-  width:90px;
+  width: 90px;
   font-size: 12px;
   color: white;
-  background:#59A656;
-  text-align:center;
-  border-radius:2px;
-  font-family:${(props)=> props.theme.fonts.Ubuntu.normal }
+  background: #59a656;
+  text-align: center;
+  border-radius: 2px;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;

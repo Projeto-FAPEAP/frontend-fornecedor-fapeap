@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 export const Container = styled.View`
   flex-direction: column;
   background: #f2f1f7;
+  flex: 1;
 `;
 
 export const Section = styled.View`
