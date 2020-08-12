@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { FlatList, Alert, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import IsEmpty from '@components/IsEmpty';
 import { useNavigation } from '@react-navigation/native';
 
 import AuthContext from '../../../contexts/auth';
@@ -132,55 +133,67 @@ const Products: React.FC = () => {
     <>
       <Container>
         {!loading ? (
-          <View>
-            <HeaderSearchProduct>
-              <SearchInput
-                autoFocus
-                onChangeText={(text) => setSearch(text)}
-                placeholder="Buscar Produto"
-              />
-            </HeaderSearchProduct>
-            {found ? <NothingFound>Nada encontrado!</NothingFound> : null}
-            <ListWrapperSearchProduct>
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={productsListResult}
-                refreshing={false}
-                onRefresh={() => getAllProducts()}
-                renderItem={({ item, index }) => (
-                  <ListProducts
-                    onPress={() =>
-                      navigation.navigate('EditProduct', {
-                        itemId: item.id,
-                      })
-                    }
-                  >
-                    <ListProductsImageWrapper
-                      source={require('../../../assets/acai_1.jpg')}
-                      resizeMode="contain"
-                    />
-                    <ListProductsTextWrapper>
-                      <ListRowTitle>{item.nome}</ListRowTitle>
-                      <ListRowSubTitle>
-                        {`${item.unidade_medida} R$ ${item.preco}`}
-                      </ListRowSubTitle>
-                      {item.status_produto ? (
-                        <ListRowSubTitle>
-                          <Icon name="check-circle" color="green" size={20} />
-                          {' ' + 'Disponivel'}
-                        </ListRowSubTitle>
-                      ) : (
-                        <ListRowSubTitle>
-                          <Icon name="ban" color="red" size={20} />
-                          {' ' + 'Indisponivel'}
-                        </ListRowSubTitle>
-                      )}
-                    </ListProductsTextWrapper>
-                  </ListProducts>
-                )}
-                keyExtractor={(item, index) => String(index)}
-              />
-            </ListWrapperSearchProduct>
+          <View style={{ flex: 1 }}>
+            {!loading && productsList?.length === 0 ? (
+              <IsEmpty icon="exclamationcircleo">
+                Parece que você não possui produtos cadastrados
+              </IsEmpty>
+            ) : (
+              <View>
+                <HeaderSearchProduct>
+                  <SearchInput
+                    autoFocus
+                    onChangeText={(text) => setSearch(text)}
+                    placeholder="Buscar Produto"
+                  />
+                </HeaderSearchProduct>
+                {found ? <NothingFound>Nada encontrado!</NothingFound> : null}
+                <ListWrapperSearchProduct>
+                  <FlatList
+                    showsVerticalScrollIndicator={false}
+                    data={productsListResult}
+                    refreshing={false}
+                    onRefresh={() => getAllProducts()}
+                    renderItem={({ item, index }) => (
+                      <ListProducts
+                        onPress={() =>
+                          navigation.navigate('EditProduct', {
+                            itemId: item.id,
+                          })
+                        }
+                      >
+                        <ListProductsImageWrapper
+                          source={require('../../../assets/acai_1.jpg')}
+                          resizeMode="contain"
+                        />
+                        <ListProductsTextWrapper>
+                          <ListRowTitle>{item.nome}</ListRowTitle>
+                          <ListRowSubTitle>
+                            {`${item.unidade_medida} R$ ${item.preco}`}
+                          </ListRowSubTitle>
+                          {item.status_produto ? (
+                            <ListRowSubTitle>
+                              <Icon
+                                name="check-circle"
+                                color="green"
+                                size={20}
+                              />
+                              {' ' + 'Disponivel'}
+                            </ListRowSubTitle>
+                          ) : (
+                            <ListRowSubTitle>
+                              <Icon name="ban" color="red" size={20} />
+                              {' ' + 'Indisponivel'}
+                            </ListRowSubTitle>
+                          )}
+                        </ListProductsTextWrapper>
+                      </ListProducts>
+                    )}
+                    keyExtractor={(item, index) => String(index)}
+                  />
+                </ListWrapperSearchProduct>
+              </View>
+            )}
           </View>
         ) : (
           <Loader loading={loading} />

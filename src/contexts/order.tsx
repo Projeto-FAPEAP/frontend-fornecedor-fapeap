@@ -8,44 +8,45 @@ import React, {
 import { Alert } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
-import AuthContext from './auth'
+
 import api from '../services/api';
+import AuthContext from './auth';
 
 interface IOrders {
   id: string;
   status_pedido: string;
   delivery: boolean;
   total: number;
-  subtotal:number;
-  taxa_entrega:number|undefined;
+  subtotal: number;
+  taxa_entrega: number | undefined;
   consumidor: {
     nome: string;
-    logradouro:string;
-    numero_local:string;
+    logradouro: string;
+    numero_local: string;
   };
-  created_at:string;
+  created_at: string;
 }
 
 interface IOrdersContextData {
-  ordersData: IOrders[]|null;
-  getAllOrders():Promise<void>;
-  loading:boolean;
-  pendingLength:number;
+  ordersData: IOrders[] | null;
+  getAllOrders(): Promise<void>;
+  loading: boolean;
+  pendingLength: number;
 }
 
-const OrderContext = createContext<IOrdersContextData>({} as IOrdersContextData);
+const OrderContext = createContext<IOrdersContextData>(
+  {} as IOrdersContextData,
+);
 export const OrdersProvider: React.FC = ({ children }) => {
   const [ordersData, setOrdersData] = useState<IOrders[] | null>([]);
   const [loading, setLoading] = useState(true);
   const [pendingLength, setPendingLength] = useState(0);
-  const {user,signed} = useContext(AuthContext)
+  const { user, signed } = useContext(AuthContext);
   useEffect(() => {
     setTimeout(function () {
-      if(signed){
+      if (signed) {
         getAllOrders();
       }
-      
-    
     }, 1000);
   }, []);
 
@@ -81,14 +82,13 @@ export const OrdersProvider: React.FC = ({ children }) => {
   }
 
   async function getAllOrders(): Promise<void> {
-    
     setLoading(true);
     try {
       const response = await api.get(
         `${api.defaults.baseURL}/fornecedor/pedidos`,
       );
-        console.log(JSON.stringify(response.data, null, 2)); 
-      
+      console.log(JSON.stringify(response.data, null, 2));
+
       handleOrderList(response.data);
 
       setLoading(false);
@@ -122,10 +122,9 @@ export const OrdersProvider: React.FC = ({ children }) => {
     }
   }
 
- 
   return (
     <OrderContext.Provider
-      value={{ pendingLength, loading,getAllOrders,ordersData }}
+      value={{ pendingLength, loading, getAllOrders, ordersData }}
     >
       {children}
     </OrderContext.Provider>

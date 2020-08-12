@@ -22,7 +22,8 @@ import {
   useRoute,
   NavigationContainer,
 } from '@react-navigation/native';
-import pt, { format } from 'date-fns';
+import { format } from 'date-fns';
+import pt from 'date-fns/locale/pt-BR';
 
 import OrderContext from '../../../contexts/order';
 import api from '../../../services/api';
@@ -375,8 +376,10 @@ const OrderDetails: React.FC = () => {
             <Span>
               <ClientInformationTextWrapper>
                 <Title numberOfLines={1}>{extraData.extraData.name}</Title>
+                {extraData.extraData.address === `${null}, ${null}` ? null : (
+                  <SubTitle>{extraData.extraData.address}</SubTitle>
+                )}
 
-                <SubTitle>{extraData.extraData.address}</SubTitle>
                 <SubTitle>
                   {format(
                     Date.parse(extraData.extraData.date),
@@ -415,9 +418,9 @@ const OrderDetails: React.FC = () => {
                       <Icon name="whatsapp" size={18} color="#fff" />
                     </ButtonShareLocalizationIcon>
 
-                    <ButtonShareLocalizationText>
-                      Compartilhar Endereço
-                    </ButtonShareLocalizationText>
+                    <ButtonShareLocalizationIcon>
+                      <Icon name="share-alt" size={18} color="#fff" />
+                    </ButtonShareLocalizationIcon>
                   </ButtonShareLocalization>
                 ) : null}
               </ClientInformationButtonWrapper>
@@ -485,10 +488,12 @@ const OrderDetails: React.FC = () => {
           extraData.extraData.status === 'Pedido em rota de entrega' ||
           (extraData.extraData.status === 'Pendente' &&
             extraData.extraData.delivery === true) ? null : (
-            <ButtonWrapper>
+              <ButtonWrapper>
               <Button loading={loading} onPress={() => sendingOrder()}>
-                <ButtonText>Entregador a caminho</ButtonText>
-              </Button>
+                  <ButtonText>
+                  <Icon name="motorcycle" size={18} /> A Caminho
+                </ButtonText>
+                </Button>
             </ButtonWrapper>
           )}
         </ScrollView>

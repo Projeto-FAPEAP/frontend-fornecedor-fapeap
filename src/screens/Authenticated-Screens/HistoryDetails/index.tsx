@@ -13,6 +13,7 @@ import {
   Image,
   ScrollView,
   Linking,
+  FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -21,7 +22,8 @@ import {
   useRoute,
   NavigationContainer,
 } from '@react-navigation/native';
-import pt, { format } from 'date-fns';
+import { format } from 'date-fns';
+import pt from 'date-fns/locale/pt-BR';
 
 import OrderContext from '../../../contexts/order';
 import api from '../../../services/api';

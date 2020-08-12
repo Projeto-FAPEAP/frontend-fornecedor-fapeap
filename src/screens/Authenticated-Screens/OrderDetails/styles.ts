@@ -72,7 +72,7 @@ export const ButtonShareLocalization = styled.TouchableOpacity`
   justify-content: space-around;
   align-items: center;
 
-  width: 125px;
+  width: 100px;
   height: 38%;
   border-radius: 12px;
   background: #6fcf97;
@@ -115,6 +115,7 @@ export const ButtonWrapper = styled.View`
 `;
 
 export const Button = styled(Buttonn)`
+  min-width: 45%;
   max-width: 50%;
   border-radius: 12px;
   height: 38px;
@@ -188,13 +189,13 @@ export const SubTotalSpanInner = styled.View`
 export const SubTotalText = styled.Text`
   text-align: center;
   align-content: center;
-  font-size: 12px;
+  font-size: 13px;
   color: #9a9a9a;
   font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;
 
 export const Amount = styled.Text`
-  font-size: 12px
+  font-size: 13px
   color: #9a9a9a;
 `;
 
