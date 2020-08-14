@@ -80,6 +80,7 @@ export const ListProducts = styled.TouchableOpacity`
 
 export const ListProductsImageWrapper = styled.Image`
   width: 84px;
+  height: 84px;
   border-radius: 22px;
 `;
 export const ListProductsTextWrapper = styled.View`

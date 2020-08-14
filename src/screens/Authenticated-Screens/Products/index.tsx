@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { FlatList, Alert, View } from 'react-native';
+import { FlatList, Alert, View, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import IsEmpty from '@components/IsEmpty';
@@ -33,6 +33,7 @@ interface IProducts {
   status_produto: number;
   estoque_produto: number;
   unidade_medida: string | number;
+  arquivos: [{ url: string }];
 }
 const Products: React.FC = () => {
   const navigation = useNavigation();
@@ -43,7 +44,6 @@ const Products: React.FC = () => {
   useEffect(() => {
     setTimeout(function () {
       getAllProducts();
-      console.log(productsList?.length, 'ss');
     }, 1000);
   }, []);
 
@@ -85,8 +85,10 @@ const Products: React.FC = () => {
                     }
                   >
                     <ListProductsImageWrapper
-                      source={require('../../../assets/acai_1.jpg')}
-                      resizeMode="contain"
+                      source={{
+                        uri: (item as IProducts).arquivos[0].url,
+                      }}
+                      resizeMode="cover"
                     />
                     <ListProductsTextWrapper>
                       <ListRowTitle>{(item as IProducts).nome}</ListRowTitle>

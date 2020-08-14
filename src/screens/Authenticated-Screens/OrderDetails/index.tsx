@@ -146,6 +146,7 @@ const OrderDetails: React.FC = () => {
 
   async function getAllItems(): Promise<void> {
     setLoading(true);
+    console.log(routeParams.itemId);
     try {
       const response = await api.get(
         `${api.defaults.baseURL}/fornecedor/pedidos/itens/${routeParams.itemId}`,
@@ -488,13 +489,13 @@ const OrderDetails: React.FC = () => {
           extraData.extraData.status === 'Pedido em rota de entrega' ||
           (extraData.extraData.status === 'Pendente' &&
             extraData.extraData.delivery === true) ? null : (
-              <ButtonWrapper>
-              <Button loading={loading} onPress={() => sendingOrder()}>
-                  <ButtonText>
-                  <Icon name="motorcycle" size={18} /> A Caminho
-                </ButtonText>
-                </Button>
-            </ButtonWrapper>
+            <ButtonWrapper>
+                <Button loading={loading} onPress={() => sendingOrder()}>
+                <ButtonText>
+                    <Icon name="motorcycle" size={18} /> A Caminho
+                  </ButtonText>
+              </Button>
+              </ButtonWrapper>
           )}
         </ScrollView>
       ) : (

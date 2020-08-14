@@ -29,6 +29,7 @@ interface Products {
   status_produto: number;
   estoque_produto: number;
   unidade_medida: string | number;
+  arquivos: [{ url: string }];
 }
 const Products: React.FC = () => {
   const navigation = useNavigation();
@@ -163,8 +164,10 @@ const Products: React.FC = () => {
                         }
                       >
                         <ListProductsImageWrapper
-                          source={require('../../../assets/acai_1.jpg')}
-                          resizeMode="contain"
+                          source={{
+                            uri: item.arquivos[0].url,
+                          }}
+                          resizeMode="cover"
                         />
                         <ListProductsTextWrapper>
                           <ListRowTitle>{item.nome}</ListRowTitle>
