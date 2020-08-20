@@ -197,7 +197,7 @@ const VisualizeRegister: React.FC = () => {
                       <Photo
                         key={`${item.id}-${index}`}
                         source={{
-                          uri: files[0].url,
+                          uri: item.url,
                         }}
                         resizeMode="cover"
                       />
