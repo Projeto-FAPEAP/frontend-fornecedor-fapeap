@@ -63,29 +63,43 @@ const User: React.FC = ({ navigation }) => {
 
   return (
     <Container>
-      <KeyboardAwareScrollView>
-        <Header>
-          <StoreName>{storeName}</StoreName>
-        </Header>
-        <Options>
-          <Button onPress={() => navigation.navigate('Settings')}>
-            <ButtonIcon>
-              <Icon name="cog" size={32} color="#798599" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Editar Cadastro</ButtonText>
-            </ButtonWrapperText>
-          </Button>
-          <Button onPress={() => logOutt()}>
-            <ButtonIcon>
-              <Icon name="sign-out" size={32} color="#EB5757" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Sair</ButtonText>
-            </ButtonWrapperText>
-          </Button>
-        </Options>
-      </KeyboardAwareScrollView>
+      <Header>
+        <StoreName>{storeName}</StoreName>
+      </Header>
+      <Options>
+        <Button onPress={() => navigation.navigate('VisualizeRegister')}>
+          <ButtonIcon>
+            <Icon name="list" size={32} color="#798599" />
+          </ButtonIcon>
+          <ButtonWrapperText>
+            <ButtonText>Visualizar Cadastro</ButtonText>
+          </ButtonWrapperText>
+        </Button>
+        <Button onPress={() => navigation.navigate('EditProfile')}>
+          <ButtonIcon>
+            <Icon name="cog" size={32} color="#798599" />
+          </ButtonIcon>
+          <ButtonWrapperText>
+            <ButtonText>Editar Cadastro</ButtonText>
+          </ButtonWrapperText>
+        </Button>
+        <Button onPress={() => navigation.navigate('Settings')}>
+          <ButtonIcon>
+            <Icon name="image" size={32} color="#798599" />
+          </ButtonIcon>
+          <ButtonWrapperText>
+            <ButtonText>Atualizar Mídias</ButtonText>
+          </ButtonWrapperText>
+        </Button>
+        <Button onPress={() => logOutt()}>
+          <ButtonIcon>
+            <Icon name="sign-out" size={32} color="#EB5757" />
+          </ButtonIcon>
+          <ButtonWrapperText>
+            <ButtonText>Sair</ButtonText>
+          </ButtonWrapperText>
+        </Button>
+      </Options>
     </Container>
   );
 };

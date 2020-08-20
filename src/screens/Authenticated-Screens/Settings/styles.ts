@@ -4,6 +4,7 @@ import {
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import Buttonn from '@components/Button';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
@@ -14,6 +15,19 @@ export const Container = styled.View`
 export const BackButtonWrapper = styled.TouchableOpacity`
   margin-top: ${hp('2.5%')}px;
   padding-left: ${hp('2.5%')}px;
+`;
+
+export const ContentPhotos = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  padding: 5px;
+`;
+
+export const MainTitle = styled.Text`
+  font-size: 18px;
+  margin: 15px auto 30px;
+  color: #3e3e54;
+  font-family: ${({ theme }) => theme.fonts.Ubuntu.semiBold};
 `;
 
 export const Header = styled.View`
@@ -107,23 +121,23 @@ export const P = styled.Text`
   padding-vertical: ${hp('1.8%')}px;
 `;
 
-export const RegisterButton = styled.TouchableOpacity`
-  width: ${wp('85%')}px;
-  border-radius: 22px;
-  height: ${hp('6%')}px;
+export const RegisterButton = styled(Buttonn)`
+  min-width: 45%;
+  max-width: 50%;
+  border-radius: 12px;
+  height: 38px;
   margin-top: 25px;
-  margin-right: 25px;
-  margin-left: 25px;
+
   justify-content: center;
   background: ${(props) => props.theme.colors.primary};
-  margin-bottom: ${hp('1.8%')}px;
+  margin-bottom: 10px;
 `;
 
 export const RegisterButtonText = styled.Text`
   text-align: center;
   align-content: center;
   font-size: ${hp('2.4%')}px;
-  color: ${(props) => props.theme.colors.secundary};
+  color: #fff;
 `;
 
 export const RetrievePasswordButton = styled.TouchableOpacity`

@@ -7,10 +7,12 @@ import { useTheme } from 'styled-components/native';
 
 import AddProduct from '../screens/Authenticated-Screens/AddProduct';
 import EditProduct from '../screens/Authenticated-Screens/EditProduct';
+import EditProfile from '../screens/Authenticated-Screens/EditProfile';
+import HistoryDetails from '../screens/Authenticated-Screens/HistoryDetails';
 import OrderDetails from '../screens/Authenticated-Screens/OrderDetails';
 import SearchProduct from '../screens/Authenticated-Screens/SearchProduct';
-import HistoryDetails from '../screens/Authenticated-Screens/HistoryDetails';
 import Settings from '../screens/Authenticated-Screens/Settings';
+import VisualizeRegister from '../screens/Authenticated-Screens/VisualizeRegister';
 import BottomTabRoutes from './bottomTab.routes';
 
 const Stack = createStackNavigator();
@@ -88,12 +90,26 @@ const AppRoutes: React.FC = () => {
           }}
           component={SearchProduct}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="HistoryDetails"
           options={{
             headerTitle: 'Detalhes Histórico',
           }}
           component={HistoryDetails}
+        />
+        <Stack.Screen
+          name="EditProfile"
+          options={{
+            headerTitle: 'Editar Perfil',
+          }}
+          component={EditProfile}
+        />
+        <Stack.Screen
+          name="VisualizeRegister"
+          options={{
+            headerTitle: 'Visualizar Cadastro',
+          }}
+          component={VisualizeRegister}
         />
       </Stack.Navigator>
     </>
