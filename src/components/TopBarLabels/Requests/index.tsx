@@ -11,7 +11,7 @@ const Requests: React.FC<IPropsLabelTopBar> = ({ isFocused, ...rest }) => {
   return (
     <Container {...rest}>
       <Title isFocused={isFocused}>Pedidos</Title>
-      <Tooltip color="success">2</Tooltip>
+      {/* <Tooltip color="success">2</Tooltip> */}
     </Container>
   );
 };

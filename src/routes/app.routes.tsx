@@ -2,6 +2,7 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import { useAuth } from '@contexts/auth';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTheme } from 'styled-components/native';
 
@@ -19,6 +20,7 @@ const Stack = createStackNavigator();
 
 const AppRoutes: React.FC = () => {
   const { colors, fonts } = useTheme();
+  const { user } = useAuth();
 
   return (
     <>
@@ -51,7 +53,7 @@ const AppRoutes: React.FC = () => {
         <Stack.Screen
           name="Index"
           options={{
-            headerTitle: 'Olá, Manoel Gomes',
+            headerTitle: `Olá, ${user?.nome}`,
           }}
           component={BottomTabRoutes}
         />

@@ -11,7 +11,7 @@ const Products: React.FC<IPropsLabelTopBar> = ({ isFocused, ...rest }) => {
   return (
     <Container {...rest}>
       <Title isFocused={isFocused}>Produtos</Title>
-      <Tooltip color="success">2</Tooltip>
+      {/* <Tooltip color="success">2</Tooltip> */}
     </Container>
   );
 };
