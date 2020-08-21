@@ -67,6 +67,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
+  - OneSignal (2.14.3)
   - OpenSSL-Universal (1.0.2.19):
     - OpenSSL-Universal/Static (= 1.0.2.19)
   - OpenSSL-Universal/Static (1.0.2.19)
@@ -241,6 +242,9 @@ PODS:
     - React
   - react-native-image-resizer (1.2.3):
     - React
+  - react-native-onesignal (3.9.0):
+    - OneSignal (= 2.14.3)
+    - React (< 1.0.0, >= 0.13.0)
   - react-native-safe-area-context (3.1.1):
     - React
   - react-native-simple-toast (1.1.2):
@@ -371,6 +375,7 @@ DEPENDENCIES:
   - react-native-flipper (from `../node_modules/react-native-flipper`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
+  - react-native-onesignal (from `../node_modules/react-native-onesignal`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-simple-toast (from `../node_modules/react-native-simple-toast`)
   - react-native-video (from `../node_modules/react-native-video`)
@@ -407,6 +412,7 @@ SPEC REPOS:
     - Flipper-PeerTalk
     - Flipper-RSocket
     - FlipperKit
+    - OneSignal
     - OpenSSL-Universal
     - Toast
     - YogaKit
@@ -448,6 +454,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-image-resizer:
     :path: "../node_modules/react-native-image-resizer"
+  react-native-onesignal:
+    :path: "../node_modules/react-native-onesignal"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-simple-toast:
@@ -509,6 +517,7 @@ SPEC CHECKSUMS:
   FlipperKit: 6dc9b8f4ef60d9e5ded7f0264db299c91f18832e
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
+  OneSignal: 7dfe466265c05f02b95a274b9c997a0619ad2117
   OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
   RCTRequired: cec6a34b3ac8a9915c37e7e4ad3aa74726ce4035
   RCTTypeSafety: 93006131180074cffa227a1075802c89a49dd4ce
@@ -523,6 +532,7 @@ SPEC CHECKSUMS:
   react-native-flipper: b7340d18f1bf088de47fed2d77a729f2aa533854
   react-native-image-picker: 3d3f85baabca60a00b75fb8facc1376db7bbdafa
   react-native-image-resizer: 2f1577efa3bc762597681f530c8e8d05ce0ceeb3
+  react-native-onesignal: 3cd5b9b5a2d151698cab987a364f4cbd51552508
   react-native-safe-area-context: 344b969c45af3d8464d36e8dea264942992ef033
   react-native-simple-toast: 58b71ef003f01d2c0bf5dcd2fdccc75861dabade
   react-native-video: eee541262ada11bc7ffe8ec5508e6a877937c462

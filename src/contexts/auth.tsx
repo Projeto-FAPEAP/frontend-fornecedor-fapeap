@@ -8,6 +8,10 @@ import React, {
 import { Alert } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import {
+  subscribeToNotification,
+  unsubscribeToNotification,
+} from '@services/notifications';
 
 import api from '../services/api';
 
@@ -83,6 +87,12 @@ export const AuthProvider: React.FC = ({ children }) => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    subscribeToNotification(user.id);
+  }, [user]);
+
   const handleLogin = useCallback(
     async (cpfCnpj: string, password: string): Promise<void> => {
       setLoading(true);
@@ -120,6 +130,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   );
 
   function logOut(): void {
+    unsubscribeToNotification();
     AsyncStorage.clear().then(() => {
       setUser(null);
     });
