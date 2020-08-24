@@ -12,6 +12,30 @@ export const Container = styled.View`
   flex-direction: column;
 `;
 
+export const VideoProps = styled.View`
+  height: 50px;
+  border-radius: 2px;
+  border-width: 1px;
+  border-color: #b8b6b6;
+  flex-direction: row;
+  align-items: center;
+  padding-horizontal: 5px;
+  justify-content: space-around;
+`;
+
+export const VideoPropsTextWrapper = styled.View`
+  width: 80%;
+`;
+
+export const VideoPropsText = styled.Text`
+  font-size: 14px;
+  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
+`;
+
+export const VideoPropsButton = styled.TouchableOpacity`
+  width: 10%;
+`;
+
 export const BackButtonWrapper = styled.TouchableOpacity`
   margin-top: ${hp('2.5%')}px;
   padding-left: ${hp('2.5%')}px;
@@ -119,6 +143,16 @@ export const P = styled.Text`
   font-size: ${hp('2.4%')}px;
   color: #000000;
   padding-vertical: ${hp('1.8%')}px;
+`;
+
+export const VideoWrapper = styled.View`
+  width: 100%;
+  height: 250px;
+`;
+
+export const ContentVideo = styled.View`
+  height: 250px;
+  width: 100%;
 `;
 
 export const RegisterButton = styled(Buttonn)`

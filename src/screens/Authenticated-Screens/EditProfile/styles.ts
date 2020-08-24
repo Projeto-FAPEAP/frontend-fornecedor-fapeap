@@ -37,6 +37,12 @@ export const ButtonSubmit = styled(Button)`
   background-color: ${({ theme }) => theme.colors.success};
 `;
 
+export const Line = styled.View`
+  border-color: #b0b2b8;
+  border-width: 1px;
+  margin-top: 15px;
+`;
+
 /* export const ButtonDelete = styled(Button)`
   width: 40%;
   background-color: ${({ theme }) => theme.colors.transparent};

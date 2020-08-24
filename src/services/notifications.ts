@@ -3,7 +3,7 @@ import OneSignal, {
   ReceivedNotification,
 } from 'react-native-onesignal';
 
-const apikey = '';
+const apikey = '344214ab-5d79-4019-a9d4-ef29f23e0356';
 
 function onReceived(_notification: ReceivedNotification): void {
   // console.tron.warn('Notification received: ', notification);

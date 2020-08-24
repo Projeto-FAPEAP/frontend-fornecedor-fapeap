@@ -11,8 +11,10 @@ import MediaMeta from 'react-native-media-meta';
 import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Video from 'react-native-video';
+import VideoPlayer from 'react-native-video-controls';
 
 import ButtonPhoto from '@components/ButtonPhoto';
+import ButtonVideo from '@components/ButtonVideo';
 import { useAuth } from '@contexts/auth';
 import SelectPhoto from '@libs/SelectPhoto';
 import { useNavigation } from '@react-navigation/native';
@@ -36,6 +38,12 @@ import {
   RemoveMedia,
   MainTitle,
   ContentPhotos,
+  ContentVideo,
+  VideoWrapper,
+  VideoProps,
+  VideoPropsButton,
+  VideoPropsText,
+  VideoPropsTextWrapper,
 } from './styles';
 
 interface IFile {
@@ -43,12 +51,15 @@ interface IFile {
   url: string;
   isFilled: boolean;
   arquivo_tipo: string;
+  nome_original: string;
 }
 
 interface IReponseFile {
   arquivos: {
     id: string;
     url: string;
+    arquivo_tipo: string;
+    nome_original: string;
   }[];
 }
 
@@ -279,6 +290,8 @@ const Settings: React.FC = () => {
             return {
               id: arquivos[k].id,
               url: arquivos[k].url,
+              arquivo_tipo: arquivos[k].arquivo_tipo,
+              nome_original: arquivos[k].nome_original,
               isFilled: true,
             };
           } catch (error) {
@@ -353,7 +366,7 @@ const Settings: React.FC = () => {
                 data={files}
                 renderItem={({ item, index }) => (
                   <ButtonPhoto
-                    url={item.url}
+                    url={item.arquivo_tipo === 'imagem' ? item.url : ''}
                     style={index > 0 ? { marginLeft: 10 } : {}}
                     onPress={() => handleSaveImage(item, index)}
                     onRemove={() => handleConfirmDelete(item)}
@@ -364,34 +377,34 @@ const Settings: React.FC = () => {
             </ContentPhotos>
             <MainTitle>Vídeo (até 1 minuto) </MainTitle>
 
-            {videoSelected ? (
-              <MediaWrapper>
-                {!isEmpty(videoState) ? (
-                  <Video
-                    source={{ uri: videoState[0].uri }}
-                    style={{
-                      width: '100%',
-                      height: '100%',
+            {/* {files.map((file, idx) => (
+              <View>
+                {file.arquivo_tipo === 'video' ? (
+                  <VideoWrapper>
+                    <VideoPlayer
+                      key={`${file.id}-${idx}`}
+                      source={{
+                        uri: file.url,
+                      }}
+                      disableBack
+                    />
+                    <VideoProps>
+                      <VideoPropsTextWrapper>
+                        <VideoPropsText>
+                          <Icon name="check-circle" color="green" size={20} />
 
-                      position: 'absolute',
-                    }}
-                    poster={videoState[0].uri}
-                    resizeMode="contain"
-                    controls
-                  />
+                          {` ${file.nome_original}`}
+                        </VideoPropsText>
+                      </VideoPropsTextWrapper>
+
+                      <VideoPropsButton>
+                        <Icon name="trash" color="red" size={28} />
+                      </VideoPropsButton>
+                    </VideoProps>
+                  </VideoWrapper>
                 ) : null}
-                <RemoveMedia onPress={() => removeVideo()}>
-                  <Icon color="#EA3232" size={35} name="trash-o" />
-                </RemoveMedia>
-              </MediaWrapper>
-            ) : (
-              <MediaSpotButton onPress={() => handleChooseVideo()}>
-                <AddMediaButtonWrapper>
-                  <Icon color="#84378F" size={35} name="plus" />
-                </AddMediaButtonWrapper>
-              </MediaSpotButton>
-            )}
-
+              </View>
+            ))} */}
             <RegisterButton loading={loading}>
               <RegisterButtonText>Atualizar dados</RegisterButtonText>
             </RegisterButton>

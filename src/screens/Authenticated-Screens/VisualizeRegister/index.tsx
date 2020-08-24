@@ -73,6 +73,7 @@ const VisualizeRegister: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserData[]>([]);
   const [files, setFiles] = React.useState<IFile[]>([]);
+  const [video, setVideo] = React.useState('teste');
   const { user } = useAuth();
   useEffect(() => {
     getFornecedor();
@@ -87,6 +88,12 @@ const VisualizeRegister: React.FC = () => {
       );
       setUserData(response.data);
       setFiles(response.data.arquivos);
+      for (let i = 0; i < response.data.arquivos.length; i += 1) {
+        if (response.data.arquivos[i].arquivo_tipo === 'video') {
+          setVideo(response.data.arquivos[i].url);
+        }
+      }
+
       setLoading(false);
       console.log(JSON.stringify(response.data, null, 2));
       console.log('fdllllll');
@@ -224,21 +231,14 @@ const VisualizeRegister: React.FC = () => {
             ))} */}
           </ContentPhotos>
           <MainTitle>Vídeo</MainTitle>
-          {files.map((file, idx) => (
-            <View>
-              {file.arquivo_tipo === 'video' ? (
-                <VideoWrapper>
-                  <VideoPlayer
-                    key={`${file.id}-${idx}`}
-                    source={{
-                      uri: file.url,
-                    }}
-                    disableBack
-                  />
-                </VideoWrapper>
-              ) : null}
-            </View>
-          ))}
+          <VideoWrapper>
+            <VideoPlayer
+              source={{
+                uri: video,
+              }}
+              disableBack
+            />
+          </VideoWrapper>
 
           {/* <Video
               source={{
