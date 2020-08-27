@@ -10,6 +10,7 @@ import styled from 'styled-components/native';
 export const Container = styled.View`
   background: ${(props) => props.theme.colors.background};
   flex-direction: column;
+  flex: 1;
 `;
 
 export const VideoProps = styled.View`

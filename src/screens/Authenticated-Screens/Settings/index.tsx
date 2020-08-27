@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import ImagePicker, {
   ImagePickerResponse,
@@ -16,8 +17,11 @@ import VideoPlayer from 'react-native-video-controls';
 import ButtonPhoto from '@components/ButtonPhoto';
 import ButtonVideo from '@components/ButtonVideo';
 import { useAuth } from '@contexts/auth';
+import SelectDocument from '@libs/SelectDocument';
 import SelectPhoto from '@libs/SelectPhoto';
 import { useNavigation } from '@react-navigation/native';
+import { ka } from 'date-fns/locale';
+import { useTheme } from 'styled-components';
 
 import api from '../../../services/api';
 import Loader from '../../utils';
@@ -50,11 +54,26 @@ interface IFile {
   id: string;
   url: string;
   isFilled: boolean;
-  arquivo_tipo: string;
+}
+
+interface IVideo {
+  id: string;
+  url: string;
   nome_original: string;
 }
 
+/* interface IReponseFile {
+  arquivos: {
+    id: string;
+    url: string;
+    arquivo_tipo: string;
+    nome_original: string;
+  }[];
+} */
+
 interface IReponseFile {
+  id: string;
+  url: string;
   arquivos: {
     id: string;
     url: string;
@@ -72,14 +91,19 @@ const Settings: React.FC = () => {
   const [videoSelected, setVideoSelected] = useState(false);
   const [learning, setLearning] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [files, setFiles] = React.useState<IFile[]>([{}, {}, {}, {}, {}]);
+  const [files, setFiles] = React.useState<IFile[]>([
+    /* {}, {}, {}, {}, {} */
+  ]);
+  const [video, setVideo] = React.useState<IVideo>();
+  const [uploading, setUploading] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
   const { user } = useAuth();
-
+  const { colors } = useTheme();
   useEffect(() => {
     getFornecedor();
   }, []);
 
-  function removePhoto(index: number): void {
+  /*  function removePhoto(index: number): void {
     // Alert.alert('Jonathan');
     Alert.alert(
       'Remover foto',
@@ -215,7 +239,7 @@ const Settings: React.FC = () => {
       if (obj.hasOwnProperty(key)) return false;
     }
     return true;
-  }
+  } */
 
   const handleSaveImage = React.useCallback(
     async (file: IFile, idx: number) => {
@@ -242,10 +266,12 @@ const Settings: React.FC = () => {
 
       try {
         if (isUpdate) {
+          console.log('atualçi');
           const { data } = await api.put<IReponseFile>(
-            `/arquivoproduto/${file.id}`,
+            `/arqfornecedor/imagem/${file.id}`,
             formData,
           );
+          console.log(data.id, data.url);
           setFiles((state) =>
             state.map((findFile) =>
               findFile.id === file.id
@@ -254,11 +280,11 @@ const Settings: React.FC = () => {
             ),
           );
         } else {
+          console.log('kkiidididi');
           const { data } = await api.post<IReponseFile[]>(
-            `/arquivoproduto/${user.id}`,
+            `/arqfornecedor/`,
             formData,
           );
-
           setFiles((state) =>
             state.map((findFile, index) =>
               index === idx
@@ -272,10 +298,86 @@ const Settings: React.FC = () => {
         Toast.show('Ocorreu um erro ao atualizar', Toast.SHORT, [
           'UIAlertController',
         ]);
+        console.log(JSON.stringify(err, null, 2));
+        console.log(err, 'jonathan');
+        console.log(Object(err.response), 'salve');
+        /* Alert.alert(error.response.data.error); */
+        if (err.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(err.response.data);
+          console.log(err.response.status);
+          console.log(err.response.headers);
+        } else if (err.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(err.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', err.message);
+        }
+        console.log(err.config);
       }
     },
-    [user.id],
+    [user?.id],
   );
+
+  async function handleVideoUpload(): Promise<void> {
+    try {
+      const document = await SelectDocument();
+      if (document) {
+        Toast.show('Efetuando o upload...', Toast.SHORT, ['UIAlertController']);
+        setUploading(true);
+        console.log(video?.id, 'tesssssssssssss');
+        const formData = new FormData();
+
+        formData.append('file', document);
+        const response = await api.put(
+          `${api.defaults.baseURL}/arqfornecedor/video/${video?.id}`,
+          formData,
+          {
+            onUploadProgress: (e) => {
+              const progresss = Math.round((e.loaded * 100) / e.total);
+
+              setProgress(progresss);
+            },
+          },
+        );
+        console.log(response.data, 'retettete');
+        setVideo(response.data);
+        setUploading(false);
+        setProgress(0);
+        Toast.show('Video atualizado', Toast.SHORT, ['UIAlertController']);
+      } else {
+        Toast.show('Operação Cancelada', Toast.SHORT, ['UIAlertController']);
+        setUploading(false);
+      }
+    } catch (error) {
+      setUploading(false);
+      setProgress(0);
+      console.log(JSON.stringify(error, null, 2));
+      console.log(error, 'jonathan');
+      console.log(Object(error.response), 'salve');
+      /* Alert.alert(error.response.data.error); */
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
+  }
 
   async function getFornecedor(): Promise<void> {
     console.log('dfdf');
@@ -285,7 +387,34 @@ const Settings: React.FC = () => {
       .get<IReponseFile>(`${api.defaults.baseURL}/fornecedor/${user?.id}`)
       .then((response) => {
         const { arquivos } = response.data;
-        const responseFiles = Array.from({ length: 5 }, (_v, k) => {
+        const responseFiles = [];
+        const aux = [];
+        let j = 0;
+        arquivos.forEach((file, i) => {
+          if (file.arquivo_tipo === 'imagem') {
+            aux[j] = {
+              id: arquivos[j].id,
+              url: arquivos[j].url,
+              arquivo_tipo: arquivos[j].arquivo_tipo,
+              nome_original: arquivos[j].nome_original,
+              isFilled: true,
+            };
+            j += 1;
+          } else {
+            responseFiles[i] = {
+              id: '',
+              url: '',
+              isFilled: false,
+            };
+          }
+        });
+        for (let i = j; i < 5; i += 1) {
+          aux.push({ id: '', url: '', isFilled: false });
+        }
+
+        setFiles(aux);
+
+        /* const responseFiles = Array.from({ length: 5 }, (_v, k) => {
           try {
             return {
               id: arquivos[k].id,
@@ -302,8 +431,14 @@ const Settings: React.FC = () => {
             };
           }
         });
-        setFiles(responseFiles);
-        console.log(responseFiles);
+        setFiles(responseFiles); */
+        for (let i = 0; i < response.data.arquivos.length; i += 1) {
+          if (response.data.arquivos[i].arquivo_tipo === 'video') {
+            setVideo(response.data.arquivos[i]);
+            console.log(response.data.arquivos[i], 'gfgf');
+          }
+        }
+        console.log(video, 'tets');
 
         setLoading(false);
       })
@@ -311,15 +446,15 @@ const Settings: React.FC = () => {
         setLoading(false);
       });
 
-    setLoading(false);
+    /* setLoading(false); */
     /* console.log(JSON.stringify(response.data, null, 2)); */
     console.log('fdllllll');
   }
 
   const handleDeleteImage = React.useCallback(async (file: IFile) => {
     try {
-      await api.delete(`/arquivoproduto/${file.id}`);
-
+      await api.delete(`/arqfornecedor/imagem/${file.id}`);
+      console.log(file.id);
       setFiles((state) =>
         state.map((findFile) =>
           findFile.id === file.id
@@ -350,6 +485,7 @@ const Settings: React.FC = () => {
         { cancelable: false },
       );
     },
+
     [handleDeleteImage],
   );
 
@@ -364,50 +500,73 @@ const Settings: React.FC = () => {
               <FlatList
                 horizontal
                 data={files}
+                extraData={files}
                 renderItem={({ item, index }) => (
                   <ButtonPhoto
-                    url={item.arquivo_tipo === 'imagem' ? item.url : ''}
+                    url={item.url}
                     style={index > 0 ? { marginLeft: 10 } : {}}
                     onPress={() => handleSaveImage(item, index)}
-                    onRemove={() => handleConfirmDelete(item)}
+                    onRemove={() => {
+                      let k = 0;
+                      files.forEach((filess) => {
+                        if (filess.isFilled) {
+                          k += 1;
+                        }
+                      });
+                      if (k > 1) {
+                        handleConfirmDelete(item);
+                      } else {
+                        console.log(files, 'trtr');
+                        Toast.show(
+                          'É necessário ter pelo menos uma imagem',
+                          Toast.SHORT,
+                          ['UIAlertController'],
+                        );
+                      }
+                    }}
                   />
                 )}
                 keyExtractor={(item, index) => String(index)}
               />
             </ContentPhotos>
             <MainTitle>Vídeo (até 1 minuto) </MainTitle>
+            {uploading ? (
+              <AnimatedCircularProgress
+                size={50}
+                width={3}
+                fill={progress}
+                tintColor={colors.primary}
+                backgroundColor={colors.regular}
+              >
+                {(fill) => <Text>{`${progress}%`}</Text>}
+              </AnimatedCircularProgress>
+            ) : (
+              <VideoWrapper>
+                <VideoPlayer
+                  source={{
+                    uri: video?.url,
+                  }}
+                  disableBack
+                />
+                <VideoProps>
+                  <VideoPropsTextWrapper>
+                    <VideoPropsText>
+                      <Icon name="check-circle" color="green" size={20} />
 
-            {/* {files.map((file, idx) => (
-              <View>
-                {file.arquivo_tipo === 'video' ? (
-                  <VideoWrapper>
-                    <VideoPlayer
-                      key={`${file.id}-${idx}`}
-                      source={{
-                        uri: file.url,
-                      }}
-                      disableBack
-                    />
-                    <VideoProps>
-                      <VideoPropsTextWrapper>
-                        <VideoPropsText>
-                          <Icon name="check-circle" color="green" size={20} />
+                      {` ${video?.nome_original}`}
+                    </VideoPropsText>
+                  </VideoPropsTextWrapper>
 
-                          {` ${file.nome_original}`}
-                        </VideoPropsText>
-                      </VideoPropsTextWrapper>
+                  <VideoPropsButton onPress={() => handleVideoUpload()}>
+                    <Icon name="trash" color="red" size={28} />
+                  </VideoPropsButton>
+                </VideoProps>
+              </VideoWrapper>
+            )}
 
-                      <VideoPropsButton>
-                        <Icon name="trash" color="red" size={28} />
-                      </VideoPropsButton>
-                    </VideoProps>
-                  </VideoWrapper>
-                ) : null}
-              </View>
-            ))} */}
-            <RegisterButton loading={loading}>
+            {/*   <RegisterButton loading={loading}>
               <RegisterButtonText>Atualizar dados</RegisterButtonText>
-            </RegisterButton>
+            </RegisterButton> */}
           </Form>
         </KeyboardAwareScrollView>
       ) : (

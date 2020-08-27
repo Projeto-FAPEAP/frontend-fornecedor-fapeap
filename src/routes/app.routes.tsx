@@ -81,7 +81,7 @@ const AppRoutes: React.FC = () => {
         <Stack.Screen
           name="Settings"
           options={{
-            headerTitle: 'Editar Perfil',
+            headerTitle: 'Editar Mídias',
           }}
           component={Settings}
         />
