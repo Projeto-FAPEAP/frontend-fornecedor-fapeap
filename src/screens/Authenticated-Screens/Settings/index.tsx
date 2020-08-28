@@ -392,11 +392,12 @@ const Settings: React.FC = () => {
         let j = 0;
         arquivos.forEach((file, i) => {
           if (file.arquivo_tipo === 'imagem') {
+            console.log(file.arquivo_tipo);
             aux[j] = {
-              id: arquivos[j].id,
-              url: arquivos[j].url,
-              arquivo_tipo: arquivos[j].arquivo_tipo,
-              nome_original: arquivos[j].nome_original,
+              id: file.id,
+              url: file.url,
+              arquivo_tipo: file.arquivo_tipo,
+              nome_original: file.nome_original,
               isFilled: true,
             };
             j += 1;
@@ -408,6 +409,7 @@ const Settings: React.FC = () => {
             };
           }
         });
+        console.log(aux, 'rererererer');
         for (let i = j; i < 5; i += 1) {
           aux.push({ id: '', url: '', isFilled: false });
         }
@@ -432,6 +434,7 @@ const Settings: React.FC = () => {
           }
         });
         setFiles(responseFiles); */
+        u = 0;
         for (let i = 0; i < response.data.arquivos.length; i += 1) {
           if (response.data.arquivos[i].arquivo_tipo === 'video') {
             setVideo(response.data.arquivos[i]);
@@ -462,6 +465,7 @@ const Settings: React.FC = () => {
             : findFile,
         ),
       );
+
       Toast.show('Foto excluída', Toast.SHORT, ['UIAlertController']);
     } catch {
       Toast.show('Ocorreu um erro ao deletar', Toast.SHORT, [
@@ -488,6 +492,16 @@ const Settings: React.FC = () => {
 
     [handleDeleteImage],
   );
+  function getSize(): number {
+    let k = 0;
+    files.forEach((filess) => {
+      if (filess.isFilled) {
+        k += 1;
+      }
+    });
+    console.log(k, 'joantnn');
+    return k;
+  }
 
   return (
     <Container>
@@ -504,25 +518,11 @@ const Settings: React.FC = () => {
                 renderItem={({ item, index }) => (
                   <ButtonPhoto
                     url={item.url}
+                    size={getSize()}
                     style={index > 0 ? { marginLeft: 10 } : {}}
                     onPress={() => handleSaveImage(item, index)}
                     onRemove={() => {
-                      let k = 0;
-                      files.forEach((filess) => {
-                        if (filess.isFilled) {
-                          k += 1;
-                        }
-                      });
-                      if (k > 1) {
-                        handleConfirmDelete(item);
-                      } else {
-                        console.log(files, 'trtr');
-                        Toast.show(
-                          'É necessário ter pelo menos uma imagem',
-                          Toast.SHORT,
-                          ['UIAlertController'],
-                        );
-                      }
+                      handleConfirmDelete(item);
                     }}
                   />
                 )}

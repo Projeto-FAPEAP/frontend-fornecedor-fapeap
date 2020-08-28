@@ -115,7 +115,13 @@ const EditProfile: React.FC = () => {
               otherwise: Yup.string(),
             })
             .oneOf([Yup.ref('senha'), ''], 'Confirmação incorreta'),
-          senhaAtual: Yup.string().required('Campo obrigatório'),
+          senhaAtual: Yup.string().when('senha', {
+            is: (val) => !!val.length,
+            then: Yup.string()
+              .required('Campo obrigatório')
+              .min(5, 'Senha Atual Obrigatória!'),
+            otherwise: Yup.string(),
+          }),
 
           /* senhaAtual: Yup.string().when('oldPassword', {
               is: (val) => !!val.length,
@@ -144,12 +150,20 @@ const EditProfile: React.FC = () => {
         } = values;
         /*    } */
         try {
-          await api.put(`/fornecedor/`, {
-            telefone_whatsapp,
-            telefone,
-            senhaAtual,
-            senha,
-          });
+          if (senha !== '') {
+            await api.put(`/fornecedor/`, {
+              telefone_whatsapp,
+              telefone,
+              senhaAtual,
+              senha,
+            });
+          } else {
+            await api.put(`/fornecedor/`, {
+              telefone_whatsapp,
+              telefone,
+              senhaAtual,
+            });
+          }
 
           Alert.alert(
             'Tudo certo',
@@ -166,7 +180,7 @@ const EditProfile: React.FC = () => {
           console.log(JSON.stringify(error, null, 2));
           console.log(error, 'jonathan');
           console.log(Object(error.response), 'salve');
-          Alert.alert('Erro encontrado', error.response.data.error);
+          Alert.alert('Ocorreu um erro', error.response.data.error);
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx

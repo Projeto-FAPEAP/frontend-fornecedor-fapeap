@@ -7,12 +7,13 @@ import * as S from './styles';
 
 interface IButtonPhotoProps extends TouchableOpacityProps {
   url?: string;
+  size: number;
   onRemove(): void;
   onPress(): Promise<void>;
 }
 
 const ButtonPhoto: React.FC<IButtonPhotoProps> = (props) => {
-  const { url, onRemove, onPress, ...rest } = props;
+  const { size, url, onRemove, onPress, ...rest } = props;
   const { colors } = useTheme();
   const [loading, setLoading] = React.useState(false);
 
@@ -50,9 +51,12 @@ const ButtonPhoto: React.FC<IButtonPhotoProps> = (props) => {
       {!url && <S.IconPhoto />}
       {!!url && (
         <>
-          <S.ButtonTrash onPress={handleDelete}>
-            <S.IconTrash />
-          </S.ButtonTrash>
+          {size > 1 ? (
+            <S.ButtonTrash onPress={handleDelete}>
+              <S.IconTrash />
+            </S.ButtonTrash>
+          ) : null}
+
           <S.Photo source={{ uri: url }} />
         </>
       )}

@@ -50,8 +50,19 @@ const User: React.FC = ({ navigation }) => {
     setStoreName(userLoaded.nome_fantasia);
   }
   function logOutt(): void {
+    Alert.alert(
+      'Deseja mesmo sair',
+      'Você será redirecionado a tela inicial',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        { text: 'Sim', onPress: () => logOut() },
+      ],
+      { cancelable: false },
+    );
     console.log('oiiiiiii');
-    logOut();
   }
 
   function isEmpty(obj: object): boolean {
