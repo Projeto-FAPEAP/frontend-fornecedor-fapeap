@@ -51,7 +51,7 @@ const User: React.FC = ({ navigation }) => {
   }
   function logOutt(): void {
     Alert.alert(
-      'Deseja mesmo sair',
+      'Deseja mesmo sair?',
       'Você será redirecionado a tela inicial',
       [
         {
