@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -10,7 +16,7 @@ import ImagePicker, {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MediaMeta from 'react-native-media-meta';
 import Toast from 'react-native-simple-toast';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import VideoPlayer from 'react-native-video-controls';
 
@@ -101,7 +107,7 @@ const Settings: React.FC = () => {
   const { colors } = useTheme();
   useEffect(() => {
     getFornecedor();
-  }, []);
+  }, [user?.id]);
 
   /*  function removePhoto(index: number): void {
     // Alert.alert('Jonathan');
@@ -379,7 +385,79 @@ const Settings: React.FC = () => {
     }
   }
 
-  async function getFornecedor(): Promise<void> {
+  const getFornecedor = React.useCallback(async () => {
+    api
+      .get<IReponseFile>(`${api.defaults.baseURL}/fornecedor/${user?.id}`)
+      .then((response) => {
+        const { arquivos } = response.data;
+        const responseFiles = [];
+        const aux = [];
+        let j = 0;
+        arquivos.forEach((file, i) => {
+          if (file.arquivo_tipo === 'imagem') {
+            console.log(file.arquivo_tipo);
+            aux[j] = {
+              id: file.id,
+              url: file.url,
+              arquivo_tipo: file.arquivo_tipo,
+              nome_original: file.nome_original,
+              isFilled: true,
+            };
+            j += 1;
+          } else {
+            responseFiles[i] = {
+              id: '',
+              url: '',
+              isFilled: false,
+            };
+          }
+        });
+        console.log(aux, 'rererererer');
+        for (let i = j; i < 3; i += 1) {
+          aux.push({ id: '', url: '', isFilled: false });
+        }
+
+        setFiles(aux);
+
+        /* const responseFiles = Array.from({ length: 5 }, (_v, k) => {
+      try {
+        return {
+          id: arquivos[k].id,
+          url: arquivos[k].url,
+          arquivo_tipo: arquivos[k].arquivo_tipo,
+          nome_original: arquivos[k].nome_original,
+          isFilled: true,
+        };
+      } catch (error) {
+        return {
+          id: '',
+          url: '',
+          isFilled: false,
+        };
+      }
+    });
+    setFiles(responseFiles); */
+        u = 0;
+        for (let i = 0; i < response.data.arquivos.length; i += 1) {
+          if (response.data.arquivos[i].arquivo_tipo === 'video') {
+            setVideo(response.data.arquivos[i]);
+            console.log(response.data.arquivos[i], 'gfgf');
+          }
+        }
+        console.log(video, 'tets');
+
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+
+    /* setLoading(false); */
+    /* console.log(JSON.stringify(response.data, null, 2)); */
+    console.log('fdllllll');
+  }, [user?.id]);
+
+  /*  async function getFornecedor(): Promise<void> {
     console.log('dfdf');
     setLoading(true);
 
@@ -410,7 +488,7 @@ const Settings: React.FC = () => {
           }
         });
         console.log(aux, 'rererererer');
-        for (let i = j; i < 5; i += 1) {
+        for (let i = j; i < 3; i += 1) {
           aux.push({ id: '', url: '', isFilled: false });
         }
 
@@ -433,7 +511,7 @@ const Settings: React.FC = () => {
             };
           }
         });
-        setFiles(responseFiles); */
+        setFiles(responseFiles); 
         u = 0;
         for (let i = 0; i < response.data.arquivos.length; i += 1) {
           if (response.data.arquivos[i].arquivo_tipo === 'video') {
@@ -450,9 +528,9 @@ const Settings: React.FC = () => {
       });
 
     /* setLoading(false); */
-    /* console.log(JSON.stringify(response.data, null, 2)); */
-    console.log('fdllllll');
-  }
+  /* console.log(JSON.stringify(response.data, null, 2)); */
+  /*  console.log('fdllllll');
+  }  */
 
   const handleDeleteImage = React.useCallback(async (file: IFile) => {
     try {
@@ -508,7 +586,7 @@ const Settings: React.FC = () => {
       {!loading ? (
         <KeyboardAwareScrollView>
           <Form>
-            <MainTitle>Fotos (até 4 fotos)</MainTitle>
+            <MainTitle>Fotos (até 3 fotos)</MainTitle>
 
             <ContentPhotos>
               <FlatList
@@ -543,6 +621,7 @@ const Settings: React.FC = () => {
             ) : (
               <VideoWrapper>
                 <VideoPlayer
+                  paused
                   source={{
                     uri: video?.url,
                   }}
@@ -551,14 +630,14 @@ const Settings: React.FC = () => {
                 <VideoProps>
                   <VideoPropsTextWrapper>
                     <VideoPropsText>
-                      <Icon name="check-circle" color="green" size={20} />
+                      <Icon name="check-circle" color="green" size={18} />
 
                       {` ${video?.nome_original}`}
                     </VideoPropsText>
                   </VideoPropsTextWrapper>
 
                   <VideoPropsButton onPress={() => handleVideoUpload()}>
-                    <Icon name="trash" color="red" size={28} />
+                    <Icon name="file-replace" color="#84378F" size={25} />
                   </VideoPropsButton>
                 </VideoProps>
               </VideoWrapper>

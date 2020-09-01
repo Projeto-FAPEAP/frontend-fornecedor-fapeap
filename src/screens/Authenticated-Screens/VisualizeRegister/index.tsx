@@ -78,10 +78,9 @@ const VisualizeRegister: React.FC = () => {
 
   useEffect(() => {
     getFornecedor();
-  }, []);
+  }, [user?.id]);
 
-  async function getFornecedor(): Promise<void> {
-    console.log('dfdf');
+  const getFornecedor = React.useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/fornecedor/${user?.id}`);
@@ -126,7 +125,7 @@ const VisualizeRegister: React.FC = () => {
         console.log(error.config);
       }
     }
-  }
+  }, [user?.id]);
 
   if (loading) {
     return <Loader loading={loading} />;
@@ -239,6 +238,7 @@ const VisualizeRegister: React.FC = () => {
         <MainTitle>Vídeo</MainTitle>
         <VideoWrapper>
           <VideoPlayer
+            paused
             source={{
               uri: video,
             }}

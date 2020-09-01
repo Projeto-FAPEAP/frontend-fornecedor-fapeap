@@ -59,23 +59,6 @@ const EditProfile: React.FC = () => {
     setLoading(false);
   }, []);
 
-  async function getFornecedor(): Promise<void> {
-    try {
-      const response = await api.get(
-        `${api.defaults.baseURL}/fornecedor/${user?.id}`,
-      );
-      setLoading(false);
-      formRef.current?.setData({
-        telefone_whatsapp: response.data.telefone_whatsapp,
-        telefone: response.data.telefone,
-      });
-      console.log(response.data.telefone_whatsapp);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    }
-  }
-
   const handleSubmit = React.useCallback(
     async (values: ISubmit) => {
       console.log('fdfddddddd');
