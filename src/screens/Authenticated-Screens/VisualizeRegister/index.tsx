@@ -70,11 +70,12 @@ interface IFile {
 }
 
 const VisualizeRegister: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<UserData[]>([]);
   const [files, setFiles] = React.useState<IFile[]>([]);
   const [video, setVideo] = React.useState('teste');
   const { user } = useAuth();
+
   useEffect(() => {
     getFornecedor();
   }, []);
@@ -83,10 +84,10 @@ const VisualizeRegister: React.FC = () => {
     console.log('dfdf');
     setLoading(true);
     try {
-      const response = await api.get(
-        `${api.defaults.baseURL}/fornecedor/${user?.id}`,
-      );
+      const response = await api.get(`/fornecedor/${user?.id}`);
+
       setUserData(response.data);
+
       setFiles(response.data.arquivos);
       for (let i = 0; i < response.data.arquivos.length; i += 1) {
         if (response.data.arquivos[i].arquivo_tipo === 'video') {
@@ -98,6 +99,7 @@ const VisualizeRegister: React.FC = () => {
       console.log(JSON.stringify(response.data, null, 2));
       console.log('fdllllll');
     } catch (error) {
+      console.log(JSON.stringify(error, null, 2));
       setLoading(false);
       if (error.message === 'Network Error') {
         Alert.alert('Verifique sua conexão de internet e tente novamente!!');
@@ -126,95 +128,99 @@ const VisualizeRegister: React.FC = () => {
     }
   }
 
+  if (loading) {
+    return <Loader loading={loading} />;
+  }
+
   return (
     <Container>
-      {!loading ? (
-        <ScrollView
-          style={{
-            backgroundColor: 'white',
-            flex: 1,
-          }}
-        >
+      <ScrollView
+        style={{
+          backgroundColor: 'white',
+          flex: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <TextWrapper>
+          <Title>Nome</Title>
+          <SubTitle>{userData?.nome}</SubTitle>
+        </TextWrapper>
+        <TextWrapper>
+          <Title>Email</Title>
+          <SubTitle>{userData?.email}</SubTitle>
+        </TextWrapper>
+        <Agroup>
           <TextWrapper>
-            <Title>Nome</Title>
-            <SubTitle>{userData!.nome}</SubTitle>
+            <Title>Telefone whatsapp</Title>
+            <SubTitle>{userData?.telefone_whatsapp}</SubTitle>
           </TextWrapper>
           <TextWrapper>
-            <Title>Email</Title>
-            <SubTitle>{userData!.email}</SubTitle>
+            <Title>Telefone</Title>
+            <SubTitle>{userData?.telefone}</SubTitle>
           </TextWrapper>
-          <Agroup>
-            <TextWrapper>
-              <Title>Telefone whatsapp</Title>
-              <SubTitle>{userData!.telefone_whatsapp}</SubTitle>
-            </TextWrapper>
-            <TextWrapper>
-              <Title>Telefone</Title>
-              <SubTitle>{userData!.telefone}</SubTitle>
-            </TextWrapper>
-          </Agroup>
-          <Agroup>
-            <TextWrapper>
-              <Title>CPF/CNPJ</Title>
-              <SubTitle>{userData!.cpf_cnpj}</SubTitle>
-            </TextWrapper>
-            <TextWrapper>
-              <Title>Estabelecimento</Title>
-              <SubTitle>{userData!.nome_fantasia}</SubTitle>
-            </TextWrapper>
-          </Agroup>
-          <Agroup>
-            <TextWrapper>
-              <Title>Bairro</Title>
-              <SubTitle>{userData!.bairro}</SubTitle>
-            </TextWrapper>
-            <TextWrapper>
-              <Title>Cep</Title>
-              <SubTitle>{userData!.cep}</SubTitle>
-            </TextWrapper>
-          </Agroup>
-          <Agroup>
-            <TextWrapper>
-              <Title>Logradouro</Title>
-              <SubTitle>{`${userData!.logradouro} `}</SubTitle>
-            </TextWrapper>
-            <TextWrapper>
-              <Title>Número</Title>
-              <SubTitle>{userData!.numero_local}</SubTitle>
-            </TextWrapper>
-          </Agroup>
-          {userData!.taxa_delivery !== null ? (
-            <TextWrapper>
-              <Title>Taxa de Entrega</Title>
-              <SubTitle>
-                {formatPrice(parseFloat(userData!.taxa_delivery))}
-              </SubTitle>
-            </TextWrapper>
-          ) : null}
+        </Agroup>
+        <Agroup>
+          <TextWrapper>
+            <Title>CPF/CNPJ</Title>
+            <SubTitle>{userData?.cpf_cnpj}</SubTitle>
+          </TextWrapper>
+          <TextWrapper>
+            <Title>Estabelecimento</Title>
+            <SubTitle>{userData?.nome_fantasia}</SubTitle>
+          </TextWrapper>
+        </Agroup>
+        <Agroup>
+          <TextWrapper>
+            <Title>Bairro</Title>
+            <SubTitle>{userData?.bairro}</SubTitle>
+          </TextWrapper>
+          <TextWrapper>
+            <Title>Cep</Title>
+            <SubTitle>{userData?.cep}</SubTitle>
+          </TextWrapper>
+        </Agroup>
+        <Agroup>
+          <TextWrapper>
+            <Title>Logradouro</Title>
+            <SubTitle>{`${userData?.logradouro} `}</SubTitle>
+          </TextWrapper>
+          <TextWrapper>
+            <Title>Número</Title>
+            <SubTitle>{userData?.numero_local}</SubTitle>
+          </TextWrapper>
+        </Agroup>
+        {userData?.taxa_delivery !== null ? (
+          <TextWrapper>
+            <Title>Taxa de Entrega</Title>
+            <SubTitle>
+              {formatPrice(parseFloat(userData?.taxa_delivery))}
+            </SubTitle>
+          </TextWrapper>
+        ) : null}
 
-          <MainTitle>Fotos</MainTitle>
-          <ContentPhotos>
-            <FlatList
-              horizontal
-              data={files}
-              renderItem={({ item, index }) => (
-                <View>
-                  {item.arquivo_tipo === 'imagem' ? (
-                    <PhotoWrapper style={index > 0 ? { marginLeft: 5 } : {}}>
-                      <Photo
-                        key={`${item.id}-${index}`}
-                        source={{
-                          uri: item.url,
-                        }}
-                        resizeMode="cover"
-                      />
-                    </PhotoWrapper>
-                  ) : null}
-                </View>
-              )}
-              keyExtractor={(item, index) => String(index)}
-            />
-            {/* {files.map((file, idx) => (
+        <MainTitle>Fotos</MainTitle>
+        <ContentPhotos>
+          <FlatList
+            horizontal
+            data={files}
+            renderItem={({ item, index }) => (
+              <View>
+                {item.arquivo_tipo === 'imagem' ? (
+                  <PhotoWrapper style={index > 0 ? { marginLeft: 5 } : {}}>
+                    <Photo
+                      key={`${item.id}-${index}`}
+                      source={{
+                        uri: item.url,
+                      }}
+                      resizeMode="cover"
+                    />
+                  </PhotoWrapper>
+                ) : null}
+              </View>
+            )}
+            keyExtractor={(item, index) => String(index)}
+          />
+          {/* {files.map((file, idx) => (
               <PhotoWrapper>
                 <View>
                   {files[0].arquivo_tipo === 'imagem' ? (
@@ -229,18 +235,18 @@ const VisualizeRegister: React.FC = () => {
                 </View>
               </PhotoWrapper>
             ))} */}
-          </ContentPhotos>
-          <MainTitle>Vídeo</MainTitle>
-          <VideoWrapper>
-            <VideoPlayer
-              source={{
-                uri: video,
-              }}
-              disableBack
-            />
-          </VideoWrapper>
+        </ContentPhotos>
+        <MainTitle>Vídeo</MainTitle>
+        <VideoWrapper>
+          <VideoPlayer
+            source={{
+              uri: video,
+            }}
+            disableBack
+          />
+        </VideoWrapper>
 
-          {/* <Video
+        {/* <Video
               source={{
                 uri:
                   'https://app-ws-fapeap.s3.amazonaws.com/f9f2523b-d34a-4018-961d-4373fa40a46f-VID-20200722-WA0000.mp4',
@@ -254,7 +260,7 @@ const VisualizeRegister: React.FC = () => {
               controls
             /> */}
 
-          {/*    <Video
+        {/*    <Video
               source={{
                 uri:
                   'https://app-ws-fapeap.s3.amazonaws.com/f9f2523b-d34a-4018-961d-4373fa40a46f-VID-20200722-WA0000.mp4',
@@ -267,10 +273,7 @@ const VisualizeRegister: React.FC = () => {
               resizeMode="contain"
               controls
             /> */}
-        </ScrollView>
-      ) : (
-        <Loader loading={loading} />
-      )}
+      </ScrollView>
     </Container>
   );
 };

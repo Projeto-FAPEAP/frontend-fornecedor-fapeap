@@ -1,10 +1,13 @@
+import { getBottomSpace } from 'react-native-iphone-x-helper';
+
 import Button from '@components/Button';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  margin: 20px 10px;
+  margin: 20px 10px 0;
   justify-content: center;
   align-items: stretch;
+  padding-bottom: ${20 + getBottomSpace()}px;
 `;
 
 export const Title = styled.Text`

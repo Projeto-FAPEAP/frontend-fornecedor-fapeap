@@ -1,3 +1,4 @@
+import { getBottomSpace } from 'react-native-iphone-x-helper';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -12,6 +13,7 @@ export const Container = styled.View`
   background: #fff;
   flex: 1;
   padding: 10px;
+  padding-bottom: ${10 + getBottomSpace()}px;
 `;
 
 export const MainTitle = styled.Text`
