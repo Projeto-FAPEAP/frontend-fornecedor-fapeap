@@ -2,6 +2,7 @@ import React from 'react';
 import { Alert, Keyboard } from 'react-native';
 import { DocumentPickerResponse } from 'react-native-document-picker';
 import { ImagePickerResponse } from 'react-native-image-picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import KeyboardView from '@components/KeyboardView';
 import { useNavigation, StackActions } from '@react-navigation/native';
@@ -32,6 +33,8 @@ interface ISubmitForm {
   logradouro: string;
   numero_local: string;
   bairro: string;
+  cidade: string;
+  uf: string;
 }
 
 interface IFormDataStep1 {
@@ -53,6 +56,8 @@ interface IFormDataStep3 {
   logradouro: string;
   numero_local: string;
   bairro: string;
+  cidade: string;
+  uf: string;
 }
 
 const Login: React.FC = () => {
@@ -216,6 +221,8 @@ const Login: React.FC = () => {
             logradouro: Yup.string().required('Campo obrigatório'),
             bairro: Yup.string().required('Campo obrigatório'),
             numero_local: Yup.string().required('Campo obrigatório'),
+            cidade: Yup.string().required('Campo obrigatório'),
+            uf: Yup.string().required('Campo obrigatório'),
           });
 
           const objectFormData = Object.assign(formData, {
@@ -223,15 +230,17 @@ const Login: React.FC = () => {
             logradouro: data.logradouro,
             bairro: data.bairro,
             numero_local: data.numero_local,
+            cidade: data.cidade,
+            uf: data.uf,
           });
 
           const { cep, logradouro } = objectFormData;
-          const { bairro, numero_local } = objectFormData;
+          const { bairro, numero_local, cidade, uf } = objectFormData;
 
           console.log(objectFormData);
 
           await schemaStep3.validate(
-            { cep, logradouro, bairro, numero_local },
+            { cep, logradouro, bairro, numero_local, cidade, uf },
             { abortEarly: false },
           );
           setDataStep3({
@@ -239,6 +248,8 @@ const Login: React.FC = () => {
             logradouro,
             bairro,
             numero_local,
+            cidade,
+            uf,
           });
 
           setStep(step + 1);
@@ -293,6 +304,7 @@ const Login: React.FC = () => {
 
           navigation.dispatch(StackActions.replace('SuccessSubmit'));
         } catch (error) {
+          console.log(JSON.stringify(error, null, 2));
           const hasResponse = error.response?.data?.error;
           if (hasResponse) {
             Alert.alert('Ocorreu um erro', hasResponse);
@@ -329,7 +341,7 @@ const Login: React.FC = () => {
   );
 
   return (
-    <KeyboardView>
+    <KeyboardAwareScrollView>
       <S.Container>
         <S.Header>
           <S.Title>Crie sua conta</S.Title>
@@ -404,7 +416,7 @@ const Login: React.FC = () => {
           </S.Footer>
         )}
       </S.Container>
-    </KeyboardView>
+    </KeyboardAwareScrollView>
   );
 };
 

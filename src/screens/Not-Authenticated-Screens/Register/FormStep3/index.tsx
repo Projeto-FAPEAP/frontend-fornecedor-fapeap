@@ -10,6 +10,7 @@ interface ICEPResponse {
   logradouro: string;
   bairro: string;
   localidade: string;
+  uf: string;
 }
 
 interface IFormStep3Props {
@@ -27,9 +28,12 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
     if (cep.length === 9) {
       Axios.get<ICEPResponse>(`https://viacep.com.br/ws/${cep}/json/`)
         .then((response) => {
-          const { logradouro, bairro } = response.data;
+          const { logradouro, bairro, localidade, uf } = response.data;
+
           formRef.current?.setFieldValue('logradouro', logradouro);
           formRef.current?.setFieldValue('bairro', bairro);
+          formRef.current?.setFieldValue('cidade', localidade);
+          formRef.current?.setFieldValue('uf', uf);
         })
         .catch(() => {
           Alert.alert('Cuidado', 'Você informou um CEP inválido ');
@@ -95,6 +99,34 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         label="Número da casa"
         name="numero_local"
         placeholder="Número da casa"
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="next"
+        onSubmitEditing={() => focusTargetInput('cidade')}
+      />
+      <Input
+        containerStyle={{
+          marginTop: 15,
+          maxWidth: 350,
+        }}
+        icon="hash"
+        label="Cidade"
+        name="cidade"
+        placeholder="Cidade"
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="next"
+        onSubmitEditing={() => focusTargetInput('uf')}
+      />
+      <Input
+        containerStyle={{
+          marginTop: 15,
+          maxWidth: 350,
+        }}
+        icon="hash"
+        label="UF"
+        name="uf"
+        placeholder="UF"
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="next"
