@@ -60,7 +60,7 @@ interface IFormDataStep3 {
   uf: string;
 }
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const navigation = useNavigation();
   const formRef = React.useRef<FormHandles>(null);
   const { colors } = useTheme();
@@ -420,4 +420,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;

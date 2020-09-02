@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useTheme } from 'styled-components/native';
 
 import AddProduct from '../screens/Authenticated-Screens/AddProduct';
+import EditDelivery from '../screens/Authenticated-Screens/EditDelivery';
 import EditProduct from '../screens/Authenticated-Screens/EditProduct';
 import EditProfile from '../screens/Authenticated-Screens/EditProfile';
 import HistoryDetails from '../screens/Authenticated-Screens/HistoryDetails';
@@ -112,6 +113,13 @@ const AppRoutes: React.FC = () => {
             headerTitle: 'Visualizar Cadastro',
           }}
           component={VisualizeRegister}
+        />
+        <Stack.Screen
+          name="EditDelivery"
+          options={{
+            headerTitle: 'Editar Entrega de Produtos',
+          }}
+          component={EditDelivery}
         />
       </Stack.Navigator>
     </>

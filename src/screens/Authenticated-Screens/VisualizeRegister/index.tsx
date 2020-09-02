@@ -238,7 +238,6 @@ const VisualizeRegister: React.FC = () => {
         <MainTitle>Vídeo</MainTitle>
         <VideoWrapper>
           <VideoPlayer
-            paused
             source={{
               uri: video,
             }}

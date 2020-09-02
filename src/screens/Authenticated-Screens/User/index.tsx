@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -78,38 +78,48 @@ const User: React.FC = ({ navigation }) => {
         <StoreName>{storeName}</StoreName>
       </Header>
       <Options>
-        <Button onPress={() => navigation.navigate('VisualizeRegister')}>
-          <ButtonIcon>
-            <Icon name="list" size={32} color="#798599" />
-          </ButtonIcon>
-          <ButtonWrapperText>
-            <ButtonText>Visualizar Cadastro</ButtonText>
-          </ButtonWrapperText>
-        </Button>
-        <Button onPress={() => navigation.navigate('EditProfile')}>
-          <ButtonIcon>
-            <Icon name="cog" size={32} color="#798599" />
-          </ButtonIcon>
-          <ButtonWrapperText>
-            <ButtonText>Editar Cadastro</ButtonText>
-          </ButtonWrapperText>
-        </Button>
-        <Button onPress={() => navigation.navigate('Settings')}>
-          <ButtonIcon>
-            <Icon name="image" size={32} color="#798599" />
-          </ButtonIcon>
-          <ButtonWrapperText>
-            <ButtonText>Atualizar Mídias</ButtonText>
-          </ButtonWrapperText>
-        </Button>
-        <Button onPress={() => logOutt()}>
-          <ButtonIcon>
-            <Icon name="sign-out" size={32} color="#EB5757" />
-          </ButtonIcon>
-          <ButtonWrapperText>
-            <ButtonText>Sair</ButtonText>
-          </ButtonWrapperText>
-        </Button>
+        <ScrollView>
+          <Button onPress={() => navigation.navigate('VisualizeRegister')}>
+            <ButtonIcon>
+              <Icon name="list" size={32} color="#798599" />
+            </ButtonIcon>
+            <ButtonWrapperText>
+              <ButtonText>Visualizar Cadastro</ButtonText>
+            </ButtonWrapperText>
+          </Button>
+          <Button onPress={() => navigation.navigate('EditProfile')}>
+            <ButtonIcon>
+              <Icon name="cog" size={32} color="#798599" />
+            </ButtonIcon>
+            <ButtonWrapperText>
+              <ButtonText>Editar Cadastro</ButtonText>
+            </ButtonWrapperText>
+          </Button>
+          <Button onPress={() => navigation.navigate('Settings')}>
+            <ButtonIcon>
+              <Icon name="image" size={32} color="#798599" />
+            </ButtonIcon>
+            <ButtonWrapperText>
+              <ButtonText>Atualizar Mídias</ButtonText>
+            </ButtonWrapperText>
+          </Button>
+          <Button onPress={() => navigation.navigate('EditDelivery')}>
+            <ButtonIcon>
+              <Icon name="motorcycle" size={32} color="#798599" />
+            </ButtonIcon>
+            <ButtonWrapperText>
+              <ButtonText>Delivery </ButtonText>
+            </ButtonWrapperText>
+          </Button>
+          <Button onPress={() => logOutt()}>
+            <ButtonIcon>
+              <Icon name="sign-out" size={32} color="#EB5757" />
+            </ButtonIcon>
+            <ButtonWrapperText>
+              <ButtonText>Sair</ButtonText>
+            </ButtonWrapperText>
+          </Button>
+        </ScrollView>
       </Options>
     </Container>
   );

@@ -15,16 +15,15 @@ export const Container = styled.View`
 export const Header = styled.View`
   background: ${(props) => props.theme.colors.primary};
   flex-direction: column;
-  height: 35%;
+  height: 30%;
   justify-content: flex-end;
 `;
 export const Options = styled.View`
   background: #f2f1f7;
   flex-direction: column;
-  height: 75%;
+  height: 70%;
   justify-content: flex-start;
   align-items: center;
-  border-width: 1px;
 `;
 
 export const Button = styled.TouchableOpacity`
