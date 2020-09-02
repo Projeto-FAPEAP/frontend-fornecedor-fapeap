@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { MaskService } from 'react-native-masked-text';
@@ -22,7 +22,7 @@ import * as Yup from 'yup';
 import Loader from '../../utils/index';
 import * as S from './styles';
 
-type IAvailability = 'Disponível' | 'Indisponivel';
+type IAvailability = 'Sim' | 'Não';
 interface ISubmit {
   status_delivery: string;
   preco: string;
@@ -39,8 +39,10 @@ const EditDelivery: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const { user } = useAuth();
   const navigation = useNavigation();
-  const [delivery, setDelivery] = React.useState(true);
+  const [delivery, setDelivery] = React.useState(false);
   const [wasChanged, setWasChanged] = React.useState(false);
+  const [price, setPrice] = React.useState('');
+
   React.useEffect(() => {
     try {
       api
@@ -48,11 +50,7 @@ const EditDelivery: React.FC = () => {
         .then((response) => {
           if (response.data.taxa_delivery !== null) {
             setDelivery(true);
-            formRef.current?.setData({
-              status_delivery: 'Sim',
-              preco: response.data.taxa_delivery,
-            });
-            console.log(response.data.taxa_delivery);
+            setPrice(response.data.taxa_delivery);
           } else {
             setDelivery(false);
           }
@@ -146,6 +144,16 @@ const EditDelivery: React.FC = () => {
     [user.id],
   );
 
+  useEffect(() => {
+    console.log(price, delivery, 'dddd');
+    if (delivery) {
+      formRef.current?.setData({
+        status_delivery: 'Sim',
+        preco: price,
+      });
+    }
+  }, [price]);
+
   const handleChangeAvailability = React.useCallback((value) => {
     const option = value as IAvailability;
     setWasChanged(true);
@@ -188,7 +196,7 @@ const EditDelivery: React.FC = () => {
                 }}
               />
             </RNPickerSelect>
-            {delivery ? (
+            {delivery && (
               <Input
                 icon="dollar-sign"
                 label="Preço do Entrega"
@@ -214,17 +222,17 @@ const EditDelivery: React.FC = () => {
                   formRef.current?.setFieldValue('preco', formatted);
                 }}
               />
-            ) : null}
+            )}
           </S.Form>
 
-          {wasChanged ? (
+          {wasChanged && (
             <S.ButtonSubmit
               loading={loading}
               onPress={() => formRef.current?.submitForm()}
             >
               Atualizar
             </S.ButtonSubmit>
-          ) : null}
+          )}
         </FormProvider>
       </S.Container>
     </KeyboardAwareScrollView>
