@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { MaskService } from 'react-native-masked-text';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-simple-toast';
@@ -36,6 +37,7 @@ interface IResponseProduct {
   status_produto: boolean;
   nome: string;
   preco: string;
+  unidade_medida: string;
   estoque_produto: string;
   arquivos: {
     id: string;
@@ -81,16 +83,17 @@ const EditProduct: React.FC = () => {
           status_produto,
           arquivos,
           estoque_produto,
+          unidade_medida,
         } = response.data;
 
         formRef.current?.setData({
           nome,
           preco: `R$ ${preco}`,
           status_produto: status_produto ? 'Disponivel' : 'Indisponivel',
-          unidade_medida: 'Litro',
+          unidade_medida,
           estoque_produto: String(estoque_produto),
         });
-
+        console.log(response.data);
         const responseFiles = Array.from({ length: 2 }, (_v, k) => {
           try {
             return {
@@ -319,7 +322,7 @@ const EditProduct: React.FC = () => {
   }, [handleDelete]);
 
   return (
-    <KeyboardView>
+    <KeyboardAwareScrollView>
       <S.Container>
         <S.Title>Você só precisa alterar o necessário</S.Title>
         <FormProvider onSubmit={handleSubmit} ref={formRef}>
@@ -458,7 +461,7 @@ const EditProduct: React.FC = () => {
           </S.Actions>
         </FormProvider>
       </S.Container>
-    </KeyboardView>
+    </KeyboardAwareScrollView>
   );
 };
 

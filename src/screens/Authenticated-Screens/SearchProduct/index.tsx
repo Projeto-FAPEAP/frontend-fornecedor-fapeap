@@ -104,7 +104,7 @@ const Products: React.FC = () => {
     const aux: Products[] = [];
     let k = 0;
     for (let i = 0; i < productsList!.length; i += 1) {
-      if (productsList![i].nome.match(`^${search}`)) {
+      if (productsList![i].nome.match(new RegExp(`^${search}`, 'i'))) {
         console.log(i, productsList![i].nome);
 
         aux[k] = productsList![i];

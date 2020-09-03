@@ -31,11 +31,12 @@ export const Button = styled.TouchableOpacity`
   flex-direction: row;
   height: 65px;
   border-width: 1px;
-  width: 95%;
+  width: 98%;
   border-color: #e4e4e6;
   justify-content: space-around;
   align-items: center;
   margin-top: 3px;
+  align-self: center;
 `;
 
 export const ButtonWrapperText = styled.View`

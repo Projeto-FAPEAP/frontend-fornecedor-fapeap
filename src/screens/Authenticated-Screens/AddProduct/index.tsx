@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { MaskService } from 'react-native-masked-text';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -190,7 +191,7 @@ const AddProduct: React.FC = () => {
   );
 
   return (
-    <KeyboardView>
+    <KeyboardAwareScrollView>
       <S.Container>
         <S.Title>Você só precisa alterar o necessário</S.Title>
         <FormProvider onSubmit={handleSubmit} ref={formRef}>
@@ -322,7 +323,7 @@ const AddProduct: React.FC = () => {
           </S.Actions>
         </FormProvider>
       </S.Container>
-    </KeyboardView>
+    </KeyboardAwareScrollView>
   );
 };
 
