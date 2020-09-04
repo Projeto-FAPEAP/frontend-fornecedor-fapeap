@@ -41,14 +41,19 @@ interface Response {
 interface IResponseFornecedor {
   fornecedor: IUser;
   tokenFornecedor: string;
+  verificado: boolean;
 }
 
 interface AuthContextData {
   signed: boolean;
   user: IUser | null;
   loading: boolean;
-  logIn(cpfCnpj: string, password: string): Promise<void>;
+  logIn(cpfCnpj: string, password: string): Promise<ILocalResponse>;
   logOut(): void;
+}
+
+interface ILocalResponse {
+  informacao: number;
 }
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC = ({ children }) => {
@@ -94,7 +99,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   }, [user]);
 
   const handleLogin = useCallback(
-    async (cpfCnpj: string, password: string): Promise<void> => {
+    async (cpfCnpj: string, password: string): Promise<ILocalResponse> => {
       setLoading(true);
       try {
         const response = await api.post<IResponseFornecedor>(
@@ -104,20 +109,34 @@ export const AuthProvider: React.FC = ({ children }) => {
             senha: password,
           },
         );
+        console.log(response.data.verificado, 'teste');
+        if (response.data.verificado === false) {
+          setLoading(false);
+          console.log('entrou aquiii');
+          return new Promise((resolve, reject) => {
+            resolve({ informacao: 0 });
+          });
+        }
+        console.log(response.data.fornecedor.verificado, 'teste');
+        if (response.data.fornecedor.verificado === true) {
+          console.log('jonathandsdd', response.data.verificado);
+          const { fornecedor, tokenFornecedor } = response.data;
 
-        const { fornecedor, tokenFornecedor } = response.data;
+          setUser(fornecedor);
+          api.defaults.headers.authorization = `Bearer ${tokenFornecedor}`;
 
-        setUser(fornecedor);
-        api.defaults.headers.authorization = `Bearer ${tokenFornecedor}`;
-
-        await AsyncStorage.setItem(
-          '@QueroAçaí-Fornecedor:user',
-          JSON.stringify(fornecedor),
-        );
-        await AsyncStorage.setItem(
-          '@QueroAçaí-Fornecedor:token',
-          tokenFornecedor,
-        );
+          await AsyncStorage.setItem(
+            '@QueroAçaí-Fornecedor:user',
+            JSON.stringify(fornecedor),
+          );
+          await AsyncStorage.setItem(
+            '@QueroAçaí-Fornecedor:token',
+            tokenFornecedor,
+          );
+          return new Promise((resolve, reject) => {
+            resolve({ informacao: 1 });
+          });
+        }
       } catch (error) {
         const hasResponse = error.response?.data?.error;
         if (hasResponse) {
@@ -125,6 +144,10 @@ export const AuthProvider: React.FC = ({ children }) => {
         }
       }
       setLoading(false);
+      console.log('yyyyyyyyyyyyyyyyyyyyyyyyy');
+      return new Promise((resolve, reject) => {
+        resolve({ informacao: 3 });
+      });
     },
     [],
   );

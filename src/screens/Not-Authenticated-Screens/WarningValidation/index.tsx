@@ -1,45 +1,33 @@
-import React from 'react';
-import { Text, SafeAreaView } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React, { useCallback } from 'react';
+
 import { useNavigation } from '@react-navigation/native';
-import {
-  Container,
-  Title,
-  Input,
-  RetrievePasswordButton,
-  RetrievePasswordText,
-  Form,
-  Header,
-  RegisterButton,
-  RegularText,
-  RegisterButtonText,
-  P,
-  BackButtonWrapper,
-  TextWrapper,
-} from './styles';
+
+import * as S from './styles';
 
 const WarningValidation: React.FC = () => {
-  const navigation = useNavigation();
+  const { navigate } = useNavigation();
+
+  const navigateToWelcomeAuth = useCallback(() => {
+    navigate('Login');
+  }, [navigate]);
+
   return (
-    <Container>
-      <KeyboardAwareScrollView>
-        <Header>
-          <BackButtonWrapper onPress={() => navigation.navigate('Welcome')}>
-            <Icon color="#84378F" size={28} name="chevron-left" />
-          </BackButtonWrapper>
-          <Title>Aviso</Title>
-        </Header>
-        <Form>
-          <TextWrapper>
-            <P>
-              Seu Cadasto foi encaminhado para validação, aguarde o processo de
-              avaliação para utilizar a aplicação.
-            </P>
-          </TextWrapper>
-        </Form>
-      </KeyboardAwareScrollView>
-    </Container>
+    <S.Container>
+      <S.Header>
+        <S.IconSuccess />
+      </S.Header>
+      <S.Content>
+        <S.Title>Cadastro em Análise</S.Title>
+        <S.Subtitle>
+          Aguarde a confirmação do seu cadastro pelo GEA. Enviaremos um e-mail
+          informando sobre a homologação do seus dados cadastrais.
+        </S.Subtitle>
+
+        <S.Button onPress={navigateToWelcomeAuth}>
+          VOLTAR A TELA INICIAL
+        </S.Button>
+      </S.Content>
+    </S.Container>
   );
 };
 

@@ -42,7 +42,18 @@ const Login: React.FC = () => {
         await schema.validate(data, { abortEarly: false });
 
         const { cpf_cnpj, password } = data;
-        logIn(cpf_cnpj, password);
+
+        logIn(cpf_cnpj, password).then((response) => {
+          console.log(response.informacao, 'response do login');
+          if (response.informacao === 0) {
+            console.log(response, 'response do login');
+            formRef.current?.setData({
+              cpf_cnpj: '',
+              password: '',
+            });
+            navigation.navigate('WarningValidation');
+          }
+        });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);

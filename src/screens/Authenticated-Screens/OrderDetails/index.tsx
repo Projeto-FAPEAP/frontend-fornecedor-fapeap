@@ -111,7 +111,7 @@ const OrderDetails: React.FC = () => {
 
       getAllOrders().then((response) => {
         setLoading(false);
-        Alert.alert('Aviso', 'Pedido Confirmado!!', [
+        Alert.alert('Aviso', 'Confirmado!!', [
           {
             text: 'Ok',
             onPress: () => navigation.navigate('Index'),
@@ -277,7 +277,7 @@ const OrderDetails: React.FC = () => {
 
       getAllOrders().then((response) => {
         setLoadingCancel(false);
-        Alert.alert('Aviso', 'Pedido Cancelado!!', [
+        Alert.alert('Aviso', 'Cancelado!!', [
           {
             text: 'Ok',
             onPress: () => navigation.navigate('Index'),
@@ -471,6 +471,19 @@ const OrderDetails: React.FC = () => {
               </TotalSpan>
             </OrderRecipe>
           </OrderInformation>
+          {extraData.extraData.status === 'Reserva confirmada' && (
+            <ButtonWrapper>
+              <Button loading={loading} onPress={() => confirmOrder()}>
+                <ButtonText>Confirmar Reserva</ButtonText>
+              </Button>
+              <ButtonCancel
+                loading={loadingCancel}
+                onPress={() => cancelOrder()}
+              >
+                <ButtonText>Cancelar Reserva</ButtonText>
+              </ButtonCancel>
+            </ButtonWrapper>
+          )}
 
           {extraData.extraData.status === 'Pendente' ? (
             <ButtonWrapper>
@@ -490,12 +503,12 @@ const OrderDetails: React.FC = () => {
           (extraData.extraData.status === 'Pendente' &&
             extraData.extraData.delivery === true) ? null : (
             <ButtonWrapper>
-                <Button loading={loading} onPress={() => sendingOrder()}>
+              <Button loading={loading} onPress={() => sendingOrder()}>
                 <ButtonText>
-                    <Icon name="motorcycle" size={18} /> A Caminho
-                  </ButtonText>
+                  <Icon name="motorcycle" size={18} /> A Caminho
+                </ButtonText>
               </Button>
-              </ButtonWrapper>
+            </ButtonWrapper>
           )}
         </ScrollView>
       ) : (
