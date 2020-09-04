@@ -93,3 +93,9 @@ export const ListRowTotal = styled.Text`
   color: #666666;
   font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
 `;
+
+export const EmptyView = styled.View`
+  justify-content: center;
+  flex-direction: column;
+  flex: 1;
+`;

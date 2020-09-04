@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { FlatList, Alert, View, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import ButtonRefresh from '@components/ButtonRefresh';
 import IsEmpty from '@components/IsEmpty';
 import { useNavigation } from '@react-navigation/native';
 
@@ -23,6 +24,7 @@ import {
   ListProductsTextWrapper,
   SearchTextInner,
   SearchInputButton,
+  EmptyView,
 } from './styles';
 
 // import * as S from './styles';
@@ -66,9 +68,12 @@ const Products: React.FC = () => {
             </AddButton>
           </SearchWrapper>
           {!loading && productList?.length === 0 ? (
-            <IsEmpty icon="exclamationcircleo">
-              Parece que você não possui produtos cadastrados
-            </IsEmpty>
+            <EmptyView>
+              <IsEmpty icon="exclamationcircleo">
+                Parece que você não possui produtos cadastrados
+              </IsEmpty>
+              <ButtonRefresh onPress={() => getAllProducts()} />
+            </EmptyView>
           ) : (
             <View style={{ flex: 1 }}>
               <ListWrapper

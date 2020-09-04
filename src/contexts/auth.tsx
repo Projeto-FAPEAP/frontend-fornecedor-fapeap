@@ -133,6 +133,7 @@ export const AuthProvider: React.FC = ({ children }) => {
             '@QueroAçaí-Fornecedor:token',
             tokenFornecedor,
           );
+          setLoading(false);
           return new Promise((resolve, reject) => {
             resolve({ informacao: 1 });
           });

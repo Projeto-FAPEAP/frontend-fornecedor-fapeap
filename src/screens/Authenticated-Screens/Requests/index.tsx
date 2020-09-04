@@ -6,6 +6,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import ButtonRefresh from '@components/ButtonRefresh';
 import IsEmpty from '@components/IsEmpty';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -31,6 +32,7 @@ import {
   ListRowPending,
   ListRowConfirmed,
   ListRowTotal,
+  EmptyView,
 } from './styles';
 
 interface Orders {
@@ -69,9 +71,12 @@ const Requests: React.FC = () => {
         {!loading ? (
           <View style={{ flex: 1 }}>
             {!loading && ordersData?.length === 0 ? (
-              <IsEmpty icon="exclamationcircleo">
-                Parece que você não possui pedidos
-              </IsEmpty>
+              <EmptyView>
+                <IsEmpty icon="exclamationcircleo">
+                  Parece que você não possui pedidos
+                </IsEmpty>
+                <ButtonRefresh onPress={() => getAllOrders()} />
+              </EmptyView>
             ) : (
               <View style={{ flex: 1 }}>
                 <ListWrapperOrders>

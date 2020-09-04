@@ -1,12 +1,14 @@
 import React from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 
+import ButtonRefresh from '@components/ButtonRefresh';
 import IsEmpty from '@components/IsEmpty';
 import Loading from '@components/Loading';
 import { ItemDocument } from '@screens/Not-Authenticated-Screens/Register/FormStep4/styles';
 import api from '@services/api';
 
 import CardHistoryItem from './CardHistoryItem';
+import * as S from './styles';
 
 interface IResponse {
   historico: {
@@ -48,6 +50,7 @@ const History: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
 
   const findRequestPerPage = React.useCallback(async (nextPage: number) => {
+    setLoading(true);
     const response = await api.get<IResponse>(`/fornecedor/pedidos/historico`, {
       params: {
         page: nextPage,
@@ -103,9 +106,12 @@ const History: React.FC = () => {
 
   if (!hasRequest) {
     return (
-      <IsEmpty icon="exclamationcircleo">
-        Parece que você não possui pedidos no histórico
-      </IsEmpty>
+      <S.EmptyView>
+        <IsEmpty icon="exclamationcircleo">
+          Parece que você não possui pedidos no histórico
+        </IsEmpty>
+        <ButtonRefresh onPress={() => findRequestPerPage(1)} />
+      </S.EmptyView>
     );
   }
 

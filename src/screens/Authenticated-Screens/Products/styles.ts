@@ -86,3 +86,9 @@ export const ListProductsImageWrapper = styled.Image`
 export const ListProductsTextWrapper = styled.View`
   width: 68%;
 `;
+
+export const EmptyView = styled.View`
+  justify-content: center;
+  flex-direction: column;
+  flex: 1;
+`;
