@@ -1,11 +1,5 @@
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
-import Buttonn from '@components/Button';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
@@ -25,7 +19,7 @@ export const MainTitle = styled.Text`
 
 export const Title = styled.Text`
   font-size: 15px;
-  color:#8f8fa1
+  color: #8f8fa1;
   font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 

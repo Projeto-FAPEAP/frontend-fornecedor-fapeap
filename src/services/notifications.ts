@@ -9,11 +9,22 @@ function onReceived(_notification: ReceivedNotification): void {
   // console.tron.warn('Notification received: ', notification);
 }
 
-function onOpened(openResult: OpenResult): void {
+async function onOpened(openResult: OpenResult): Promise<void> {
   try {
     if (openResult.notification.payload.additionalData) {
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
       const data = openResult.notification.payload.additionalData;
-      console.log(data);
+      // console.log(data); // dados da notificação
+      // switch (data.type) {
+      //   case 'NOVO_PEDIDO':
+      //     //  redireciona pra tela home e atualiza a lista
+      //     break;
+      //   case 'PEDIDO_CANCELADO':
+      //   // redireciona pra do pedido cancelado
+      //   default:
+      //     //
+      //     break;
+      // }
       // NavigationService.navigate('DetailRequest', { item: { id: pedido_id } });
     } else {
       // NavigationService.navigate('Main');
@@ -28,11 +39,11 @@ function onIds(_device: any): void {
 }
 
 function subscribeToNotification(idKey: string): void {
-  OneSignal.setLogLevel(6, 0);
+  // OneSignal.setLogLevel(6, 0);
   OneSignal.init(apikey, {
     kOSSettingsKeyAutoPrompt: true,
   });
-  OneSignal.inFocusDisplaying(0);
+  // OneSignal.inFocusDisplaying(0);
   OneSignal.addEventListener('received', onReceived);
   OneSignal.addEventListener('opened', onOpened);
   OneSignal.addEventListener('ids', onIds);
