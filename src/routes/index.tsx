@@ -1,6 +1,7 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, Image, View, ActivityIndicator } from 'react-native';
 
+import logo from '@assets/logo.png';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTheme } from 'styled-components';
 
@@ -12,7 +13,15 @@ const Stack = createStackNavigator();
 
 const Routes: React.FC = () => {
   const { colors } = useTheme();
-  const { signed } = useAuth();
+  const { signed, loading } = useAuth();
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Image source={logo} resizeMode="center" />
+        <ActivityIndicator animating={loading} color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <>
