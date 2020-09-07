@@ -8,8 +8,20 @@ import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
-  flex-direction: column;
-  background: #f9f9f9;
+
+  background: ${(props) => props.theme.colors.background};
+`;
+
+export const Header = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const Image = styled.Image`
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  border-radius: 5px;
 `;
 
 export const ClientInformation = styled.View`

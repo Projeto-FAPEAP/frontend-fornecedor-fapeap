@@ -37,6 +37,7 @@ interface IResponse {
 const EditDelivery: React.FC = () => {
   const formRef = React.useRef<FormHandles>(null);
   const [loading, setLoading] = React.useState(true);
+  const [loadingButton, setLoadingButton] = React.useState(false);
   const { user } = useAuth();
   const navigation = useNavigation();
   const [delivery, setDelivery] = React.useState(false);
@@ -49,9 +50,11 @@ const EditDelivery: React.FC = () => {
         .get(`${api.defaults.baseURL}/fornecedor/${user?.id}`)
         .then((response) => {
           if (response.data.taxa_delivery !== null) {
+            setLoading(false);
             setDelivery(true);
             setPrice(response.data.taxa_delivery);
           } else {
+            setLoading(false);
             setDelivery(false);
           }
         });
@@ -59,13 +62,12 @@ const EditDelivery: React.FC = () => {
       setLoading(false);
       console.log(error);
     }
-    setLoading(false);
   }, [user?.id]);
 
   const handleSubmit = React.useCallback(
     async (values: ISubmit) => {
       console.log('fdfddddddd');
-      setLoading(true);
+      setLoadingButton(true);
       formRef.current?.setErrors({});
       try {
         const schema = Yup.object().shape({
@@ -97,10 +99,10 @@ const EditDelivery: React.FC = () => {
               taxa_delivery: null,
             });
           }
-
+          setLoadingButton(false);
           Alert.alert(
             'Tudo certo',
-            'As Informações do Perfil Foram Atualizadas!!',
+            'As Informações do Delivery Foram Atualizadas!!',
             [
               {
                 text: 'Ok',
@@ -139,7 +141,7 @@ const EditDelivery: React.FC = () => {
           formRef.current?.setErrors(errors);
         }
       }
-      setLoading(false);
+      setLoadingButton(false);
     },
     [user.id],
   );
@@ -166,75 +168,79 @@ const EditDelivery: React.FC = () => {
   }, []);
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1 }}>
-      <S.Container>
-        <FormProvider onSubmit={handleSubmit} ref={formRef}>
-          <S.Form>
-            <RNPickerSelect
-              onValueChange={handleChangeAvailability}
-              placeholder={{
-                label: ' Selecione uma opção',
-                displayValue: false,
-              }}
-              items={[
-                { label: 'Sim, faço entregas', value: 'Sim' },
-                { label: 'Não', value: 'Não' },
-              ]}
-            >
-              <Input
-                icon="alert-circle"
-                label="Faz Entregas?"
-                name="status_delivery"
-                placeholder="Seu estabelecimento faz entregas?"
-                autoCapitalize="none"
-                keyboardType="number-pad"
-                autoCorrect={false}
-                returnKeyType="next"
-                containerStyle={{
-                  marginTop: 15,
-                  minWidth: 350,
+    <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
+      {!loading ? (
+        <S.Container>
+          <FormProvider onSubmit={handleSubmit} ref={formRef}>
+            <S.Form>
+              <RNPickerSelect
+                onValueChange={handleChangeAvailability}
+                placeholder={{
+                  label: ' Selecione uma opção',
+                  displayValue: false,
                 }}
-              />
-            </RNPickerSelect>
-            {delivery && (
-              <Input
-                icon="dollar-sign"
-                label="Preço do Entrega"
-                name="preco"
-                placeholder="Preço da Entrega"
-                autoCapitalize="none"
-                keyboardType="number-pad"
-                autoCorrect={false}
-                returnKeyType="next"
-                containerStyle={{
-                  marginTop: 15,
-                  maxWidth: 350,
-                }}
-                onChangeText={(text) => {
-                  const formatted = MaskService.toMask('money', text, {
-                    precision: 2,
-                    separator: '.',
-                    delimiter: ',',
-                    unit: 'R$ ',
-                    suffixUnit: '',
-                  });
-                  setWasChanged(true);
-                  formRef.current?.setFieldValue('preco', formatted);
-                }}
-              />
-            )}
-          </S.Form>
+                items={[
+                  { label: 'Sim, faço entregas', value: 'Sim' },
+                  { label: 'Não', value: 'Não' },
+                ]}
+              >
+                <Input
+                  icon="alert-circle"
+                  label="Faz Entregas?"
+                  name="status_delivery"
+                  placeholder="Seu estabelecimento faz entregas?"
+                  autoCapitalize="none"
+                  keyboardType="number-pad"
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  containerStyle={{
+                    marginTop: 15,
+                    minWidth: 350,
+                  }}
+                />
+              </RNPickerSelect>
+              {delivery && (
+                <Input
+                  icon="dollar-sign"
+                  label="Preço do Entrega"
+                  name="preco"
+                  placeholder="Preço da Entrega"
+                  autoCapitalize="none"
+                  keyboardType="number-pad"
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  containerStyle={{
+                    marginTop: 15,
+                    maxWidth: 350,
+                  }}
+                  onChangeText={(text) => {
+                    const formatted = MaskService.toMask('money', text, {
+                      precision: 2,
+                      separator: '.',
+                      delimiter: ',',
+                      unit: 'R$ ',
+                      suffixUnit: '',
+                    });
+                    setWasChanged(true);
+                    formRef.current?.setFieldValue('preco', formatted);
+                  }}
+                />
+              )}
+            </S.Form>
 
-          {wasChanged && (
-            <S.ButtonSubmit
-              loading={loading}
-              onPress={() => formRef.current?.submitForm()}
-            >
-              Atualizar
-            </S.ButtonSubmit>
-          )}
-        </FormProvider>
-      </S.Container>
+            {wasChanged && (
+              <S.ButtonSubmit
+                loading={loadingButton}
+                onPress={() => formRef.current?.submitForm()}
+              >
+                Atualizar
+              </S.ButtonSubmit>
+            )}
+          </FormProvider>
+        </S.Container>
+      ) : (
+        <Loader loading={loading} />
+      )}
     </KeyboardAwareScrollView>
   );
 };

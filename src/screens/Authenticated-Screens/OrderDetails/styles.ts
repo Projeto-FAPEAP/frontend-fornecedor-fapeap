@@ -8,9 +8,8 @@ import Buttonn from '@components/Button';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  flex-direction: column;
-  background: #f9f9f9;
   flex: 1;
+  background: ${(props) => props.theme.colors.background};
 `;
 
 export const ClientInformation = styled.View`
@@ -31,9 +30,8 @@ export const ClientInformationImageWrapper = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: 17px;
-  color: #333;
-  font-family: ${(props) => props.theme.fonts.Ubuntu.bold};
+  font-family: 'Ubuntu-Bold';
+  font-size: 14px;
 `;
 
 export const SubTitle = styled.Text`
@@ -115,7 +113,7 @@ export const ButtonWrapper = styled.View`
 `;
 
 export const Button = styled(Buttonn)`
-  min-width: 45%;
+  min-width: 48%;
   max-width: 50%;
   border-radius: 12px;
   height: 38px;
@@ -127,7 +125,7 @@ export const Button = styled(Buttonn)`
 `;
 
 export const ButtonCancel = styled(Buttonn)`
-  width: 45%;
+  width: 48%;
   border-radius: 12px;
   height: 38px;
   margin-top: 25px;
@@ -142,6 +140,7 @@ export const ButtonText = styled.Text`
   align-content: center;
   font-size: 15px;
   color: #fff;
+
   font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
 `;
 
@@ -247,4 +246,39 @@ export const ListRowConfirmed = styled.Text`
   text-align: center;
   border-radius: 2px;
   font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
+`;
+
+export const Header = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const Image = styled.Image`
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  border-radius: 5px;
+`;
+
+export const Subtitle = styled.Text`
+  font-family: 'Ubuntu-Regular';
+  font-size: 14px;
+`;
+
+export const BorderBottom = styled.View`
+  border-bottom-width: 1px;
+  border-bottom-color: #ccc;
+  margin-top: 10px;
+`;
+
+export const StatusView = styled.View`
+  margin-top: 10px;
+  align-items: center;
+`;
+
+export const PrincipalText = styled.Text`
+  font-family: Ubuntu-Bold;
+  font-size: 18px;
+  color: #444444;
+  top: 5%;
 `;

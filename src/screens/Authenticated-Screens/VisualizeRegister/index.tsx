@@ -195,7 +195,12 @@ const VisualizeRegister: React.FC = () => {
               {formatPrice(parseFloat(userData?.taxa_delivery))}
             </SubTitle>
           </TextWrapper>
-        ) : null}
+        ) : (
+          <TextWrapper>
+            <Title>Taxa de Entrega</Title>
+            <SubTitle>------</SubTitle>
+          </TextWrapper>
+        )}
 
         <MainTitle>Fotos</MainTitle>
         <ContentPhotos>
@@ -238,6 +243,7 @@ const VisualizeRegister: React.FC = () => {
         <MainTitle>Vídeo</MainTitle>
         <VideoWrapper>
           <VideoPlayer
+            paused
             source={{
               uri: video,
             }}

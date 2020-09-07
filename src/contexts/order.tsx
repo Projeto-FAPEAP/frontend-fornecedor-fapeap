@@ -23,6 +23,8 @@ interface IOrders {
     nome: string;
     logradouro: string;
     numero_local: string;
+    bairro: string;
+    cep: string;
   };
   created_at: string;
 }
@@ -40,6 +42,7 @@ const OrderContext = createContext<IOrdersContextData>(
 export const OrdersProvider: React.FC = ({ children }) => {
   const [ordersData, setOrdersData] = useState<IOrders[] | null>([]);
   const [loading, setLoading] = useState(true);
+
   const [pendingLength, setPendingLength] = useState(0);
   const { user, signed } = useContext(AuthContext);
   useEffect(() => {

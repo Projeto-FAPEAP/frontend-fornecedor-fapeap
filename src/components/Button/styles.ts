@@ -12,7 +12,6 @@ export const Container = styled(RectButton)`
   justify-content: center;
   align-items: center;
   background: ${({ theme }) => theme.colors.primary};
-  padding: 0 20px;
 `;
 
 export const ButtonText = styled.Text<IButtonTextProps>`

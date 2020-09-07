@@ -10,7 +10,6 @@ import {
   Text,
   SafeAreaView,
   Alert,
-  Image,
   ScrollView,
   Linking,
   FlatList,
@@ -22,15 +21,20 @@ import {
   useRoute,
   NavigationContainer,
 } from '@react-navigation/native';
+import Axios from 'axios';
 import { format } from 'date-fns';
 import pt from 'date-fns/locale/pt-BR';
 
+import logo from '../../../assets/icone1024x1024.png';
+import Icone from '../../../components/Icons';
 import OrderContext from '../../../contexts/order';
 import api from '../../../services/api';
 import formatPrice from '../../../utils/formatPrice';
 import Loader from '../../utils/index';
 import {
   Container,
+  Header,
+  Image,
   ClientInformation,
   ClientInformationImageWrapper,
   ClientInformationImage,
@@ -71,6 +75,11 @@ interface Items {
   };
 }
 
+interface ICEPResponse {
+  localidade: string;
+  uf: string;
+}
+
 const HistoryDetails: React.FC = () => {
   const route = useRoute();
   const navigation = useNavigation();
@@ -78,6 +87,7 @@ const HistoryDetails: React.FC = () => {
   const [itemsList, setItemList] = useState<Items[] | undefined>([]);
   const [initializing, setInitializing] = useState(true);
   const { itemId } = route.params;
+  const [city, setCity] = React.useState('');
   const { extraData } = route.params;
   const { getAllOrders } = useContext(OrderContext);
   useEffect(() => {
@@ -305,77 +315,222 @@ const HistoryDetails: React.FC = () => {
   return (
     <Container>
       {!initializing ? (
-        <ScrollView style={{ backgroundColor: '#f9f9f9' }}>
-          <ClientInformation>
-            {/* <ClientInformationImageWrapper>
-            <ClientInformationImage
-              source={require('../../../assets/Order.png')}
-              resizeMode="contain"
-            />
-          </ClientInformationImageWrapper> */}
-            <Span>
-              <ClientInformationTextWrapper>
-                <Title numberOfLines={1}>{extraData.name}</Title>
+        <View style={{ marginHorizontal: 20, marginVertical: 20 }}>
+          <Header>
+            <Image source={logo} />
+            <Title numberOfLines={1}>{extraData.name}</Title>
+          </Header>
 
-                <SubTitle>{extraData.address}</SubTitle>
-                <SubTitle>
-                  {format(
-                    Date.parse(extraData.date),
-                    "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
-                    { locale: pt },
-                  )}
-                </SubTitle>
-              </ClientInformationTextWrapper>
-              <ClientInformationButtonWrapper>
-                {extraData.status === 'Cancelado' ? (
-                  <ListRowPending>{extraData.status}</ListRowPending>
-                ) : (
-                  <ListRowConfirmed>{extraData.status}</ListRowConfirmed>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ fontFamily: 'Ubuntu-Regular', color: '#999' }}>
+              Realizado em{' '}
+              {format(
+                Date.parse(extraData.date),
+                "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
+                { locale: pt },
+              )}
+            </Text>
+          </View>
+
+          {extraData.status === 'Finalizado' ||
+          extraData.status === 'Cancelado' ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 20,
+                backgroundColor: '#ebebeb',
+                padding: 5,
+                borderRadius: 5,
+              }}
+            >
+              {Icone(extraData.status)}
+              {/* <Icon
+         name="check-circle"
+         style={{ marginRight: 10 }}
+         size={30}
+         color={
+           pedido.status_pedido === 'Finalizado'
+             ? colors.success
+             : colors.danger
+         }
+       /> */}
+              <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                Pedido {extraData.status} em{' '}
+                {format(
+                  Date.parse(extraData.date),
+                  "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
+                  { locale: pt },
                 )}
-              </ClientInformationButtonWrapper>
-            </Span>
-          </ClientInformation>
-          <OrderInformation>
-            <OrderRecipe>
-              <ListWrapper>
-                <FlatList
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                  data={itemsList}
-                  scrollEnabled={false}
-                  renderItem={({ item, index }) => (
-                    <ListWrapperItem>
-                      <ListWrapperInner>
-                        <TotalText>{item.produto.nome}</TotalText>
-                        <TotalText>
-                          {formatPrice(parseFloat(item.preco_venda))}
-                        </TotalText>
-                      </ListWrapperInner>
-                      <Amount>{`Quantidade: ${item.quantidade}`}</Amount>
-                    </ListWrapperItem>
-                  )}
-                  keyExtractor={(item, index) => String(index)}
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 20,
+                backgroundColor: '#ebebeb',
+                padding: 5,
+                borderRadius: 5,
+              }}
+            >
+              {/* <Icon
+         name="check-circle"
+         style={{ marginRight: 10 }}
+         size={30}
+         color={colors.danger}
+       /> */}
+              {Icone(extraData.status)}
+              <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
+                {extraData.status}
+              </Text>
+            </View>
+          )}
+
+          <View style={{ marginTop: 20, marginBottom: 20 }}>
+            <View
+              style={{
+                borderTopColor: '#ebebeb',
+                borderTopWidth: 1,
+                marginTop: 10,
+                marginBottom: 10,
+              }}
+            />
+
+            {itemsList.map((item) => (
+              <>
+                <View
+                  style={{
+                    marginVertical: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        backgroundColor: '#ccc',
+                        paddingVertical: 2,
+                        borderRadius: 5,
+                        paddingHorizontal: 5,
+                        marginRight: 10,
+                      }}
+                    >
+                      <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                        {item.quantidade}
+                      </Text>
+                    </View>
+                    <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                      {item.produto.nome}
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                    {formatPrice(parseFloat(item.preco_venda))}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    borderTopColor: '#ebebeb',
+                    borderTopWidth: 1,
+                    marginTop: 10,
+                    marginBottom: 10,
+                  }}
                 />
-              </ListWrapper>
-              <SubTotalSpan>
-                <SubTotalSpanInner>
-                  <SubTotalText>Taxa de Entrega</SubTotalText>
-                  <SubTotalText>
-                    {extraData.delivery ? formatPrice(extraData.tax) : '0.00'}
-                  </SubTotalText>
-                </SubTotalSpanInner>
-                <SubTotalSpanInner>
-                  <SubTotalText>SubTotal</SubTotalText>
-                  <SubTotalText>{formatPrice(extraData.subtotal)}</SubTotalText>
-                </SubTotalSpanInner>
-              </SubTotalSpan>
-              <TotalSpan>
-                <TotalText>Total</TotalText>
-                <TotalText>{formatPrice(extraData.total)}</TotalText>
-              </TotalSpan>
-            </OrderRecipe>
-          </OrderInformation>
-        </ScrollView>
+              </>
+            ))}
+          </View>
+
+          <View style={{ marginBottom: 20 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+              }}
+            >
+              <Text style={{ fontFamily: 'Ubuntu-Regular' }}>Subtotal</Text>
+              <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                {formatPrice(extraData.subtotal)}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+              }}
+            >
+              <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                Taxa de entrega
+              </Text>
+              <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
+                {extraData.delivery ? formatPrice(extraData.tax) : '0.00'}
+              </Text>
+            </View>
+
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
+              <Text style={{ fontFamily: 'Ubuntu-Bold' }}>Total</Text>
+              <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
+                {formatPrice(extraData.total)}
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={{
+              borderTopColor: '#ebebeb',
+              borderTopWidth: 1,
+              marginTop: 10,
+              marginBottom: 20,
+            }}
+          />
+
+          <View>
+            {extraData.delivery ? (
+              <>
+                <Text
+                  style={{ fontFamily: 'Ubuntu-Bold', textAlign: 'justify' }}
+                >
+                  Endereço de entrega
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Ubuntu-Regular',
+                    marginTop: 4,
+                    textAlign: 'justify',
+                  }}
+                >
+                  {extraData.logradouro}, nº {extraData.numero_local},{' '}
+                  {extraData.bairro}, {city}
+                </Text>
+              </>
+            ) : (
+              <Text
+                style={{
+                  fontFamily: 'Ubuntu-Bold',
+                  marginTop: 4,
+                  textAlign: 'justify',
+                }}
+              >
+                Pedido com retirada no estabelecimento
+              </Text>
+            )}
+          </View>
+        </View>
       ) : (
         <Loader loading={loading} />
       )}

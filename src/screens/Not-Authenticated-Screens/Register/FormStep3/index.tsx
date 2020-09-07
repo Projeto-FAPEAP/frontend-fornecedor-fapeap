@@ -69,6 +69,7 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
           maxWidth: 350,
         }}
         icon="map"
+        editable={false}
         label="Logradouro"
         name="logradouro"
         placeholder="Logradouro"
@@ -85,6 +86,7 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         }}
         icon="map"
         label="Bairro"
+        editable={false}
         name="bairro"
         placeholder="Bairro"
         returnKeyType="send"
@@ -99,6 +101,7 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         label="Número da casa"
         name="numero_local"
         placeholder="Número da casa"
+        editable={false}
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="next"
@@ -113,6 +116,7 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         label="Cidade"
         name="cidade"
         placeholder="Cidade"
+        editable={false}
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="next"
@@ -127,6 +131,7 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         label="UF"
         name="uf"
         placeholder="UF"
+        editable={false}
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="next"

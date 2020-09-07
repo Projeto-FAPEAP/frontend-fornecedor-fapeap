@@ -13,12 +13,12 @@ const Stack = createStackNavigator();
 
 const Routes: React.FC = () => {
   const { colors } = useTheme();
-  const { signed, loading } = useAuth();
-  if (loading) {
+  const { signed, loadingApp } = useAuth();
+  if (loadingApp) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Image source={logo} resizeMode="center" />
-        <ActivityIndicator animating={loading} color={colors.primary} />
+        <ActivityIndicator animating={loadingApp} color={colors.primary} />
       </View>
     );
   }

@@ -7,11 +7,13 @@ import React, {
 } from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { Card, ListItem } from 'react-native-elements';
 import { TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import AuthContext from '../../../contexts/auth';
 import {
@@ -23,19 +25,23 @@ import {
   ButtonWrapperText,
   ButtonIcon,
   StoreName,
+  TextProfile,
+  Subtitle,
 } from './styles';
 
 interface User {
   nome: string;
   nome_fantasia: string;
 }
-const User: React.FC = ({ navigation }) => {
+const User: React.FC = () => {
+  const navigation = useNavigation();
   const [delivery, setDelivery] = useState(false);
   const [extraPhoto, setExtraPhoto] = useState(false);
   // const [pictures, setPictures] = useState([5]);
   const [showExtraInput, setShowExtraInput] = useState(0);
   const { logOut } = useContext(AuthContext);
   const [video, setVideo] = useState({});
+
   useEffect(() => {
     getInitialData();
   }, []);
@@ -74,53 +80,94 @@ const User: React.FC = ({ navigation }) => {
 
   return (
     <Container>
-      <Header>
-        <StoreName>{storeName}</StoreName>
-      </Header>
-      <Options>
-        <ScrollView>
-          <Button onPress={() => navigation.navigate('VisualizeRegister')}>
-            <ButtonIcon>
-              <Icon name="list" size={32} color="#798599" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Visualizar Cadastro</ButtonText>
-            </ButtonWrapperText>
-          </Button>
-          <Button onPress={() => navigation.navigate('EditProfile')}>
-            <ButtonIcon>
-              <Icon name="cog" size={32} color="#798599" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Editar Cadastro</ButtonText>
-            </ButtonWrapperText>
-          </Button>
-          <Button onPress={() => navigation.navigate('Settings')}>
-            <ButtonIcon>
-              <Icon name="image" size={32} color="#798599" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Atualizar Mídias</ButtonText>
-            </ButtonWrapperText>
-          </Button>
-          <Button onPress={() => navigation.navigate('EditDelivery')}>
-            <ButtonIcon>
-              <Icon name="motorcycle" size={32} color="#798599" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Delivery </ButtonText>
-            </ButtonWrapperText>
-          </Button>
-          <Button onPress={() => logOutt()}>
-            <ButtonIcon>
-              <Icon name="sign-out" size={32} color="#EB5757" />
-            </ButtonIcon>
-            <ButtonWrapperText>
-              <ButtonText>Sair</ButtonText>
-            </ButtonWrapperText>
-          </Button>
-        </ScrollView>
-      </Options>
+      <Card
+        containerStyle={{
+          borderRadius: 5,
+          paddingHorizontal: 30,
+        }}
+      >
+        <View>
+          <TextProfile>{storeName}</TextProfile>
+          <Subtitle>
+            Faça a edição de seus dados pessoais, de acesso e de entrega
+          </Subtitle>
+        </View>
+      </Card>
+      <ScrollView>
+        <Card
+          containerStyle={{
+            borderRadius: 5,
+            paddingHorizontal: 15,
+          }}
+        >
+          <ListItem
+            title="Visualizar Cadastro"
+            titleStyle={{
+              fontFamily: 'Ubuntu-Bold',
+            }}
+            subtitle="Listar dados"
+            subtitleStyle={{
+              fontFamily: 'Ubuntu-Regular',
+              marginTop: 5,
+            }}
+            bottomDivider
+            chevron
+            onPress={() => navigation.navigate('VisualizeRegister')}
+          />
+          <ListItem
+            title="Editar Perfil"
+            titleStyle={{
+              fontFamily: 'Ubuntu-Bold',
+            }}
+            subtitle="Telefone, whatsapp, senha"
+            subtitleStyle={{
+              fontFamily: 'Ubuntu-Regular',
+              marginTop: 5,
+            }}
+            bottomDivider
+            chevron
+            onPress={() => navigation.navigate('EditProfile')}
+          />
+          <ListItem
+            title="Atualizar Mídias"
+            titleStyle={{
+              fontFamily: 'Ubuntu-Bold',
+            }}
+            subtitle="Fotos e Vídeo"
+            subtitleStyle={{
+              fontFamily: 'Ubuntu-Regular',
+            }}
+            bottomDivider
+            chevron
+            onPress={() => navigation.navigate('Settings')}
+          />
+          <ListItem
+            title="Delivery"
+            titleStyle={{
+              fontFamily: 'Ubuntu-Bold',
+            }}
+            subtitle="Alterar status de entrega"
+            subtitleStyle={{
+              fontFamily: 'Ubuntu-Regular',
+            }}
+            bottomDivider
+            chevron
+            onPress={() => navigation.navigate('EditDelivery')}
+          />
+          <ListItem
+            title="Sair"
+            titleStyle={{
+              fontFamily: 'Ubuntu-Bold',
+            }}
+            subtitle="Desconecte-se da sua conta"
+            subtitleStyle={{
+              fontFamily: 'Ubuntu-Regular',
+            }}
+            chevron
+            onPress={() => logOutt()}
+          />
+        </Card>
+      </ScrollView>
     </Container>
   );
 };

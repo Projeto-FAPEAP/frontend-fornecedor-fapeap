@@ -50,6 +50,7 @@ interface AuthContextData {
   loading: boolean;
   logIn(cpfCnpj: string, password: string): Promise<ILocalResponse>;
   logOut(): void;
+  loadingApp: boolean;
 }
 
 interface ILocalResponse {
@@ -59,7 +60,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [loadingApp, setLoadingApp] = useState(true);
   useEffect(() => {
     api.interceptors.response.use(
       (response) => {
@@ -88,6 +89,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       }
 
       setLoading(false);
+      setLoadingApp(false);
     }
     loadData();
   }, []);
@@ -161,7 +163,14 @@ export const AuthProvider: React.FC = ({ children }) => {
   }
   return (
     <AuthContext.Provider
-      value={{ signed: !!user, user, logIn: handleLogin, logOut, loading }}
+      value={{
+        signed: !!user,
+        user,
+        logIn: handleLogin,
+        logOut,
+        loading,
+        loadingApp,
+      }}
     >
       {children}
     </AuthContext.Provider>

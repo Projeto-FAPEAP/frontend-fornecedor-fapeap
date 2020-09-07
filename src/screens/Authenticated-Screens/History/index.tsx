@@ -119,6 +119,8 @@ const History: React.FC = () => {
     <FlatList
       showsVerticalScrollIndicator={false}
       data={requests}
+      refreshing={false}
+      onRefresh={() => findRequestPerPage(1)}
       keyExtractor={(item) => String(item.id)}
       renderItem={({ item: request }) => <CardHistoryItem request={request} />}
     />
