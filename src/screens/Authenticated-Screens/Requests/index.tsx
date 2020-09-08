@@ -100,19 +100,6 @@ const Requests: React.FC = () => {
                           onPress={() =>
                             navigation.navigate('OrderDetails', {
                               itemId: item.id,
-                              extraData: {
-                                name: item.consumidor.nome,
-                                status: item.status_pedido,
-                                delivery: item.delivery,
-                                logradouro: item.consumidor.logradouro,
-                                numero_local: item.consumidor.numero_local,
-                                bairro: item.consumidor.bairro,
-                                cep: item.consumidor.cep,
-                                total: item.total,
-                                date: item.created_at,
-                                subtotal: item.subtotal,
-                                tax: item.taxa_entrega,
-                              },
                             })
                           }
                         >

@@ -81,19 +81,17 @@ interface IParams {
 }
 
 interface IExtraData {
-  extraData: {
-    name: string;
-    status: string;
-    delivery: boolean;
-    logradouro: string;
-    numero_local: string;
-    cep: string;
-    bairro: string;
-    total: number;
-    date: string;
-    subtotal: number;
-    tax: number;
-  };
+  nome: string;
+  status_pedido: string;
+  delivery: boolean;
+  logradouro: string;
+  numero_local: string;
+  cep: string;
+  bairro: string;
+  total: number;
+  created_at: string;
+  subtotal: number;
+  taxa_entrega: number;
 }
 
 interface ICEPResponse {
@@ -111,7 +109,8 @@ const OrderDetails: React.FC = () => {
   const [initializing, setInitializing] = useState(true);
   const [itemsList, setItemList] = useState<Items[] | undefined>([]);
   const routeParams = params as IParams;
-  const extraData = params as IExtraData;
+  /* const extraData = params as IExtraData; */
+  const [objetoPedido, setObjetoPedido] = useState<IExtraData>({});
   const [city, setCity] = React.useState('');
   const { getAllOrders } = useContext(OrderContext);
   useEffect(() => {
@@ -250,8 +249,10 @@ const OrderDetails: React.FC = () => {
           },
         },
       ];
-      setItemList(response.data);
-      getCityAndUf(extraData.extraData.cep);
+      console.log(response.data.objPedido.nome, 'jjjjjjjjjjjjjjjjjjjjjjjjj');
+      setObjetoPedido(response.data.objPedido);
+      setItemList(response.data.itensPedido);
+      getCityAndUf(response.data.objPedido.cep);
 
       console.log(JSON.stringify(response.data, null, 2));
     } catch (error) {
@@ -397,21 +398,23 @@ const OrderDetails: React.FC = () => {
         >
           <Header>
             <Image source={logo} />
-            <Title numberOfLines={1}>{extraData.extraData.name}</Title>
-            {extraData.extraData.status !== 'Pendente' &&
-            extraData.extraData.delivery ? (
+            <Title numberOfLines={1} style={{ width: '45%' }}>
+              {objetoPedido.nome}
+            </Title>
+            {objetoPedido.status_pedido !== 'Pendente' &&
+            objetoPedido.delivery ? (
               <TouchableOpacity
                 onPress={() => {
                   Linking.canOpenURL(
-                    `whatsapp://send?text=${extraData.extraData.logradouro}, nº
-                    ${extraData.extraData.numero_local},{' '}
-                    ${extraData.extraData.bairro}, ${extraData.extraData.city}`,
+                    `whatsapp://send?text=${objetoPedido.logradouro}, nº
+                    ${objetoPedido.numero_local},{' '}
+                    ${objetoPedido.bairro}, ${city}`,
                   ).then((response) =>
                     response
                       ? Linking.openURL(
-                          `whatsapp://send?text=${extraData.extraData.logradouro}, nº
-                          ${extraData.extraData.numero_local},{' '}
-                          ${extraData.extraData.bairro}, ${extraData.extraData.city}`,
+                          `whatsapp://send?text=${objetoPedido.logradouro}, nº
+                          ${objetoPedido.numero_local},{' '}
+                          ${objetoPedido.bairro}, ${city}`,
                         )
                       : Alert.alert(
                           'Aviso',
@@ -434,8 +437,9 @@ const OrderDetails: React.FC = () => {
                   size={14}
                   color={colors.white}
                 />
+
                 <Text style={{ fontFamily: 'Ubuntu-Regular', color: '#fff' }}>
-                  Compartilhar Endereço
+                  Endereço
                 </Text>
               </TouchableOpacity>
             ) : null}
@@ -452,15 +456,15 @@ const OrderDetails: React.FC = () => {
             <Text style={{ fontFamily: 'Ubuntu-Regular', color: '#999' }}>
               Realizado em{' '}
               {format(
-                Date.parse(extraData.extraData.date),
+                Date.parse(objetoPedido.created_at),
                 "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
                 { locale: pt },
               )}
             </Text>
           </View>
 
-          {extraData.extraData.status === 'Finalizado' ||
-          extraData.extraData.status === 'Cancelado' ? (
+          {objetoPedido.status_pedido === 'Finalizado' ||
+          objetoPedido.status_pedido === 'Cancelado' ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -472,7 +476,7 @@ const OrderDetails: React.FC = () => {
                 borderRadius: 5,
               }}
             >
-              {Icone(extraData.extraData.status)}
+              {Icone(objetoPedido.status_pedido)}
               {/* <Icon
               name="check-circle"
               style={{ marginRight: 10 }}
@@ -484,9 +488,9 @@ const OrderDetails: React.FC = () => {
               }
             /> */}
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                Pedido {extraData.extraData.status} em{' '}
+                Pedido {objetoPedido.status_pedido} em{' '}
                 {format(
-                  Date.parse(extraData.extraData.date),
+                  Date.parse(objetoPedido.created_at),
                   "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
                   { locale: pt },
                 )}
@@ -510,9 +514,9 @@ const OrderDetails: React.FC = () => {
               size={30}
               color={colors.danger}
             /> */}
-              {Icone(extraData.extraData.status)}
+              {Icone(objetoPedido.status_pedido)}
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
-                {extraData.extraData.status}
+                {objetoPedido.status_pedido}
               </Text>
             </View>
           )}
@@ -581,7 +585,7 @@ const OrderDetails: React.FC = () => {
             >
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>Subtotal</Text>
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                {formatPrice(extraData.extraData.subtotal)}
+                {formatPrice(objetoPedido.subtotal)}
               </Text>
             </View>
 
@@ -596,8 +600,8 @@ const OrderDetails: React.FC = () => {
                 Taxa de entrega
               </Text>
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                {extraData.extraData.delivery
-                  ? formatPrice(extraData.extraData.tax)
+                {objetoPedido.delivery
+                  ? formatPrice(objetoPedido.taxa_entrega)
                   : '0.00'}
               </Text>
             </View>
@@ -607,7 +611,7 @@ const OrderDetails: React.FC = () => {
             >
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>Total</Text>
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
-                {formatPrice(extraData.extraData.total)}
+                {formatPrice(objetoPedido.total)}
               </Text>
             </View>
           </View>
@@ -622,7 +626,7 @@ const OrderDetails: React.FC = () => {
           />
 
           <View>
-            {extraData.extraData.delivery ? (
+            {objetoPedido.delivery ? (
               <>
                 <Text
                   style={{ fontFamily: 'Ubuntu-Bold', textAlign: 'justify' }}
@@ -636,9 +640,8 @@ const OrderDetails: React.FC = () => {
                     textAlign: 'justify',
                   }}
                 >
-                  {extraData.extraData.logradouro}, nº{' '}
-                  {extraData.extraData.numero_local},{' '}
-                  {extraData.extraData.bairro}, {city}
+                  {objetoPedido.logradouro}, nº {objetoPedido.numero_local},{' '}
+                  {objetoPedido.bairro}, {city}
                 </Text>
               </>
             ) : (
@@ -662,7 +665,7 @@ const OrderDetails: React.FC = () => {
               marginBottom: 20,
             }}
           />
-          {extraData.extraData.status === 'Reserva confirmada' && (
+          {objetoPedido.status_pedido === 'Reserva confirmada' && (
             <ButtonWrapper>
               <Button loading={loading} onPress={() => confirmOrder()}>
                 <ButtonText>Confirmar Reserva</ButtonText>
@@ -676,7 +679,7 @@ const OrderDetails: React.FC = () => {
             </ButtonWrapper>
           )}
 
-          {extraData.extraData.status === 'Pendente' ? (
+          {objetoPedido.status_pedido === 'Pendente' ? (
             <ButtonWrapper>
               <Button loading={loading} onPress={() => confirmOrder()}>
                 <ButtonText>Confirmar Pedido</ButtonText>
@@ -689,10 +692,10 @@ const OrderDetails: React.FC = () => {
               </ButtonCancel>
             </ButtonWrapper>
           ) : null}
-          {extraData.extraData.delivery === false ||
-          extraData.extraData.status === 'Pedido em rota de entrega' ||
-          (extraData.extraData.status === 'Pendente' &&
-            extraData.extraData.delivery === true) ? null : (
+          {objetoPedido.delivery === false ||
+          objetoPedido.status_pedido === 'Pedido em rota de entrega' ||
+          (objetoPedido.status_pedido === 'Pendente' &&
+            objetoPedido.delivery === true) ? null : (
             <ButtonWrapper>
               <Button loading={loading} onPress={() => sendingOrder()}>
                 <ButtonText>
@@ -715,11 +718,11 @@ export default OrderDetails;
   /* <ButtonShareLocalization
                 onPress={() => {
                   Linking.canOpenURL(
-                    `whatsapp://send?text=${extraData.extraData.address}`,
+                    `whatsapp://send?text=${objetoPedido.address}`,
                   ).then((response) =>
                     response
                       ? Linking.openURL(
-                          `whatsapp://send?text=${extraData.extraData.address}`,
+                          `whatsapp://send?text=${objetoPedido.address}`,
                         )
                       : Alert.alert(
                           'Aviso',

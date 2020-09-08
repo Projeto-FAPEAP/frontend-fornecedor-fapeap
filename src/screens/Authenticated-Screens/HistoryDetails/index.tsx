@@ -80,6 +80,20 @@ interface ICEPResponse {
   uf: string;
 }
 
+interface IExtraData {
+  nome: string;
+  status_pedido: string;
+  delivery: boolean;
+  logradouro: string;
+  numero_local: string;
+  cep: string;
+  bairro: string;
+  total: number;
+  created_at: string;
+  subtotal: number;
+  taxa_entrega: number;
+}
+
 const HistoryDetails: React.FC = () => {
   const route = useRoute();
   const navigation = useNavigation();
@@ -88,7 +102,8 @@ const HistoryDetails: React.FC = () => {
   const [initializing, setInitializing] = useState(true);
   const { itemId } = route.params;
   const [city, setCity] = React.useState('');
-  const { extraData } = route.params;
+
+  const [objetoPedido, setObjetoPedido] = useState<IExtraData>({});
   const { getAllOrders } = useContext(OrderContext);
   useEffect(() => {
     getAllItems();
@@ -187,7 +202,8 @@ const HistoryDetails: React.FC = () => {
         },
         
       ]; */
-      setItemList(response.data);
+      setObjetoPedido(response.data.objPedido);
+      setItemList(response.data.itensPedido);
       setInitializing(false);
       setLoading(false);
       console.log(JSON.stringify(response.data, null, 2));
@@ -313,12 +329,12 @@ const HistoryDetails: React.FC = () => {
   }
 
   return (
-    <Container>
+    <ScrollView contentContainerStyle={{ flex: 1 }}>
       {!initializing ? (
         <View style={{ marginHorizontal: 20, marginVertical: 20 }}>
           <Header>
             <Image source={logo} />
-            <Title numberOfLines={1}>{extraData.name}</Title>
+            <Title numberOfLines={1}>{objetoPedido.nome}</Title>
           </Header>
 
           <View
@@ -332,15 +348,15 @@ const HistoryDetails: React.FC = () => {
             <Text style={{ fontFamily: 'Ubuntu-Regular', color: '#999' }}>
               Realizado em{' '}
               {format(
-                Date.parse(extraData.date),
+                Date.parse(objetoPedido.created_at),
                 "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
                 { locale: pt },
               )}
             </Text>
           </View>
 
-          {extraData.status === 'Finalizado' ||
-          extraData.status === 'Cancelado' ? (
+          {objetoPedido.status_pedido === 'Finalizado' ||
+          objetoPedido.status_pedido === 'Cancelado' ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -352,21 +368,21 @@ const HistoryDetails: React.FC = () => {
                 borderRadius: 5,
               }}
             >
-              {Icone(extraData.status)}
+              {Icone(objetoPedido.status_pedido)}
               {/* <Icon
          name="check-circle"
          style={{ marginRight: 10 }}
          size={30}
          color={
-           pedido.status_pedido === 'Finalizado'
+           pedido.status_pedido_pedido === 'Finalizado'
              ? colors.success
              : colors.danger
          }
        /> */}
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                Pedido {extraData.status} em{' '}
+                Pedido {objetoPedido.status_pedido} em{' '}
                 {format(
-                  Date.parse(extraData.date),
+                  Date.parse(objetoPedido.created_at),
                   "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
                   { locale: pt },
                 )}
@@ -390,9 +406,9 @@ const HistoryDetails: React.FC = () => {
          size={30}
          color={colors.danger}
        /> */}
-              {Icone(extraData.status)}
+              {Icone(objetoPedido.status_pedido)}
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
-                {extraData.status}
+                {objetoPedido.status_pedido}
               </Text>
             </View>
           )}
@@ -461,7 +477,7 @@ const HistoryDetails: React.FC = () => {
             >
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>Subtotal</Text>
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                {formatPrice(extraData.subtotal)}
+                {formatPrice(objetoPedido.subtotal)}
               </Text>
             </View>
 
@@ -476,7 +492,9 @@ const HistoryDetails: React.FC = () => {
                 Taxa de entrega
               </Text>
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                {extraData.delivery ? formatPrice(extraData.tax) : '0.00'}
+                {objetoPedido.delivery
+                  ? formatPrice(objetoPedido.taxa_entrega)
+                  : '0.00'}
               </Text>
             </View>
 
@@ -485,7 +503,7 @@ const HistoryDetails: React.FC = () => {
             >
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>Total</Text>
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
-                {formatPrice(extraData.total)}
+                {formatPrice(objetoPedido.total)}
               </Text>
             </View>
           </View>
@@ -500,7 +518,7 @@ const HistoryDetails: React.FC = () => {
           />
 
           <View>
-            {extraData.delivery ? (
+            {objetoPedido.delivery ? (
               <>
                 <Text
                   style={{ fontFamily: 'Ubuntu-Bold', textAlign: 'justify' }}
@@ -514,8 +532,8 @@ const HistoryDetails: React.FC = () => {
                     textAlign: 'justify',
                   }}
                 >
-                  {extraData.logradouro}, nº {extraData.numero_local},{' '}
-                  {extraData.bairro}, {city}
+                  {objetoPedido.logradouro}, nº {objetoPedido.numero_local},{' '}
+                  {objetoPedido.bairro}, {city}
                 </Text>
               </>
             ) : (
@@ -534,7 +552,7 @@ const HistoryDetails: React.FC = () => {
       ) : (
         <Loader loading={loading} />
       )}
-    </Container>
+    </ScrollView>
   );
 };
 
