@@ -528,6 +528,7 @@ const OrderDetails: React.FC = () => {
   async function onShare(): Promise<void> {
     try {
       const logradouroFormatado = objetoPedido?.logradouro.split(' ').join('+');
+
       const respostaAxios = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${
           objetoPedido?.numero_local
@@ -537,6 +538,7 @@ const OrderDetails: React.FC = () => {
         respostaAxios.data.results[0].geometry.location;
 
       const url = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`;
+
       const result = await Share.share({
         message: url,
       });
@@ -550,7 +552,7 @@ const OrderDetails: React.FC = () => {
         // dismissed
       }
     } catch (error) {
-      alert(error.message);
+      Alert.alert('Ops!', 'Algo inesperado aconteceu, tente novamente!');
     }
   }
 
@@ -819,34 +821,41 @@ const OrderDetails: React.FC = () => {
                     color: '#4AB2EF',
                   }}
                   onPress={async () => {
-                    const logradouroFormatado = objetoPedido?.logradouro
-                      .split(' ')
-                      .join('+');
-                    const respostaAxios = await axios.get(
-                      `https://maps.googleapis.com/maps/api/geocode/json?address=${
-                        objetoPedido?.numero_local
-                      }+${logradouroFormatado},+${localidade},+${uf}&key=${'AIzaSyARpgEngeu2k129CS3cdlp4HjTUhKyPblU'}`,
-                    );
-                    console.log(
-                      respostaAxios.data,
-                      'jjjjjjjjjjjjjjjjjjjjjjjjj',
-                      logradouroFormatado,
-                    );
+                    try {
+                      const logradouroFormatado = objetoPedido?.logradouro
+                        .split(' ')
+                        .join('+');
+                      const respostaAxios = await axios.get(
+                        `https://maps.googleapis.com/maps/api/geocode/json?address=${
+                          objetoPedido?.numero_local
+                        }+${logradouroFormatado},+${localidade},+${uf}&key=${'AIzaSyARpgEngeu2k129CS3cdlp4HjTUhKyPblU'}`,
+                      );
+                      console.log(
+                        respostaAxios.data,
+                        'jjjjjjjjjjjjjjjjjjjjjjjjj',
+                        logradouroFormatado,
+                      );
 
-                    const coordenadasEndereco =
-                      respostaAxios.data.results[0].geometry.location;
-                    const scheme = Platform.select({
-                      ios: 'maps:0,0?q=',
-                      android: 'geo:0,0?q=',
-                    });
-                    const urll = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`;
-                    const latLng = `${coordenadasEndereco.lat},${coordenadasEndereco.lng}`;
-                    const label = 'Custom Label';
-                    const url = Platform.select({
-                      ios: `${scheme}${label}@${latLng}`,
-                      android: urll,
-                    });
-                    Linking.openURL(url);
+                      const coordenadasEndereco =
+                        respostaAxios.data.results[0].geometry.location;
+                      const scheme = Platform.select({
+                        ios: 'maps:0,0?q=',
+                        android: 'geo:0,0?q=',
+                      });
+                      const urll = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`;
+                      const latLng = `${coordenadasEndereco.lat},${coordenadasEndereco.lng}`;
+                      const label = 'Custom Label';
+                      const url = Platform.select({
+                        ios: `${scheme}${label}@${latLng}`,
+                        android: urll,
+                      });
+                      Linking.openURL(url);
+                    } catch (error) {
+                      Alert.alert(
+                        'Ops!',
+                        'Algo inesperado aconteceu, tente novamente!',
+                      );
+                    }
                   }}
                 >
                   {objetoPedido?.logradouro}, nº {objetoPedido?.numero_local},{' '}
