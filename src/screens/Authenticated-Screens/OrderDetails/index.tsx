@@ -24,6 +24,7 @@ import {
   NavigationContainer,
 } from '@react-navigation/native';
 import Axios from 'axios';
+import axios from 'axios';
 import { format } from 'date-fns';
 import pt from 'date-fns/locale/pt-BR';
 import { useTheme } from 'styled-components';
@@ -100,7 +101,6 @@ interface ICEPResponse {
 }
 
 const OrderDetails: React.FC = () => {
-  const route = useRoute();
   const { colors } = useTheme();
   const { params } = useRoute();
   const navigation = useNavigation();
@@ -109,58 +109,22 @@ const OrderDetails: React.FC = () => {
   const [initializing, setInitializing] = useState(true);
   const [itemsList, setItemList] = useState<Items[] | undefined>([]);
   const routeParams = params as IParams;
-  /* const extraData = params as IExtraData; */
-  const [objetoPedido, setObjetoPedido] = useState<IExtraData>({});
+  const [objetoPedido, setObjetoPedido] = useState<IExtraData>();
   const [city, setCity] = React.useState('');
+  const [localidade, setLoacalidade] = React.useState('');
+  const [uf, setUf] = React.useState('');
   const { getAllOrders } = useContext(OrderContext);
+
   useEffect(() => {
     getAllItems();
-  }, []);
+  }, [routeParams.itemId]);
 
-  async function confirmOrder(): Promise<void> {
-    setLoading(true);
-    try {
-      const response = await api.put(
-        `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
-      );
-      console.log(JSON.stringify(response.data, null, 2));
-
-      getAllOrders().then((response) => {
-        setLoading(false);
-        Alert.alert('Aviso', 'Confirmado!!', [
-          {
-            text: 'Ok',
-            onPress: () => navigation.navigate('Index'),
-            style: 'default',
-          },
-        ]);
-      });
-    } catch (error) {
-      setLoading(false);
-      console.log(JSON.stringify(error, null, 2));
-      console.log(error, 'jonathan');
-      console.log(Object(error.response), 'salve');
-      Alert.alert(error.response.data.error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
-      }
-      console.log(error.config);
-    }
-  }
-
-  async function getAllItems(): Promise<void> {
+  /*  React.useEffect(() => {
+    return () => {
+      getAllOrders();
+    };
+  }, [getAllOrders]); */
+  const getAllItems = React.useCallback(async () => {
     setLoading(true);
     console.log(routeParams.itemId);
     try {
@@ -282,7 +246,174 @@ const OrderDetails: React.FC = () => {
         console.log(error.config);
       }
     }
+  }, [routeParams.itemId]);
+
+  async function confirmOrder(): Promise<void> {
+    setLoading(true);
+    try {
+      const response = await api.put(
+        `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
+      );
+      console.log(JSON.stringify(response.data, null, 2));
+
+      getAllOrders().then((response) => {
+        setLoading(false);
+        Alert.alert('Aviso', 'Confirmado!!', [
+          {
+            text: 'Ok',
+            onPress: () => navigation.navigate('Index'),
+            style: 'default',
+          },
+        ]);
+      });
+    } catch (error) {
+      setLoading(false);
+      console.log(JSON.stringify(error, null, 2));
+      console.log(error, 'jonathan');
+      console.log(Object(error.response), 'salve');
+      Alert.alert(error.response.data.error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
   }
+
+  /* async function getAllItems(): Promise<void> {
+    setLoading(true);
+    console.log(routeParams.itemId);
+    try {
+      const response = await api.get(
+        `${api.defaults.baseURL}/fornecedor/pedidos/itens/${routeParams.itemId}`,
+      );
+      console.log(routeParams.itemId, 'jogogogo');
+      const a = [
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+
+        {
+          total: '35.63',
+          status_pedido: 'Pendente',
+          tipo_da_compra: false,
+          produto: {
+            nome: 'teste',
+          },
+        },
+      ];
+      console.log(response.data.objPedido.nome, 'jjjjjjjjjjjjjjjjjjjjjjjjj');
+      setObjetoPedido(response.data.objPedido);
+      setItemList(response.data.itensPedido);
+      getCityAndUf(response.data.objPedido.cep);
+
+      console.log(JSON.stringify(response.data, null, 2));
+    } catch (error) {
+      setLoading(false);
+      if (error.message === 'Network Error') {
+        Alert.alert('Verifique sua conexão de internet e tente novamente!!');
+      } else {
+        console.log(JSON.stringify(error, null, 2));
+        console.log(error, 'jonathan');
+        console.log(Object(error.response), 'salve');
+        Alert.alert(error.response.data.error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+      }
+    }
+  } */
 
   async function cancelOrder(): Promise<void> {
     setLoadingCancel(true);
@@ -380,7 +511,10 @@ const OrderDetails: React.FC = () => {
     Axios.get<ICEPResponse>(`https://viacep.com.br/ws/${cep}/json/`)
       .then((response) => {
         const { localidade, uf } = response.data;
+
         setCity(` ${localidade} - ${uf}`);
+        setLoacalidade(localidade);
+        setUf(uf);
         setInitializing(false);
         setLoading(false);
       })
@@ -399,22 +533,22 @@ const OrderDetails: React.FC = () => {
           <Header>
             <Image source={logo} />
             <Title numberOfLines={1} style={{ width: '45%' }}>
-              {objetoPedido.nome}
+              {objetoPedido?.nome}
             </Title>
-            {objetoPedido.status_pedido !== 'Pendente' &&
-            objetoPedido.delivery ? (
+            {objetoPedido?.status_pedido !== 'Pendente' &&
+            objetoPedido?.delivery ? (
               <TouchableOpacity
                 onPress={() => {
                   Linking.canOpenURL(
-                    `whatsapp://send?text=${objetoPedido.logradouro}, nº
-                    ${objetoPedido.numero_local},{' '}
-                    ${objetoPedido.bairro}, ${city}`,
+                    `whatsapp://send?text=${objetoPedido?.logradouro}, nº
+                    ${objetoPedido?.numero_local},{' '}
+                    ${objetoPedido?.bairro}, ${city}`,
                   ).then((response) =>
                     response
                       ? Linking.openURL(
-                          `whatsapp://send?text=${objetoPedido.logradouro}, nº
-                          ${objetoPedido.numero_local},{' '}
-                          ${objetoPedido.bairro}, ${city}`,
+                          `whatsapp://send?text=${objetoPedido?.logradouro}, nº
+                          ${objetoPedido?.numero_local},{' '}
+                          ${objetoPedido?.bairro}, ${city}`,
                         )
                       : Alert.alert(
                           'Aviso',
@@ -424,8 +558,8 @@ const OrderDetails: React.FC = () => {
                 }}
                 style={{
                   flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: colors.regular,
+                  alignItems: 'flex-end',
+                  backgroundColor: '#39B554',
                   padding: 10,
                   borderRadius: 5,
                   marginLeft: 5,
@@ -456,15 +590,15 @@ const OrderDetails: React.FC = () => {
             <Text style={{ fontFamily: 'Ubuntu-Regular', color: '#999' }}>
               Realizado em{' '}
               {format(
-                Date.parse(objetoPedido.created_at),
+                Date.parse(String(objetoPedido?.created_at)),
                 "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
                 { locale: pt },
               )}
             </Text>
           </View>
 
-          {objetoPedido.status_pedido === 'Finalizado' ||
-          objetoPedido.status_pedido === 'Cancelado' ? (
+          {objetoPedido?.status_pedido === 'Finalizado' ||
+          objetoPedido?.status_pedido === 'Cancelado' ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -476,7 +610,7 @@ const OrderDetails: React.FC = () => {
                 borderRadius: 5,
               }}
             >
-              {Icone(objetoPedido.status_pedido)}
+              {Icone(objetoPedido?.status_pedido)}
               {/* <Icon
               name="check-circle"
               style={{ marginRight: 10 }}
@@ -488,9 +622,9 @@ const OrderDetails: React.FC = () => {
               }
             /> */}
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                Pedido {objetoPedido.status_pedido} em{' '}
+                Pedido {objetoPedido?.status_pedido} em{' '}
                 {format(
-                  Date.parse(objetoPedido.created_at),
+                  Date.parse(objetoPedido?.created_at),
                   "'Dia' dd 'de' MMMM', às ' HH:mm'h'",
                   { locale: pt },
                 )}
@@ -514,9 +648,9 @@ const OrderDetails: React.FC = () => {
               size={30}
               color={colors.danger}
             /> */}
-              {Icone(objetoPedido.status_pedido)}
+              {Icone(objetoPedido?.status_pedido)}
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
-                {objetoPedido.status_pedido}
+                {objetoPedido?.status_pedido}
               </Text>
             </View>
           )}
@@ -531,8 +665,8 @@ const OrderDetails: React.FC = () => {
               }}
             />
 
-            {itemsList.map((item) => (
-              <>
+            {itemsList?.map((item) => (
+              <View key={item.id}>
                 <View
                   style={{
                     marginVertical: 10,
@@ -540,6 +674,7 @@ const OrderDetails: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
+                  key={item.id}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View
@@ -571,7 +706,7 @@ const OrderDetails: React.FC = () => {
                     marginBottom: 10,
                   }}
                 />
-              </>
+              </View>
             ))}
           </View>
 
@@ -585,7 +720,7 @@ const OrderDetails: React.FC = () => {
             >
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>Subtotal</Text>
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                {formatPrice(objetoPedido.subtotal)}
+                {formatPrice(objetoPedido?.subtotal)}
               </Text>
             </View>
 
@@ -600,8 +735,8 @@ const OrderDetails: React.FC = () => {
                 Taxa de entrega
               </Text>
               <Text style={{ fontFamily: 'Ubuntu-Regular' }}>
-                {objetoPedido.delivery
-                  ? formatPrice(objetoPedido.taxa_entrega)
+                {objetoPedido?.delivery
+                  ? formatPrice(objetoPedido?.taxa_entrega)
                   : '0.00'}
               </Text>
             </View>
@@ -611,7 +746,7 @@ const OrderDetails: React.FC = () => {
             >
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>Total</Text>
               <Text style={{ fontFamily: 'Ubuntu-Bold' }}>
-                {formatPrice(objetoPedido.total)}
+                {formatPrice(objetoPedido?.total)}
               </Text>
             </View>
           </View>
@@ -626,7 +761,7 @@ const OrderDetails: React.FC = () => {
           />
 
           <View>
-            {objetoPedido.delivery ? (
+            {objetoPedido?.delivery ? (
               <>
                 <Text
                   style={{ fontFamily: 'Ubuntu-Bold', textAlign: 'justify' }}
@@ -638,10 +773,40 @@ const OrderDetails: React.FC = () => {
                     fontFamily: 'Ubuntu-Regular',
                     marginTop: 4,
                     textAlign: 'justify',
+                    color: '#4AB2EF',
+                  }}
+                  onPress={async () => {
+                    const logradouroFormatado = objetoPedido?.logradouro
+                      .split(' ')
+                      .join('+');
+                    const respostaAxios = await axios.get(
+                      `https://maps.googleapis.com/maps/api/geocode/json?address=${
+                        objetoPedido?.numero_local
+                      }+${logradouroFormatado},+${localidade},+${uf}&key=${'AIzaSyARpgEngeu2k129CS3cdlp4HjTUhKyPblU'}`,
+                    );
+                    console.log(
+                      respostaAxios.data,
+                      'jjjjjjjjjjjjjjjjjjjjjjjjj',
+                      logradouroFormatado,
+                    );
+
+                    const coordenadasEndereco =
+                      respostaAxios.data.results[0].geometry.location;
+                    const scheme = Platform.select({
+                      ios: 'maps:0,0?q=',
+                      android: 'geo:0,0?q=',
+                    });
+                    const latLng = `${coordenadasEndereco.lat},${coordenadasEndereco.lng}`;
+                    const label = 'Custom Label';
+                    const url = Platform.select({
+                      ios: `${scheme}${label}@${latLng}`,
+                      android: `${scheme}${latLng}(${label})`,
+                    });
+                    Linking.openURL(url);
                   }}
                 >
-                  {objetoPedido.logradouro}, nº {objetoPedido.numero_local},{' '}
-                  {objetoPedido.bairro}, {city}
+                  {objetoPedido?.logradouro}, nº {objetoPedido?.numero_local},{' '}
+                  {objetoPedido?.bairro}, {city}
                 </Text>
               </>
             ) : (
@@ -665,12 +830,17 @@ const OrderDetails: React.FC = () => {
               marginBottom: 20,
             }}
           />
-          {objetoPedido.status_pedido === 'Reserva confirmada' && (
+          {objetoPedido?.status_pedido === 'Reserva confirmada' && (
             <ButtonWrapper>
-              <Button loading={loading} onPress={() => confirmOrder()}>
+              <Button
+                enabled={!loading}
+                loading={loading}
+                onPress={() => confirmOrder()}
+              >
                 <ButtonText>Confirmar Reserva</ButtonText>
               </Button>
               <ButtonCancel
+                enabled={!loadingCancel}
                 loading={loadingCancel}
                 onPress={() => cancelOrder()}
               >
@@ -679,7 +849,7 @@ const OrderDetails: React.FC = () => {
             </ButtonWrapper>
           )}
 
-          {objetoPedido.status_pedido === 'Pendente' ? (
+          {objetoPedido?.status_pedido === 'Pendente' ? (
             <ButtonWrapper>
               <Button loading={loading} onPress={() => confirmOrder()}>
                 <ButtonText>Confirmar Pedido</ButtonText>
@@ -692,14 +862,18 @@ const OrderDetails: React.FC = () => {
               </ButtonCancel>
             </ButtonWrapper>
           ) : null}
-          {objetoPedido.delivery === false ||
-          objetoPedido.status_pedido === 'Pedido em rota de entrega' ||
-          (objetoPedido.status_pedido === 'Pendente' &&
-            objetoPedido.delivery === true) ? null : (
+          {objetoPedido?.delivery === false ||
+          objetoPedido?.status_pedido === 'Pedido em rota de entrega' ||
+          (objetoPedido?.status_pedido === 'Pendente' &&
+            objetoPedido?.delivery === true) ? null : (
             <ButtonWrapper>
-              <Button loading={loading} onPress={() => sendingOrder()}>
+              <Button
+                enabled={!loading}
+                loading={loading}
+                onPress={() => sendingOrder()}
+              >
                 <ButtonText>
-                  <Icon name="motorcycle" size={18} /> A Caminho
+                  <Icon name="truck" size={18} /> A Caminho
                 </ButtonText>
               </Button>
             </ButtonWrapper>
@@ -718,11 +892,11 @@ export default OrderDetails;
   /* <ButtonShareLocalization
                 onPress={() => {
                   Linking.canOpenURL(
-                    `whatsapp://send?text=${objetoPedido.address}`,
+                    `whatsapp://send?text=${objetoPedido?.address}`,
                   ).then((response) =>
                     response
                       ? Linking.openURL(
-                          `whatsapp://send?text=${objetoPedido.address}`,
+                          `whatsapp://send?text=${objetoPedido?.address}`,
                         )
                       : Alert.alert(
                           'Aviso',

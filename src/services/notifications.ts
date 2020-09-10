@@ -27,9 +27,11 @@ async function onOpened(openResult: OpenResult): Promise<void> {
 
           break;
         case 'Cancelado':
+          console.log('tesssssssssssssssste');
           navigate('HistoryDetails', {
             itemId: data.pedido_id,
           });
+          break;
         default:
           break;
       }

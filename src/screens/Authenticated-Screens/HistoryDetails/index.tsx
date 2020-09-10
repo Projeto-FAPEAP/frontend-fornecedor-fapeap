@@ -423,8 +423,8 @@ const HistoryDetails: React.FC = () => {
               }}
             />
 
-            {itemsList.map((item) => (
-              <>
+            {itemsList?.map((item) => (
+              <View key={item.id}>
                 <View
                   style={{
                     marginVertical: 10,
@@ -463,7 +463,7 @@ const HistoryDetails: React.FC = () => {
                     marginBottom: 10,
                   }}
                 />
-              </>
+              </View>
             ))}
           </View>
 

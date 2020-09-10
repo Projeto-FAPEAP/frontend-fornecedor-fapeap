@@ -57,14 +57,15 @@ const User: React.FC = () => {
   }
   function logOutt(): void {
     Alert.alert(
-      'Deseja mesmo sair?',
-      'Você será redirecionado a tela inicial',
+      'Sair da conta',
+      'Você realmente deseja sair de sua conta?',
       [
+        { text: 'Sim', onPress: () => logOut() },
         {
           text: 'Cancelar',
+          onPress: () => {},
           style: 'cancel',
         },
-        { text: 'Sim', onPress: () => logOut() },
       ],
       { cancelable: false },
     );

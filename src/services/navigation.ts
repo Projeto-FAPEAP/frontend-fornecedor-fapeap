@@ -15,6 +15,10 @@ export function navigate(name: string, params: ParamListBase): void {
   navigationRef.current?.navigate(name, params);
 }
 
+export function navigateNoParams(name: string): void {
+  navigationRef.current?.navigate(name);
+}
+
 export function useNavigationTopLevel(): INavigationTopLevelData {
   return {
     navigate,

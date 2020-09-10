@@ -11,7 +11,7 @@ export default {
     danger: '#FF4646',
     warning: '#FFD500',
 
-    background: '#E5E5E5',
+    background: '#fff',
     border: '#eee',
 
     title: '#444',
