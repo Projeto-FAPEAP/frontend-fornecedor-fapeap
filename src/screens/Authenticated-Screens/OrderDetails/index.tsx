@@ -15,6 +15,7 @@ import {
   Linking,
   TouchableOpacity,
   ActivityIndicator,
+  Share,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -113,6 +114,7 @@ const OrderDetails: React.FC = () => {
   const [city, setCity] = React.useState('');
   const [localidade, setLoacalidade] = React.useState('');
   const [uf, setUf] = React.useState('');
+  const [cep, setCep] = useState('');
   const { getAllOrders } = useContext(OrderContext);
 
   useEffect(() => {
@@ -217,7 +219,7 @@ const OrderDetails: React.FC = () => {
       setObjetoPedido(response.data.objPedido);
       setItemList(response.data.itensPedido);
       getCityAndUf(response.data.objPedido.cep);
-
+      setCep(response.data.objPedido.cep);
       console.log(JSON.stringify(response.data, null, 2));
     } catch (error) {
       setLoading(false);
@@ -523,6 +525,35 @@ const OrderDetails: React.FC = () => {
       });
   }
 
+  async function onShare(): Promise<void> {
+    try {
+      const logradouroFormatado = objetoPedido?.logradouro.split(' ').join('+');
+      const respostaAxios = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${
+          objetoPedido?.numero_local
+        }+${logradouroFormatado},+${localidade},+${uf}&key=${'AIzaSyARpgEngeu2k129CS3cdlp4HjTUhKyPblU'}`,
+      );
+      const coordenadasEndereco =
+        respostaAxios.data.results[0].geometry.location;
+
+      const url = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`;
+      const result = await Share.share({
+        message: url,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
   return (
     <Container>
       {!initializing ? (
@@ -538,23 +569,35 @@ const OrderDetails: React.FC = () => {
             {objetoPedido?.status_pedido !== 'Pendente' &&
             objetoPedido?.delivery ? (
               <TouchableOpacity
-                onPress={() => {
+                onPress={async () => {
+                  onShare();
+                  /* const logradouroFormatado = objetoPedido?.logradouro
+                    .split(' ')
+                    .join('+');
+                  console.log(logradouroFormatado, 'jjjjjjjjjjjjjjjjjjjjjjjjo');
+                  const respostaAxios = await axios.get(
+                    `https://maps.googleapis.com/maps/api/geocode/json?address=${
+                      objetoPedido?.numero_local
+                    }+${logradouroFormatado},+${localidade},+${uf}&key=${'AIzaSyARpgEngeu2k129CS3cdlp4HjTUhKyPblU'}`,
+                  );
+                  const coordenadasEndereco =
+                    respostaAxios.data.results[0].geometry.location; */
+                  /* const url = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`; */
+                  // const url = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`;
+                  /* const url = `https://www.google.com.br/maps/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`; */
+                  /* console.log(url, 'jjjjjjjjjjjjjjjjj');
                   Linking.canOpenURL(
-                    `whatsapp://send?text=${objetoPedido?.logradouro}, nº
-                    ${objetoPedido?.numero_local},{' '}
-                    ${objetoPedido?.bairro}, ${city}`,
+                    `whatsapp://send?text=${url}`,
                   ).then((response) =>
                     response
                       ? Linking.openURL(
-                          `whatsapp://send?text=${objetoPedido?.logradouro}, nº
-                          ${objetoPedido?.numero_local},{' '}
-                          ${objetoPedido?.bairro}, ${city}`,
+                          `whatsapp://send?text=https://www.google.com.br/maps/place/Rua+Dr+Braulino,+1325+-+Zerão,+Macapá+-+AP,+68903022/@-0.003605,-51.0900899,17z`,
                         )
                       : Alert.alert(
                           'Aviso',
                           'Instale o whatsapp para utilizar esta função!!',
                         ),
-                  );
+                  ); */
                 }}
                 style={{
                   flexDirection: 'row',
@@ -796,11 +839,12 @@ const OrderDetails: React.FC = () => {
                       ios: 'maps:0,0?q=',
                       android: 'geo:0,0?q=',
                     });
+                    const urll = `https://www.google.com.br/maps/place/${logradouroFormatado},+${objetoPedido?.numero_local}+-+${objetoPedido?.bairro},+${localidade}+-+${uf},+${cep}/@${coordenadasEndereco.lat},${coordenadasEndereco.lng},17z`;
                     const latLng = `${coordenadasEndereco.lat},${coordenadasEndereco.lng}`;
                     const label = 'Custom Label';
                     const url = Platform.select({
                       ios: `${scheme}${label}@${latLng}`,
-                      android: `${scheme}${latLng}(${label})`,
+                      android: urll,
                     });
                     Linking.openURL(url);
                   }}
