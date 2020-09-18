@@ -89,7 +89,7 @@ const EditProduct: React.FC = () => {
         formRef.current?.setData({
           nome,
           preco: `R$ ${preco}`,
-          status_produto: status_produto ? 'Disponivel' : 'Indisponivel',
+          status_produto: status_produto ? 'Disponívelme ' : 'Indisponivel',
           unidade_medida,
           estoque_produto: String(estoque_produto),
         });

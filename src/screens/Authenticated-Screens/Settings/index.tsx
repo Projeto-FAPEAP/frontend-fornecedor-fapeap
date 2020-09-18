@@ -14,7 +14,7 @@ import ImagePicker, {
   ImagePickerOptions,
 } from 'react-native-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import MediaMeta from 'react-native-media-meta';
+// import MediaMeta from 'react-native-media-meta';
 import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
@@ -511,7 +511,7 @@ const Settings: React.FC = () => {
             };
           }
         });
-        setFiles(responseFiles); 
+        setFiles(responseFiles);
         u = 0;
         for (let i = 0; i < response.data.arquivos.length; i += 1) {
           if (response.data.arquivos[i].arquivo_tipo === 'video') {

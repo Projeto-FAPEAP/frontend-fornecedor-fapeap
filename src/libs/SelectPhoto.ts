@@ -14,6 +14,7 @@ const options = {
   chooseFromLibraryButtonTitle: 'Escolher da galeria',
   takePhotoButtonTitle: 'Tirar nova foto',
   storageOptions: {
+    privateDirectory: true,
     skipBackup: true,
     path: 'images',
   },
@@ -49,10 +50,10 @@ export default async function SelectPhoto(): Promise<ImagePickerResponse | null>
     new Promise((resolve) => {
       ImagePicker.showImagePicker(options, (response) => {
         if (response.didCancel) {
-          // console.log('User cancelled image picker');
+          console.log('User cancelled image picker');
           Toast.show('Operação cancelada', Toast.SHORT, ['UIAlertController']);
         } else if (response.error) {
-          // console.log('ImagePicker Error: ', response.error);
+          console.log('ImagePicker Error: ', response.error);
           Toast.show(
             'Ocorreu um erro ao selecionar a foto, tente novamente',
             Toast.SHORT,

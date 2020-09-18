@@ -68,6 +68,20 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
           marginTop: 15,
           maxWidth: 350,
         }}
+        icon="hash"
+        label="Número do estabelecimento"
+        name="numero_local"
+        placeholder="Número do estabelecimento"
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="next"
+        onSubmitEditing={() => focusTargetInput('cidade')}
+      />
+      <Input
+        containerStyle={{
+          marginTop: 15,
+          maxWidth: 350,
+        }}
         icon="map"
         editable={false}
         label="Logradouro"
@@ -91,20 +105,6 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         placeholder="Bairro"
         returnKeyType="send"
         onSubmitEditing={() => focusTargetInput('numero_local')}
-      />
-      <Input
-        containerStyle={{
-          marginTop: 15,
-          maxWidth: 350,
-        }}
-        icon="hash"
-        label="Número da casa"
-        name="numero_local"
-        placeholder="Número da casa"
-        autoCapitalize="none"
-        autoCorrect={false}
-        returnKeyType="next"
-        onSubmitEditing={() => focusTargetInput('cidade')}
       />
       <Input
         containerStyle={{
