@@ -250,47 +250,124 @@ const OrderDetails: React.FC = () => {
     }
   }, [routeParams.itemId]);
 
-  async function confirmOrder(): Promise<void> {
-    setLoading(true);
-    try {
-      const response = await api.put(
-        `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
-      );
-      console.log(JSON.stringify(response.data, null, 2));
+  async function finalizeOrder(): Promise<void> {
+    Alert.alert(
+      'Finalizar pedido',
+      'Você realmente deseja finalizar o pedido?',
+      [
+        {
+          text: 'Sim',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              const response = await api.put(
+                `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
+              );
+              console.log(JSON.stringify(response.data, null, 2));
 
-      getAllOrders().then((response) => {
-        setLoading(false);
-        Alert.alert('Aviso', 'Confirmado!!', [
-          {
-            text: 'Ok',
-            onPress: () => navigation.navigate('Index'),
-            style: 'default',
+              getAllOrders().then((response) => {
+                setLoading(false);
+                Alert.alert('Aviso', 'Finalizado!!', [
+                  {
+                    text: 'Ok',
+                    onPress: () => navigation.navigate('Index'),
+                    style: 'default',
+                  },
+                ]);
+              });
+            } catch (error) {
+              setLoading(false);
+              console.log(JSON.stringify(error, null, 2));
+              console.log(error, 'jonathan');
+              console.log(Object(error.response), 'salve');
+              Alert.alert(error.response.data.error);
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            }
           },
-        ]);
-      });
-    } catch (error) {
-      setLoading(false);
-      console.log(JSON.stringify(error, null, 2));
-      console.log(error, 'jonathan');
-      console.log(Object(error.response), 'salve');
-      Alert.alert(error.response.data.error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
-      }
-      console.log(error.config);
-    }
+        },
+        {
+          text: 'Cancelar',
+          onPress: () => {},
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false },
+    );
+  }
+
+  async function confirmOrder(): Promise<void> {
+    Alert.alert(
+      'Confirmar pedido',
+      'Você realmente deseja confirmar o pedido?',
+      [
+        {
+          text: 'Sim',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              const response = await api.put(
+                `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
+              );
+              console.log(JSON.stringify(response.data, null, 2));
+
+              getAllOrders().then((response) => {
+                setLoading(false);
+                Alert.alert('Aviso', 'Confirmado!!', [
+                  {
+                    text: 'Ok',
+                    onPress: () => navigation.navigate('Index'),
+                    style: 'default',
+                  },
+                ]);
+              });
+            } catch (error) {
+              setLoading(false);
+              console.log(JSON.stringify(error, null, 2));
+              console.log(error, 'jonathan');
+              console.log(Object(error.response), 'salve');
+              Alert.alert(error.response.data.error);
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            }
+          },
+        },
+        {
+          text: 'Cancelar',
+          onPress: () => {},
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false },
+    );
   }
 
   /* async function getAllItems(): Promise<void> {
@@ -418,94 +495,128 @@ const OrderDetails: React.FC = () => {
   } */
 
   async function cancelOrder(): Promise<void> {
-    setLoadingCancel(true);
-    try {
-      const response = await api.put(
-        `${api.defaults.baseURL}/cancelarpedidos/${routeParams.itemId}`,
-      );
-      console.log(JSON.stringify(response.data, null, 2));
+    Alert.alert(
+      'Cancelar pedido',
+      'Você realmente deseja cancelar o pedido?',
+      [
+        {
+          text: 'Sim',
+          onPress: async () => {
+            setLoadingCancel(true);
+            try {
+              const response = await api.put(
+                `${api.defaults.baseURL}/cancelarpedidos/${routeParams.itemId}`,
+              );
+              console.log(JSON.stringify(response.data, null, 2));
 
-      getAllOrders().then((response) => {
-        setLoadingCancel(false);
-        Alert.alert('Aviso', 'Cancelado!!', [
-          {
-            text: 'Ok',
-            onPress: () => navigation.navigate('Index'),
-            style: 'default',
+              getAllOrders().then((response) => {
+                setLoadingCancel(false);
+                Alert.alert('Aviso', 'Cancelado!!', [
+                  {
+                    text: 'Ok',
+                    onPress: () => navigation.navigate('Index'),
+                    style: 'default',
+                  },
+                ]);
+              });
+            } catch (error) {
+              setLoading(false);
+              console.log(JSON.stringify(error, null, 2));
+              console.log(error, 'jonathan');
+              console.log(Object(error.response), 'salve');
+              Alert.alert(error.response.data.error);
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            }
           },
-        ]);
-      });
-    } catch (error) {
-      setLoading(false);
-      console.log(JSON.stringify(error, null, 2));
-      console.log(error, 'jonathan');
-      console.log(Object(error.response), 'salve');
-      Alert.alert(error.response.data.error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
-      }
-      console.log(error.config);
-    }
+        },
+        {
+          text: 'Cancelar',
+          onPress: () => {},
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false },
+    );
   }
 
   async function sendingOrder(): Promise<void> {
-    setLoading(true);
-    try {
-      const response = await api.put(
-        `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
-      );
-      console.log(JSON.stringify(response.data, null, 2));
+    Alert.alert(
+      'Informar que o pedido está a caminho',
+      'Você realmente deseja confirmar que o pedido está a caminho?',
+      [
+        {
+          text: 'Sim',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              const response = await api.put(
+                `${api.defaults.baseURL}/validarpedidos/${routeParams.itemId}`,
+              );
+              console.log(JSON.stringify(response.data, null, 2));
 
-      getAllOrders().then((response) => {
-        setLoading(false);
+              getAllOrders().then((response) => {
+                setLoading(false);
 
-        Alert.alert(
-          'Aviso',
-          'O cliente foi informado que o entregador está a caminho!!',
-          [
-            {
-              text: 'Ok',
-              onPress: () => navigation.navigate('Index'),
-              style: 'default',
-            },
-          ],
-        );
-      });
-    } catch (error) {
-      setLoading(false);
-      console.log(JSON.stringify(error, null, 2));
-      console.log(error, 'jonathan');
-      console.log(Object(error.response), 'salve');
-      Alert.alert(error.response.data.error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
-      }
-      console.log(error.config);
-    }
+                Alert.alert(
+                  'Aviso',
+                  'O cliente foi informado que o entregador está a caminho!!',
+                  [
+                    {
+                      text: 'Ok',
+                      onPress: () => navigation.navigate('Index'),
+                      style: 'default',
+                    },
+                  ],
+                );
+              });
+            } catch (error) {
+              setLoading(false);
+              console.log(JSON.stringify(error, null, 2));
+              console.log(error, 'jonathan');
+              console.log(Object(error.response), 'salve');
+              Alert.alert(error.response.data.error);
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            }
+          },
+        },
+        {
+          text: 'Cancelar',
+          onPress: () => {},
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false },
+    );
   }
 
   function getCityAndUf(cep: string): void {
@@ -888,17 +999,10 @@ const OrderDetails: React.FC = () => {
               <Button
                 enabled={!loading}
                 loading={loading}
-                onPress={() => confirmOrder()}
+                onPress={() => finalizeOrder()}
               >
-                <ButtonText>Confirmar Reserva</ButtonText>
+                <ButtonText>Finalizar Pedido</ButtonText>
               </Button>
-              <ButtonCancel
-                enabled={!loadingCancel}
-                loading={loadingCancel}
-                onPress={() => cancelOrder()}
-              >
-                <ButtonText>Cancelar Reserva</ButtonText>
-              </ButtonCancel>
             </ButtonWrapper>
           )}
 
