@@ -101,7 +101,6 @@ const FormStep3: React.FC<IFormStep3Props> = (props) => {
         label="Número da casa"
         name="numero_local"
         placeholder="Número da casa"
-        editable={false}
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="next"

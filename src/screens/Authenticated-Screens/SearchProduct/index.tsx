@@ -100,8 +100,17 @@ const Products: React.FC = () => {
     }
   }
 
+  /*   function busca(text) {
+    const filter = empresas.filter((value) => {
+      return String(value.nome_fantasia)
+        .toUpperCase()
+        .includes(String(text).toUpperCase());
+    });
+    setEmpresas(filter);
+  } */
+
   function handleSearch(): void {
-    const aux: Products[] = [];
+    /* const aux: Products[] = [];
     let k = 0;
     for (let i = 0; i < productsList!.length; i += 1) {
       if (productsList![i].nome.match(new RegExp(`^${search}`, 'i'))) {
@@ -111,15 +120,21 @@ const Products: React.FC = () => {
         k += 1;
         console.log(JSON.stringify(aux[i], null, 2));
       }
-    }
-    if (aux.length === 0) {
+    } */
+    const filter = productsList?.filter((value) => {
+      return String(value.nome)
+        .toUpperCase()
+        .includes(String(search).toUpperCase());
+    });
+
+    if (filter?.length === 0) {
       setFound(true);
-      setProductsListResult(aux);
+      setProductsListResult(filter);
     } else {
       setFound(false);
-      setProductsListResult(aux);
+      setProductsListResult(filter);
     }
-    console.log(aux.length);
+    /* console.log(aux.length); */
   }
 
   useEffect(() => {
