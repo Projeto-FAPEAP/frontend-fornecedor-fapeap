@@ -65,8 +65,14 @@ const EditProduct: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const { colors } = useTheme();
   const { user } = useAuth();
-  const { goBack } = useNavigation();
-  const { getAllProducts } = useProducts();
+  const { goBack, navigate } = useNavigation();
+  const {
+    getAllProducts,
+    editProduct,
+    productList,
+    removeProduct,
+    editProductMedia,
+  } = useProducts();
   const [files, setFiles] = React.useState<IFile[]>([]);
 
   const routeParams = params as IParams;
@@ -89,7 +95,7 @@ const EditProduct: React.FC = () => {
         formRef.current?.setData({
           nome,
           preco: `R$ ${preco}`,
-          status_produto: status_produto ? 'Disponívelme ' : 'Indisponivel',
+          status_produto: status_produto ? 'Disponível' : 'Indisponivel',
           unidade_medida,
           estoque_produto: String(estoque_produto),
         });
@@ -120,11 +126,11 @@ const EditProduct: React.FC = () => {
       });
   }, [routeParams.itemId, user]);
 
-  React.useEffect(() => {
+  /* React.useEffect(() => {
     return () => {
       getAllProducts();
     };
-  }, [getAllProducts]);
+  }, [getAllProducts]); */
 
   const handleSubmit = React.useCallback(
     async (values: ISubmit) => {
@@ -164,18 +170,26 @@ const EditProduct: React.FC = () => {
         const { estoque_produto } = values;
 
         const formattedPrice = preco.split('R$ ')[1];
-
-        await api.put(`/produto/${routeParams.itemId}`, {
+        console.log(status_produto, 'trrrrrrrrrrrrr');
+        const response = await api.put(`/produto/${routeParams.itemId}`, {
           nome,
           preco: formattedPrice,
           status_produto: status_produto === 'Disponível',
           unidade_medida,
           estoque_produto,
         });
-
+        editProduct(response.data);
+        console.log(JSON.stringify(productList, null, 2), 'hjhjhjhg');
         Alert.alert(
           'Tudo certo',
           'As informações do produto foram atualizadas',
+          [
+            {
+              text: 'Ok',
+              onPress: () => navigate('Index'),
+              style: 'default',
+            },
+          ],
         );
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -191,7 +205,8 @@ const EditProduct: React.FC = () => {
   const handleDelete = React.useCallback(async () => {
     setLoading(true);
     try {
-      await api.delete(`/produto/${routeParams.itemId}`);
+      const response = await api.delete(`/produto/${routeParams.itemId}`);
+      removeProduct(routeParams.itemId);
       Alert.alert('Tudo certo', 'Produto excluído com sucesso');
       goBack();
     } catch {
@@ -210,7 +225,7 @@ const EditProduct: React.FC = () => {
   }, []);
 
   const handleSaveImage = React.useCallback(
-    async (file: IFile, idx: number) => {
+    async (file: IFile, idx: number, nextFile: IFile) => {
       const photo = await SelectPhoto();
 
       if (!photo) return;
@@ -245,6 +260,13 @@ const EditProduct: React.FC = () => {
                 : findFile,
             ),
           );
+          if (idx === 0) {
+            console.log('esquerda mudando', data.url);
+            editProductMedia(data.url, routeParams.itemId);
+          } else if (idx === 1) {
+            console.log('direita mudando');
+            editProductMedia(data.url, routeParams.itemId);
+          }
         } else {
           const { data } = await api.post<IReponseFile[]>(
             `/arquivoproduto/${routeParams.itemId}`,
@@ -258,7 +280,16 @@ const EditProduct: React.FC = () => {
                 : findFile,
             ),
           );
+
+          if (idx === 0) {
+            console.log('esquerda mudando', data[0].url);
+            editProductMedia(data[0].url, routeParams.itemId);
+          } else if (idx === 1) {
+            console.log('direita mudando');
+            editProductMedia(data[0].url, routeParams.itemId);
+          }
         }
+
         Toast.show('Foto atualizada', Toast.SHORT, ['UIAlertController']);
       } catch (err) {
         Toast.show('Ocorreu um erro ao atualizar', Toast.SHORT, [
@@ -269,27 +300,34 @@ const EditProduct: React.FC = () => {
     [routeParams.itemId],
   );
 
-  const handleDeleteImage = React.useCallback(async (file: IFile) => {
-    try {
-      await api.delete(`/arquivoproduto/${file.id}`);
+  const handleDeleteImage = React.useCallback(
+    async (file: IFile, nextFile: IFile) => {
+      try {
+        await api.delete(`/arquivoproduto/${file.id}`);
 
-      setFiles((state) =>
-        state.map((findFile) =>
-          findFile.id === file.id
-            ? { isFilled: false, url: '', id: '' }
-            : findFile,
-        ),
-      );
-      Toast.show('Foto excluída', Toast.SHORT, ['UIAlertController']);
-    } catch {
-      Toast.show('Ocorreu um erro ao deletar', Toast.SHORT, [
-        'UIAlertController',
-      ]);
-    }
-  }, []);
+        setFiles((state) =>
+          state.map((findFile) =>
+            findFile.id === file.id
+              ? { isFilled: false, url: '', id: '' }
+              : findFile,
+          ),
+        );
+        console.log('alllllllllll');
+        console.log(nextFile.url, 'jjjnhhhhhhh');
+        editProductMedia(nextFile.url, routeParams.itemId);
+        Toast.show('Foto excluída', Toast.SHORT, ['UIAlertController']);
+      } catch {
+        Toast.show('Ocorreu um erro ao deletar', Toast.SHORT, [
+          'UIAlertController',
+        ]);
+      }
+    },
+    [],
+  );
 
   const handleConfirmDelete = React.useCallback(
-    (file: IFile) => {
+    (file: IFile, nextFile: IFile) => {
+      console.log('teste');
       Alert.alert(
         'Confirme para continuar',
         'Deseja confimar a exlusão desta imagem?',
@@ -298,7 +336,10 @@ const EditProduct: React.FC = () => {
             text: 'Cancelar',
             style: 'cancel',
           },
-          { text: 'Sim, delete!', onPress: () => handleDeleteImage(file) },
+          {
+            text: 'Sim, delete!',
+            onPress: () => handleDeleteImage(file, nextFile),
+          },
         ],
         { cancelable: false },
       );
@@ -320,7 +361,16 @@ const EditProduct: React.FC = () => {
       { cancelable: false },
     );
   }, [handleDelete]);
-
+  function getSize(): number {
+    let k = 0;
+    files.forEach((filess) => {
+      if (filess.isFilled) {
+        k += 1;
+      }
+    });
+    console.log(k, 'joantnn');
+    return k;
+  }
   return (
     <KeyboardAwareScrollView>
       <S.Container>
@@ -433,13 +483,25 @@ const EditProduct: React.FC = () => {
           <S.Title>Fotos do produto (até 2 fotos)</S.Title>
 
           <S.ContentPhotos>
-            {files.map((file, idx) => (
+            {files.map((file, idx, elements) => (
               <ButtonPhoto
+                size={getSize()}
                 key={`${file.id}-${idx}`}
                 url={file.url}
                 style={idx > 0 ? { marginLeft: 10 } : {}}
-                onPress={() => handleSaveImage(file, idx)}
-                onRemove={() => handleConfirmDelete(file)}
+                onPress={() =>
+                  handleSaveImage(
+                    file,
+                    idx,
+                    idx > 0 ? elements[0] : elements[idx + 1],
+                  )
+                }
+                onRemove={() =>
+                  handleConfirmDelete(
+                    file,
+                    idx > 0 ? elements[0] : elements[idx + 1],
+                  )
+                }
               />
             ))}
           </S.ContentPhotos>

@@ -101,8 +101,8 @@ const EditProfile: React.FC = () => {
           senhaAtual: Yup.string().when('senha', {
             is: (val) => !!val.length,
             then: Yup.string()
-              .required('Campo obrigatório')
-              .min(5, 'Senha Atual Obrigatória!'),
+              .required('Senha Atual Obrigatória!')
+              .min(5, 'No mínimo 5 caracteres!'),
             otherwise: Yup.string(),
           }),
 

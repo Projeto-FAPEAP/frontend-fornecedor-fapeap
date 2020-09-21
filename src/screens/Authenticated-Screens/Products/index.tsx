@@ -40,9 +40,11 @@ interface IProducts {
 const Products: React.FC = () => {
   const navigation = useNavigation();
   /*  const [loading, setLoading] = useState(false); */
-  const [productsList, setProductsList] = useState<IProducts[] | undefined>([]);
+
   const { user } = useContext(AuthContext);
-  const { productList, getAllProducts, loading } = useContext(ProductContext);
+  const { productList, getAllProducts, loading, isUpdate } = useContext(
+    ProductContext,
+  );
   useEffect(() => {
     setTimeout(function () {
       getAllProducts();
@@ -79,6 +81,7 @@ const Products: React.FC = () => {
               <ListWrapper
                 scrollEnabled
                 data={productList}
+                extraData={isUpdate}
                 refreshing={false}
                 onRefresh={() => getAllProducts()}
                 renderItem={({ item, index }) => (

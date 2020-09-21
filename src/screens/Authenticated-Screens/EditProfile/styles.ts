@@ -35,6 +35,7 @@ export const ButtonSubmit = styled(Button)`
   width: 40%;
   min-width: 40%;
   background-color: ${({ theme }) => theme.colors.success};
+  margin-bottom: 10px;
 `;
 
 export const Line = styled.View`

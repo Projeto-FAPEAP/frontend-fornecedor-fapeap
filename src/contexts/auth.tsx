@@ -31,6 +31,7 @@ interface IUser {
   telefone: string;
   taxa_delivery?: string;
   verificado: boolean;
+  status_aprovado: string;
 }
 
 interface Response {
@@ -41,7 +42,7 @@ interface Response {
 interface IResponseFornecedor {
   fornecedor: IUser;
   tokenFornecedor: string;
-  verificado: boolean;
+  status_aprovado: string;
 }
 
 interface AuthContextData {
@@ -111,17 +112,23 @@ export const AuthProvider: React.FC = ({ children }) => {
             senha: password,
           },
         );
-        console.log(response.data.verificado, 'teste');
-        if (response.data.verificado === false) {
+        console.log(response.data.status_aprovado, 'teste');
+        if (response.data.status_aprovado === 'Em andamento') {
           setLoading(false);
           console.log('entrou aquiii');
           return new Promise((resolve, reject) => {
             resolve({ informacao: 0 });
           });
         }
-        console.log(response.data.fornecedor.verificado, 'teste');
-        if (response.data.fornecedor.verificado === true) {
-          console.log('jonathandsdd', response.data.verificado);
+        if (response.data.status_aprovado === 'Não aprovado') {
+          setLoading(false);
+          console.log('entrou aquiii');
+          return new Promise((resolve, reject) => {
+            resolve({ informacao: 1 });
+          });
+        }
+        if (response.data.fornecedor.status_aprovado === 'Aprovado') {
+          console.log('jonathandsdd', response.data.status_aprovado);
           const { fornecedor, tokenFornecedor } = response.data;
 
           setUser(fornecedor);
@@ -137,7 +144,7 @@ export const AuthProvider: React.FC = ({ children }) => {
           );
           setLoading(false);
           return new Promise((resolve, reject) => {
-            resolve({ informacao: 1 });
+            resolve({ informacao: 2 });
           });
         }
       } catch (error) {

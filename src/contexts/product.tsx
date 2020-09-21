@@ -19,12 +19,18 @@ interface IProducts {
   status_produto: number;
   estoque_produto: number;
   unidade_medida: string | number;
+  arquivos: [{ url: string }];
 }
 
 interface IProductsContextData {
   productList: IProducts[] | null;
   getAllProducts(): Promise<void>;
+  addProduct(product: IProducts): void;
+  editProduct(product: IProducts): Promise<void>;
+  editProductMedia(uri: string, id: string): Promise<void>;
+  removeProduct(id: string): Promise<void>;
   loading: boolean;
+  isUpdate: boolean;
 }
 
 const ProductContext = createContext<IProductsContextData>(
@@ -33,6 +39,7 @@ const ProductContext = createContext<IProductsContextData>(
 export const ProductProvider: React.FC = ({ children }) => {
   const [productList, setProductList] = useState<IProducts[] | null>([]);
   const [loading, setLoading] = useState(true);
+  const [isUpdate, setIsUpdate] = useState(false);
   const { user, signed } = useContext(AuthContext);
   useEffect(() => {
     if (signed) {
@@ -94,8 +101,84 @@ export const ProductProvider: React.FC = ({ children }) => {
     }
   }
 
+  function addProduct(product: IProducts): void {
+    setIsUpdate(true);
+    console.log(JSON.stringify(product, null, 2));
+    const array = productList;
+    array?.push(product);
+    array?.sort();
+    console.log(JSON.stringify(array, null, 2));
+    setProductList(array);
+    setIsUpdate(false);
+  }
+
+  async function removeProduct(id: string): Promise<void> {
+    setIsUpdate(true);
+    let k = 0;
+    const array = productList;
+    array?.forEach((value, index) => {
+      if (value.id === id) {
+        k = index;
+      }
+    });
+    if (k === 0) {
+      array?.shift();
+    } else {
+      array?.splice(k);
+    }
+
+    setProductList(array);
+    setIsUpdate(false);
+  }
+  async function editProduct(product: IProducts): Promise<void> {
+    setIsUpdate(true);
+    const array = productList;
+    console.log(product, 'jjjj');
+    array?.forEach((value) => {
+      if (value.id === product.id) {
+        value.nome = product.nome;
+        value.preco = product.preco;
+        value.status_produto = product.status_produto;
+        value.estoque_produto = product.estoque_produto;
+        value.unidade_medida = product.unidade_medida;
+      }
+    });
+    console.log(JSON.stringify(array, null, 2), 'jjjj');
+
+    setProductList(array);
+    setIsUpdate(false);
+  }
+
+  async function editProductMedia(uri: string, id: string): Promise<void> {
+    setIsUpdate(true);
+    const array = productList;
+    console.log(uri, 'jjjjjjjjjjjjjjjjjjj', id);
+    array?.forEach((value) => {
+      if (value.id === id) {
+        if (value.arquivos[0].url !== uri) {
+          console.log(value.arquivos[0].url, '', uri);
+          value.arquivos[0].url = uri;
+        }
+      }
+    });
+
+    setProductList(array);
+    setIsUpdate(false);
+  }
+
   return (
-    <ProductContext.Provider value={{ getAllProducts, loading, productList }}>
+    <ProductContext.Provider
+      value={{
+        addProduct,
+        editProduct,
+        editProductMedia,
+        getAllProducts,
+        removeProduct,
+        loading,
+        productList,
+        isUpdate,
+      }}
+    >
       {children}
     </ProductContext.Provider>
   );

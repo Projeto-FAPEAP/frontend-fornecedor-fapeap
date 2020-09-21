@@ -45,14 +45,14 @@ const AddProduct: React.FC = () => {
   const formRef = React.useRef<FormHandles>(null);
   const [loading, setLoading] = React.useState(false);
   const { goBack } = useNavigation();
-  const { getAllProducts } = useProducts();
+  const { getAllProducts, addProduct } = useProducts();
   const [files, setFiles] = React.useState<IFile[]>([{}, {}]);
 
-  React.useEffect(() => {
+  /*  React.useEffect(() => {
     return () => {
       getAllProducts();
     };
-  }, [getAllProducts]);
+  }, [getAllProducts]); */
 
   const handleSubmit = React.useCallback(
     async (values: ISubmit) => {
@@ -116,8 +116,8 @@ const AddProduct: React.FC = () => {
         formData.append('status_produto', status_produto === 'Disponível');
         formData.append('unidade_medida', unidade_medida);
 
-        await api.post(`/produto`, formData);
-
+        const response = await api.post(`/produto`, formData);
+        addProduct(response.data);
         Alert.alert('Tudo certo', 'Produto cadastrado com sucesso');
         goBack();
       } catch (err) {

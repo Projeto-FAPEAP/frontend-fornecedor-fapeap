@@ -280,7 +280,7 @@ const OrderDetails: React.FC = () => {
               console.log(JSON.stringify(error, null, 2));
               console.log(error, 'jonathan');
               console.log(Object(error.response), 'salve');
-              Alert.alert(error.response.data.error);
+              Alert.alert('Aviso', error.response.data.error);
               if (error.response) {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
@@ -340,7 +340,7 @@ const OrderDetails: React.FC = () => {
               console.log(JSON.stringify(error, null, 2));
               console.log(error, 'jonathan');
               console.log(Object(error.response), 'salve');
-              Alert.alert(error.response.data.error);
+              Alert.alert('Aviso', error.response.data.error);
               if (error.response) {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
@@ -924,6 +924,12 @@ const OrderDetails: React.FC = () => {
                 >
                   Endereço de entrega
                 </Text>
+                <Icon
+                  name="map-marker"
+                  size={25}
+                  color={colors.primary}
+                  style={{ alignSelf: 'center' }}
+                />
                 <Text
                   style={{
                     fontFamily: 'Ubuntu-Regular',

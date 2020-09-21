@@ -1,4 +1,5 @@
 import React from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { MaskService } from 'react-native-masked-text';
 
 import Input from '@components/Input';
@@ -45,13 +46,15 @@ const Login: React.FC = () => {
 
         logIn(cpf_cnpj, password).then((response) => {
           console.log(response.informacao, 'response do login');
-          if (response.informacao === 0) {
+          if (response.informacao === 0 || response.informacao === 1) {
             console.log(response, 'response do login');
             formRef.current?.setData({
               cpf_cnpj: '',
               password: '',
             });
-            navigation.navigate('WarningValidation');
+            navigation.navigate('WarningValidation', {
+              status_validation: response.informacao,
+            });
           }
         });
       } catch (err) {
@@ -74,9 +77,12 @@ const Login: React.FC = () => {
   }, [navigation]);
 
   return (
-    <KeyboardView>
-      <S.Container>
-        <S.Title>Entre com sua{'\n'}conta</S.Title>
+    <S.Container>
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+        <S.Header>
+          <S.Title>Entre com sua{'\n'}conta</S.Title>
+        </S.Header>
+
         <FormProvider onSubmit={handleSubmit} ref={formRef}>
           <S.Form>
             <Input
@@ -135,8 +141,8 @@ const Login: React.FC = () => {
             <RegisterButtonText>Registre-se aqui</RegisterButtonText>
           </RegisterButton>
         </Footer>
-      </S.Container>
-    </KeyboardView>
+      </KeyboardAwareScrollView>
+    </S.Container>
   );
 };
 
