@@ -190,6 +190,17 @@ const AddProduct: React.FC = () => {
     [handleDeleteImage],
   );
 
+  function getSize(): number {
+    let k = 0;
+    files.forEach((filess) => {
+      if (filess.isFilled) {
+        k += 1;
+      }
+    });
+    console.log(k, 'joantnn');
+    return k;
+  }
+
   return (
     <KeyboardAwareScrollView>
       <S.Container>
@@ -304,6 +315,7 @@ const AddProduct: React.FC = () => {
           <S.ContentPhotos>
             {files.map((file, idx) => (
               <ButtonPhoto
+                size={getSize()}
                 key={`${file.id}-${idx}`}
                 url={file.url}
                 style={idx > 0 ? { marginLeft: 10 } : {}}
