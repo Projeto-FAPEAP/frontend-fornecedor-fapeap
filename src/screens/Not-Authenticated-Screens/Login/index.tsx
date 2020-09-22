@@ -64,7 +64,7 @@ const Login: React.FC = () => {
         }
       }
     },
-    [logIn],
+    [logIn, navigation],
   );
 
   const focusTargetInput = React.useCallback((field: string) => {
@@ -78,7 +78,13 @@ const Login: React.FC = () => {
 
   return (
     <S.Container>
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: 'space-around',
+        }}
+      >
         <S.Header>
           <S.Title>Entre com sua{'\n'}conta</S.Title>
         </S.Header>

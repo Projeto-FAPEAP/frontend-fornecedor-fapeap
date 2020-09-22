@@ -21,62 +21,74 @@ const RecoveryPassword: React.FC = () => {
   const navigation = useNavigation();
   const formRef = React.useRef<FormHandles>(null);
   const [loading, setLoading] = React.useState(false);
-  const handleSubmit = React.useCallback(async (data: ISubmitForm) => {
-    formRef.current?.setErrors({});
-    try {
-      const schema = Yup.object().shape({
-        cpf_cnpj: Yup.string().required('CPF/CNPJ é obrigatório'),
-      });
-
-      await schema.validate(data, { abortEarly: false });
-
-      const { cpf_cnpj } = data;
-      setLoading(true);
+  const handleSubmit = React.useCallback(
+    async (data: ISubmitForm) => {
+      formRef.current?.setErrors({});
       try {
-        const response = await api.post('/sessao/fornecedor/reset_senha', {
-          cpf_cnpj,
+        const schema = Yup.object().shape({
+          cpf_cnpj: Yup.string().required('CPF/CNPJ é obrigatório'),
         });
-        console.log(response.data);
-        Alert.alert('Verifique seu email', response.data.message);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        if (error.message === 'Network Error') {
-          Alert.alert('Verifique sua conexão de internet e tente novamente!!');
-        } else {
-          console.log(JSON.stringify(error, null, 2));
-          console.log(error, 'jonathan');
-          console.log(Object(error.response), 'salve');
-          Alert.alert(error.response.data.error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
+
+        await schema.validate(data, { abortEarly: false });
+
+        const { cpf_cnpj } = data;
+        setLoading(true);
+
+        try {
+          const response = await api.post('/sessao/fornecedor/reset_senha', {
+            cpf_cnpj,
+          });
+          console.log(response.data);
+          Alert.alert('Verifique seu email', response.data.message);
+
+          setLoading(false);
+          navigation.goBack();
+        } catch (error) {
+          setLoading(false);
+          if (error.message === 'Network Error') {
+            Alert.alert(
+              'Verifique sua conexão de internet e tente novamente!!',
+            );
           } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
+            console.log(JSON.stringify(error, null, 2));
+            console.log(error, 'jonathan');
+            console.log(Object(error.response), 'salve');
+            Alert.alert(error.response.data.error);
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+            } else if (error.request) {
+              // The request was made but no response was received
+              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+              // http.ClientRequest in node.js
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              console.log('Error', error.message);
+            }
+            console.log(error.config);
           }
-          console.log(error.config);
+        }
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
         }
       }
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
-      }
-    }
-  }, []);
+    },
+    [navigation],
+  );
 
   return (
-    <Container>
-      <KeyboardAwareScrollView>
+    <KeyboardAwareScrollView
+      contentContainerStyle={{
+        flex: 1,
+      }}
+    >
+      <Container>
         <Header>
           <Title>Recupere sua{'\n'}senha</Title>
           <P>
@@ -92,7 +104,9 @@ const RecoveryPassword: React.FC = () => {
               name="cpf_cnpj"
               placeholder="CPF/CNPJ associado a sua conta"
               autoCapitalize="none"
-              returnKeyType="next"
+              returnKeyType="send"
+              keyboardType="number-pad"
+              onSubmitEditing={() => formRef.current?.submitForm()}
               containerStyle={{
                 maxWidth: 350,
               }}
@@ -118,8 +132,8 @@ const RecoveryPassword: React.FC = () => {
             </ButtonSubmit>
           </Form>
         </FormProvider>
-      </KeyboardAwareScrollView>
-    </Container>
+      </Container>
+    </KeyboardAwareScrollView>
   );
 };
 

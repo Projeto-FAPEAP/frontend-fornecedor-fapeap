@@ -10,12 +10,11 @@ import styled from 'styled-components/native';
 export const Container = styled.SafeAreaView`
   flex: 1;
   margin: 20px;
-  justify-content: space-around;
   align-self: stretch;
 `;
 
 export const Header = styled.View`
-  margin: 20px 10px;
+  margin: 50px 0 20px;
 
   justify-content: space-around;
 `;
@@ -31,7 +30,7 @@ export const Title = styled.Text`
 `;
 
 export const P = styled.Text`
-  padding-top: 5px;
+  margin-top: 15px;
   color: ${(props) => props.theme.colors.subtitle};
   font-family: ${({ theme }) => theme.fonts.Ubuntu.normal};
   font-size: 15px;
