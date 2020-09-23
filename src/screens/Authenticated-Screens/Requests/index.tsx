@@ -33,6 +33,7 @@ import {
   ListRowConfirmed,
   ListRowTotal,
   EmptyView,
+  ButtonReload,
 } from './styles';
 
 interface Orders {
@@ -79,6 +80,9 @@ const Requests: React.FC = () => {
               </EmptyView>
             ) : (
               <View style={{ flex: 1 }}>
+                <ButtonReload onPress={() => getAllOrders()}>
+                  <Icon name="refresh" />
+                </ButtonReload>
                 <ListWrapperOrders>
                   <FlatList
                     data={ordersData}

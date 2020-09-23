@@ -25,6 +25,7 @@ import {
   SearchTextInner,
   SearchInputButton,
   EmptyView,
+  ButtonReload,
 } from './styles';
 
 // import * as S from './styles';
@@ -55,6 +56,9 @@ const Products: React.FC = () => {
     <Container>
       {!loading ? (
         <View style={{ flex: 1 }}>
+          <ButtonReload onPress={() => getAllProducts()}>
+            <Icon name="refresh" />
+          </ButtonReload>
           <SearchWrapper>
             <SearchInputButton
               onPress={() => navigation.navigate('SearchProduct')}

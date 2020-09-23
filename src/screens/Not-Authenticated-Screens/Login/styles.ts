@@ -13,12 +13,6 @@ export const Container = styled.SafeAreaView`
   align-self: stretch;
 `;
 
-export const Header = styled.View`
-  margin: 15% 5px;
-
-  justify-content: space-around;
-`;
-
 export const Title = styled.Text`
   color: ${(props) => props.theme.colors.primary};
   font-family: ${({ theme }) => theme.fonts.Ubuntu.bold};

@@ -1,5 +1,6 @@
 import { FlatList } from 'react-native';
 
+import Button from '@components/Button';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
@@ -15,6 +16,17 @@ export const ListRowTitle = styled.Text`
   font-size: 16px;
   color: #333;
   font-family: ${(props) => props.theme.fonts.Ubuntu.normal};
+`;
+
+export const ButtonReload = styled(Button)`
+  background:${(props) => props.theme.colors.primary}
+  bottom:20px;
+  right:20px
+  position: absolute;
+  height:50px;
+  width:50px;
+  border-radius:120px;
+  z-index:2;
 `;
 
 export const ListRowSubTitle = styled.Text`

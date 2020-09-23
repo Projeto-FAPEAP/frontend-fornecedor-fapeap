@@ -1,5 +1,6 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import ButtonRefresh from '@components/ButtonRefresh';
 import IsEmpty from '@components/IsEmpty';
@@ -116,14 +117,22 @@ const History: React.FC = () => {
   }
 
   return (
-    <FlatList
-      showsVerticalScrollIndicator={false}
-      data={requests}
-      refreshing={false}
-      onRefresh={() => findRequestPerPage(1)}
-      keyExtractor={(item) => String(item.id)}
-      renderItem={({ item: request }) => <CardHistoryItem request={request} />}
-    />
+    <View>
+      <S.ButtonReload onPress={() => findRequestPerPage(1)}>
+        <Icon name="refresh" />
+      </S.ButtonReload>
+
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        data={requests}
+        refreshing={false}
+        onRefresh={() => findRequestPerPage(1)}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item: request }) => (
+          <CardHistoryItem request={request} />
+        )}
+      />
+    </View>
   );
 };
 
